@@ -1,73 +1,152 @@
-# Welcome to your Lovable project
+# 🍣 Sushiro Queue Dashboard
 
-## Project info
+A real-time dashboard for monitoring Sushiro restaurant queue status across Hong Kong locations. Built with Next.js, TypeScript, and modern UI components.
 
-**URL**: https://lovable.dev/projects/4ddecac1-8200-466f-83f3-174e884811b2
+## ✨ Features
 
-## How can I edit this code?
+- **Real-time Queue Monitoring**: Track waiting groups and current queue numbers for each store
+- **Store Status Tracking**: Monitor which stores are open or closed
+- **Multi-language Support**: Display store names in both Chinese and English
+- **Regional Organization**: Stores organized by Hong Kong regions (香港島, 九龍, 新界)
+- **Responsive Design**: Beautiful, modern UI that works on desktop and mobile
+- **Live Updates**: Real-time timestamp tracking for queue data
 
-There are several ways of editing your application.
+## 🛠️ Tech Stack
 
-**Use Lovable**
+- **Framework**: [Next.js 15](https://nextjs.org/) with App Router
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) with [shadcn/ui](https://ui.shadcn.com/)
+- **UI Components**: [Radix UI](https://www.radix-ui.com/) primitives
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Charts**: [Recharts](https://recharts.org/)
+- **Forms**: [React Hook Form](https://react-hook-form.com/) with [Zod](https://zod.dev/)
+- **State Management**: [TanStack Query](https://tanstack.com/query)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/4ddecac1-8200-466f-83f3-174e884811b2) and start prompting.
+## 🚀 Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js 18+ 
+- npm or yarn
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Installation
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/darrenleung1208hk/sushiro-queue-dashboard.git
+   cd sushiro-queue-dashboard
+   ```
 
-Follow these steps:
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+3. **Start the development server**
+   ```bash
+   npm run dev
+   ```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+4. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 📁 Project Structure
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+sushiro-queue-dashboard/
+├── app/                    # Next.js App Router pages
+│   ├── globals.css        # Global styles
+│   ├── layout.tsx         # Root layout
+│   ├── page.tsx           # Home page with dashboard
+│   └── providers.tsx      # Context providers
+├── components/            # React components
+│   ├── Dashboard.tsx      # Main dashboard component
+│   ├── StoreCard.tsx      # Individual store card
+│   └── ui/               # shadcn/ui components
+├── lib/                  # Utility functions and hooks
+│   ├── hooks/           # Custom React hooks
+│   └── utils.ts         # Utility functions
+├── public/              # Static assets
+└── package.json         # Dependencies and scripts
 ```
 
-**Edit a file directly in GitHub**
+## 🏪 Store Data Structure
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Each store in the dashboard includes:
 
-**Use GitHub Codespaces**
+```typescript
+interface Store {
+  shopId: number;           // Unique store identifier
+  storeStatus: "OPEN" | "CLOSED";  // Current store status
+  waitingGroup: number;     // Number of people waiting
+  storeQueue: string[];     // Current queue numbers
+  timestamp: string;        // Last update timestamp
+  name: string;            // Chinese store name
+  nameEn: string;          // English store name
+  address: string;         // Store address
+  region: string;          // Hong Kong region
+  area: string;            // District area
+}
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🎨 UI Components
 
-## What technologies are used for this project?
+The dashboard uses a comprehensive set of UI components from shadcn/ui:
 
-This project is built with:
+- **Cards**: Display store information
+- **Badges**: Show store status and queue numbers
+- **Progress bars**: Visual queue indicators
+- **Accordions**: Collapsible store details
+- **Responsive grid**: Adaptive layout for different screen sizes
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 📱 Responsive Design
 
-## How can I deploy this project?
+The dashboard is fully responsive and optimized for:
+- Desktop computers
+- Tablets
+- Mobile phones
 
-Simply open [Lovable](https://lovable.dev/projects/4ddecac1-8200-466f-83f3-174e884811b2) and click on Share -> Publish.
+## 🚀 Deployment
 
-## Can I connect a custom domain to my Lovable project?
+### Vercel (Recommended)
 
-Yes, you can!
+1. Push your code to GitHub
+2. Connect your repository to [Vercel](https://vercel.com)
+3. Deploy automatically on every push
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### Other Platforms
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+The app can be deployed to any platform that supports Next.js:
+- Netlify
+- Railway
+- DigitalOcean App Platform
+- AWS Amplify
+
+## 🔧 Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## 🙏 Acknowledgments
+
+- [Sushiro](https://www.sushiro.com.hk/) for the restaurant chain
+- [shadcn/ui](https://ui.shadcn.com/) for the beautiful UI components
+- [Next.js](https://nextjs.org/) team for the amazing framework
+
+---
+
+**Note**: This dashboard currently uses sample data. To integrate with real Sushiro queue data, you would need to connect to their API or implement a data fetching mechanism.
