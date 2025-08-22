@@ -1,84 +1,59 @@
-"use client";
+import { Suspense } from 'react';
+import { DashboardClient } from '@/components/DashboardClient';
+import { Store } from '@/components/StoreCard';
 
-import { Dashboard } from "@/components/Dashboard";
-import { Store } from "@/components/StoreCard";
+// Loading component for Suspense fallback
+function DashboardLoading() {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
+        <h2 className="text-2xl font-bold mb-2">Loading Sushiro Dashboard</h2>
+        <p className="text-muted-foreground">Fetching latest queue information...</p>
+      </div>
+    </div>
+  );
+}
+
+// Server component that fetches data on the server
+async function DashboardServer() {
+  try {
+    // Fetch data on the server side using absolute URL
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : 'http://localhost:3000';
+    
+    const response = await fetch(`${baseUrl}/api/stores`, {
+      next: { revalidate: 30 } // Cache for 30 seconds
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch stores');
+    }
+    
+    const result = await response.json();
+    const stores: Store[] = result.data;
+    
+    // Pass the server-fetched data to the client component
+    return <DashboardClient stores={stores} />;
+  } catch (error) {
+    console.error('Error fetching stores on server:', error);
+    // Return error state instead of fallback
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-destructive mb-4">Failed to Load Data</h2>
+          <p className="text-muted-foreground mb-4">Unable to fetch store information from the server.</p>
+        </div>
+      </div>
+    );
+  }
+}
 
 export default function HomePage() {
-  // Sample data based on the provided structure
-  const sampleStores: Store[] = [
-    {
-      shopId: 34,
-      storeStatus: "OPEN",
-      waitingGroup: 62,
-      storeQueue: ["265", "266", "267"],
-      timestamp: "2025-08-17T18:35:23.683+08:00",
-      name: "香港仔利港商場店",
-      nameEn: "Aberdeen Port Centre Shopping Arcade",
-      address: "香港香港仔成都道38號利港商場3樓301號舖",
-      region: "香港島",
-      area: "南區"
-    },
-    {
-      shopId: 42,
-      storeStatus: "OPEN",
-      waitingGroup: 28,
-      storeQueue: ["301", "302"],
-      timestamp: "2025-08-17T18:32:15.421+08:00",
-      name: "銅鑼灣時代廣場店",
-      nameEn: "Causeway Bay Times Square",
-      address: "香港銅鑼灣勿地臣街1號時代廣場地庫1樓B108號舖",
-      region: "香港島",
-      area: "灣仔區"
-    },
-    {
-      shopId: 58,
-      storeStatus: "CLOSED",
-      waitingGroup: 0,
-      storeQueue: [],
-      timestamp: "2025-08-17T18:00:00.000+08:00",
-      name: "旺角朗豪坊店",
-      nameEn: "Mong Kok Langham Place",
-      address: "九龍旺角亞皆老街8號朗豪坊14樓1401號舖",
-      region: "九龍",
-      area: "油尖旺區"
-    },
-    {
-      shopId: 72,
-      storeStatus: "OPEN",
-      waitingGroup: 95,
-      storeQueue: ["401", "402", "403", "404", "405"],
-      timestamp: "2025-08-17T18:40:10.892+08:00",
-      name: "沙田新城市廣場店",
-      nameEn: "Sha Tin New Town Plaza",
-      address: "新界沙田新城市廣場第1期地下G041號舖",
-      region: "新界",
-      area: "沙田區"
-    },
-    {
-      shopId: 89,
-      storeStatus: "OPEN",
-      waitingGroup: 15,
-      storeQueue: ["501"],
-      timestamp: "2025-08-17T18:38:44.256+08:00",
-      name: "中環國際金融中心店",
-      nameEn: "Central IFC Mall",
-      address: "香港中環金融街8號國際金融中心商場2樓2062號舖",
-      region: "香港島",
-      area: "中西區"
-    },
-    {
-      shopId: 103,
-      storeStatus: "OPEN",
-      waitingGroup: 42,
-      storeQueue: ["601", "602", "603"],
-      timestamp: "2025-08-17T18:36:17.734+08:00",
-      name: "尖沙咀海港城店",
-      nameEn: "Tsim Sha Tsui Harbour City",
-      address: "九龍尖沙咀廣東道3-27號海港城海運大廈地下G-K002號舖",
-      region: "九龍",
-      area: "油尖旺區"
-    }
-  ];
-
-  return <Dashboard stores={sampleStores} />;
+  return (
+    <Suspense fallback={<DashboardLoading />}>
+      <DashboardServer />
+    </Suspense>
+  );
 }
