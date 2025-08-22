@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { DashboardClient } from '@/components/DashboardClient';
+import { Dashboard } from '@/components/Dashboard';
 import { Store } from '@/components/StoreCard';
 
 // Loading component for Suspense fallback
@@ -34,8 +34,8 @@ async function DashboardServer() {
     const result = await response.json();
     const stores: Store[] = result.data;
     
-    // Pass the server-fetched data to the client component
-    return <DashboardClient stores={stores} />;
+    // Pass the server-fetched data directly to Dashboard
+    return <Dashboard stores={stores} />;
   } catch (error) {
     console.error('Error fetching stores on server:', error);
     // Return error state instead of fallback
