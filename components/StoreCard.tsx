@@ -75,8 +75,12 @@ export const StoreCard = ({ store }: StoreCardProps) => {
             <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/50 border border-border">
               <Clock className="h-4 w-4 text-muted-foreground" />
               <div>
-                <p className="text-xs text-muted-foreground">Queue</p>
-                <p className="font-semibold text-foreground">{queueLength}</p>
+                <p className="text-xs text-muted-foreground">Current</p>
+                <p className="font-semibold text-foreground">
+                  {store.storeQueue.length > 0
+                    ? `#${store.storeQueue[0]}`
+                    : '--'}
+                </p>
               </div>
             </div>
           </div>
