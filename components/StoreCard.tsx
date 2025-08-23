@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Clock, Users, MapPin } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export interface Store {
   shopId: number;
@@ -22,23 +23,10 @@ interface StoreCardProps {
 export const StoreCard = ({ store }: StoreCardProps) => {
   const isOpen = store.storeStatus === 'OPEN';
   const queueLength = store.storeQueue.length;
-  const hasHighWait = store.waitingGroup > 50;
-
-  const getStatusVariant = () => {
-    if (!isOpen) return 'destructive';
-    if (hasHighWait) return 'secondary';
-    return 'default';
-  };
-
-  const formatTime = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  const hasHighWait = store.waitingGroup >= 20;
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-card to-muted/30">
+    <Card className="group hover:shadow-lg transition-all duration-300 border border-border shadow-sm bg-card">
       <CardContent className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="space-y-1">
@@ -47,7 +35,10 @@ export const StoreCard = ({ store }: StoreCardProps) => {
             </h3>
             <p className="text-sm text-muted-foreground">{store.nameEn}</p>
           </div>
-          <Badge variant={getStatusVariant()} className="shrink-0">
+          <Badge
+            variant={isOpen ? 'default' : 'destructive'}
+            className="shrink-0"
+          >
             {store.storeStatus}
           </Badge>
         </div>
@@ -55,20 +46,41 @@ export const StoreCard = ({ store }: StoreCardProps) => {
         <div className="space-y-4">
           {/* Metrics */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/10">
-              <Users className="h-4 w-4 text-primary" />
+            <div
+              className={cn(
+                'flex items-center gap-2 p-3 rounded-lg border',
+                hasHighWait
+                  ? 'bg-destructive/10 border-destructive/20'
+                  : 'bg-success/10 border-success/20'
+              )}
+            >
+              <Users
+                className={cn(
+                  'h-4 w-4',
+                  hasHighWait ? 'text-destructive' : 'text-primary'
+                )}
+              />
               <div>
                 <p className="text-xs text-muted-foreground">Waiting</p>
-                <p className="font-semibold text-foreground">
+                <p
+                  className={cn(
+                    'font-semibold',
+                    hasHighWait ? 'text-destructive' : 'text-foreground'
+                  )}
+                >
                   {store.waitingGroup}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/50 border border-border">
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/30 border border-border">
               <Clock className="h-4 w-4 text-muted-foreground" />
               <div>
-                <p className="text-xs text-muted-foreground">Queue</p>
-                <p className="font-semibold text-foreground">{queueLength}</p>
+                <p className="text-xs text-muted-foreground">Current</p>
+                <p className="font-semibold text-foreground">
+                  {store.storeQueue.length > 0
+                    ? `#${store.storeQueue[0]}`
+                    : '--'}
+                </p>
               </div>
             </div>
           </div>
@@ -95,7 +107,7 @@ export const StoreCard = ({ store }: StoreCardProps) => {
           )}
 
           {/* Location */}
-          <div className="flex items-start gap-2 pt-2 border-t border-border">
+          <div className="flex items-start gap-2 pt-4 border-t border-border">
             <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
             <div className="space-y-1">
               <p className="text-xs text-muted-foreground">
@@ -105,12 +117,6 @@ export const StoreCard = ({ store }: StoreCardProps) => {
                 {store.address}
               </p>
             </div>
-          </div>
-
-          {/* Timestamp */}
-          <div className="flex justify-between items-center pt-2 text-xs text-muted-foreground">
-            <span>Last updated: {formatTime(store.timestamp)}</span>
-            <span>ID: {store.shopId}</span>
           </div>
         </div>
       </CardContent>
