@@ -151,13 +151,28 @@ export async function GET(
     console.log('Fetching live store data with params:', params);
 
     // Step 1: Fetch store list (equivalent to "Fetch Shops Data" in n8n)
-    const storeList = await fetchStoreList(params);
+    let storeList: StoreListResponse[];
+    try {
+      storeList = await fetchStoreList(params);
+    } catch (storeError) {
+      console.error('Failed to fetch store list:', storeError);
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'STORE_DATA_UNAVAILABLE',
+          message: 'Unable to fetch store information. Please try again later.',
+          timestamp: new Date(),
+          data: [] as Store[],
+        },
+        { status: 503 }
+      );
+    }
 
     if (!storeList.length) {
       return NextResponse.json(
         {
           success: false,
-          error: 'No stores found',
+          error: 'NO_STORES_FOUND',
           message: 'No stores available for the specified parameters',
           timestamp: new Date(),
           data: [] as Store[],
@@ -170,6 +185,8 @@ export async function GET(
 
     // Step 2: Fetch queue data for each store (equivalent to "Loop Over Shops" + "Fetch Store Queue")
     const queueDataMap = new Map<number, QueueResponse | null>();
+    const queueErrors: Array<{ storeId: number; error: string }> = [];
+    let successfulQueueFetches = 0;
 
     // Process stores in parallel with concurrency limit to avoid overwhelming the API
     const concurrencyLimit = 5;
@@ -181,11 +198,25 @@ export async function GET(
 
     for (const chunk of chunks) {
       const promises = chunk.map(async store => {
-        const queueData = await fetchStoreQueue(
-          store.id,
-          params.region || 'HK'
-        );
-        return { storeId: store.id, queueData };
+        try {
+          const queueData = await fetchStoreQueue(
+            store.id,
+            params.region || 'HK'
+          );
+          if (queueData !== null) {
+            successfulQueueFetches++;
+          }
+          return { storeId: store.id, queueData, error: null };
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : 'Unknown error';
+          queueErrors.push({ storeId: store.id, error: errorMessage });
+          console.error(
+            `Failed to fetch queue for store ${store.id}:`,
+            errorMessage
+          );
+          return { storeId: store.id, queueData: null, error: errorMessage };
+        }
       });
 
       const results = await Promise.all(promises);
@@ -203,25 +234,82 @@ export async function GET(
     const processedStores = processStoreData(storeList, queueDataMap);
 
     console.log(`Successfully processed ${processedStores.length} stores`);
+    console.log(
+      `Queue data available for ${successfulQueueFetches}/${storeList.length} stores`
+    );
+
+    // Determine response status based on data availability
+    const hasStoreData = storeList.length > 0;
+    const hasQueueData = successfulQueueFetches > 0;
+    const allDataAvailable = hasStoreData && hasQueueData;
+    const partialDataAvailable = hasStoreData && !hasQueueData;
+
+    let responseStatus: 'success' | 'partial_success' | 'error';
+    let statusCode: number;
+    let message: string;
+    let error: string | undefined;
+
+    if (allDataAvailable) {
+      responseStatus = 'success';
+      statusCode = 200;
+      message = `Successfully fetched complete data for ${processedStores.length} stores`;
+    } else if (partialDataAvailable) {
+      responseStatus = 'partial_success';
+      statusCode = 206; // Partial Content
+      message = `Store data available but queue data is currently unavailable. Showing ${processedStores.length} stores with limited information.`;
+      error = 'QUEUE_DATA_UNAVAILABLE';
+    } else {
+      responseStatus = 'error';
+      statusCode = 503;
+      message = 'Store data is currently unavailable. Please try again later.';
+      error = 'STORE_DATA_UNAVAILABLE';
+    }
+
+    // Add warnings if there were queue fetch errors
+    if (queueErrors.length > 0) {
+      console.warn(
+        `Queue fetch errors for ${queueErrors.length} stores:`,
+        queueErrors
+      );
+      if (responseStatus === 'success') {
+        message += ` Note: Queue data may be incomplete for some stores.`;
+      }
+    }
 
     // Step 4: Return final result
-    const response: ApiResponse<Store[]> = {
-      success: true,
+    const responseData: Partial<ApiResponse<Store[]>> = {
+      success: responseStatus === 'success',
       data: processedStores,
       timestamp: new Date(),
-      message: `Successfully fetched data for ${processedStores.length} stores`,
+      message,
     };
 
-    return NextResponse.json(response);
+    if (error) {
+      responseData.error = error;
+    }
+
+    if (responseStatus === 'partial_success') {
+      responseData.warnings = [
+        `Queue data unavailable for ${storeList.length - successfulQueueFetches} stores`,
+      ];
+      responseData.partialData = true;
+    }
+
+    if (queueErrors.length > 0) {
+      responseData.queueErrors = queueErrors.slice(0, 5); // Limit to first 5 errors to avoid response bloat
+    }
+
+    const response = responseData as ApiResponse<Store[]>;
+
+    return NextResponse.json(response, { status: statusCode });
   } catch (error) {
     console.error('Error in live stores API:', error);
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Internal server error',
-        message:
-          error instanceof Error ? error.message : 'Unknown error occurred',
+        error: 'INTERNAL_SERVER_ERROR',
+        message: 'An unexpected error occurred. Please try again later.',
         timestamp: new Date(),
         data: [] as Store[],
       },

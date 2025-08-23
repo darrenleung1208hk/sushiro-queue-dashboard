@@ -145,6 +145,10 @@ export interface ApiResponse<T> {
   data: T;
   timestamp: Date;
   message?: string;
+  error?: string;
+  warnings?: string[];
+  partialData?: boolean;
+  queueErrors?: Array<{ storeId: number; error: string }>;
 }
 
 export interface ErrorResponse {
