@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Clock, Users, MapPin } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export interface Store {
   shopId: number;
@@ -24,19 +25,6 @@ export const StoreCard = ({ store }: StoreCardProps) => {
   const queueLength = store.storeQueue.length;
   const hasHighWait = store.waitingGroup > 50;
 
-  const getStatusVariant = () => {
-    if (!isOpen) return 'destructive';
-    if (hasHighWait) return 'secondary';
-    return 'default';
-  };
-
-  const formatTime = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 border border-border shadow-sm bg-card">
       <CardContent className="p-6">
@@ -47,7 +35,10 @@ export const StoreCard = ({ store }: StoreCardProps) => {
             </h3>
             <p className="text-sm text-muted-foreground">{store.nameEn}</p>
           </div>
-          <Badge variant={getStatusVariant()} className="shrink-0">
+          <Badge
+            variant={isOpen ? 'default' : 'destructive'}
+            className="shrink-0"
+          >
             {store.storeStatus}
           </Badge>
         </div>
@@ -55,11 +46,28 @@ export const StoreCard = ({ store }: StoreCardProps) => {
         <div className="space-y-4">
           {/* Metrics */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/10">
-              <Users className="h-4 w-4 text-primary" />
+            <div
+              className={cn(
+                'flex items-center gap-2 p-3 rounded-lg border',
+                hasHighWait
+                  ? 'bg-destructive/10 border-destructive/20'
+                  : 'bg-primary/5 border-primary/10'
+              )}
+            >
+              <Users
+                className={cn(
+                  'h-4 w-4',
+                  hasHighWait ? 'text-destructive' : 'text-primary'
+                )}
+              />
               <div>
                 <p className="text-xs text-muted-foreground">Waiting</p>
-                <p className="font-semibold text-foreground">
+                <p
+                  className={cn(
+                    'font-semibold',
+                    hasHighWait ? 'text-destructive' : 'text-foreground'
+                  )}
+                >
                   {store.waitingGroup}
                 </p>
               </div>
