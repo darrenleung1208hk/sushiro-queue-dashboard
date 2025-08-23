@@ -23,7 +23,7 @@ interface StoreCardProps {
 export const StoreCard = ({ store }: StoreCardProps) => {
   const isOpen = store.storeStatus === 'OPEN';
   const queueLength = store.storeQueue.length;
-  const hasHighWait = store.waitingGroup > 50;
+  const hasHighWait = store.waitingGroup >= 20;
 
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 border border-border shadow-sm bg-card">
@@ -51,7 +51,7 @@ export const StoreCard = ({ store }: StoreCardProps) => {
                 'flex items-center gap-2 p-3 rounded-lg border',
                 hasHighWait
                   ? 'bg-destructive/10 border-destructive/20'
-                  : 'bg-primary/5 border-primary/10'
+                  : 'bg-success/10 border-success/20'
               )}
             >
               <Users
@@ -72,7 +72,7 @@ export const StoreCard = ({ store }: StoreCardProps) => {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/50 border border-border">
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/30 border border-border">
               <Clock className="h-4 w-4 text-muted-foreground" />
               <div>
                 <p className="text-xs text-muted-foreground">Current</p>
