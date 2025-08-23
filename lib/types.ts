@@ -18,10 +18,16 @@ export interface StoreListResponse {
 }
 
 export interface QueueResponse {
-  shopId: number;
+  boothQueue: string[];
+  counterQueue: string[];
+  mixedQueue: string[];
+  reservationQueue: string[];
+  reservationCounterQueue: string[];
+  reservationBoothQueue: string[];
   storeQueue: string[];
-  storeStatus: string;
-  waitingGroup: number;
+  storeCounterQueue: string[];
+  storeBoothQueue: string[];
+  separateQueue: number;
 }
 
 // Final processed data structure from n8n workflow
@@ -30,7 +36,7 @@ export interface StoreQueueData {
   storeStatus: string;
   waitingGroup: number;
   storeQueue: string[];
-  timestamp: string;
+  timestamp: Date;
 }
 
 // Enhanced store data with location information
@@ -137,7 +143,7 @@ export type StoreArea = (typeof STORE_AREAS)[keyof typeof STORE_AREAS];
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
-  timestamp: string;
+  timestamp: Date;
   message?: string;
 }
 
