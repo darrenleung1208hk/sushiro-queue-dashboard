@@ -38,7 +38,7 @@ export const StoreCard = ({ store }: StoreCardProps) => {
   };
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-card to-muted/30">
+    <Card className="group hover:shadow-lg transition-all duration-300 border border-border shadow-sm bg-card">
       <CardContent className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="space-y-1">
@@ -95,7 +95,7 @@ export const StoreCard = ({ store }: StoreCardProps) => {
           )}
 
           {/* Location */}
-          <div className="flex items-start gap-2 pt-2 border-t border-border">
+          <div className="flex items-start gap-2 pt-4 border-t border-border">
             <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
             <div className="space-y-1">
               <p className="text-xs text-muted-foreground">
@@ -105,12 +105,6 @@ export const StoreCard = ({ store }: StoreCardProps) => {
                 {store.address}
               </p>
             </div>
-          </div>
-
-          {/* Timestamp */}
-          <div className="flex justify-between items-center pt-2 text-xs text-muted-foreground">
-            <span>Last updated: {formatTime(store.timestamp)}</span>
-            <span>ID: {store.shopId}</span>
           </div>
         </div>
       </CardContent>
