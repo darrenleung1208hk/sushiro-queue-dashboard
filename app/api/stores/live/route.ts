@@ -79,14 +79,7 @@ async function fetchStoreQueue(
   const url = `${CORS_PROXY}?${QUEUE_API}?${queryParams.toString()}`;
 
   try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'Sushiro-Queue-Dashboard/1.0',
-      },
-      next: { revalidate: 15 }, // Cache for 15 seconds (more frequent updates for queue data)
-    });
+    const response = await fetch(url, { next: { revalidate: 15 } });
 
     if (!response.ok) {
       if (response.status === 404) {
@@ -117,15 +110,15 @@ function processStoreData(
 
     return {
       shopId: store.id,
-      storeStatus: store.storeStatus || 'UNKNOWN',
-      waitingGroup: queue?.waitingGroup || store.waitingGroup || 0,
-      storeQueue: queue?.storeQueue || [],
-      timestamp: new Date().toISOString(),
       name: store.name || '',
       nameEn: store.nameEn || '',
+      storeStatus: store.storeStatus || 'UNKNOWN',
+      waitingGroup: store.waitingGroup || 0,
+      storeQueue: queue?.storeQueue || [],
       address: store.address || '',
       region: store.region || '',
       area: store.area || '',
+      timestamp: new Date(),
       latitude: store.latitude,
       longitude: store.longitude,
     };
@@ -166,7 +159,8 @@ export async function GET(
           success: false,
           error: 'No stores found',
           message: 'No stores available for the specified parameters',
-          timestamp: new Date().toISOString(),
+          timestamp: new Date(),
+          data: [] as Store[],
         },
         { status: 404 }
       );
@@ -214,7 +208,7 @@ export async function GET(
     const response: ApiResponse<Store[]> = {
       success: true,
       data: processedStores,
-      timestamp: new Date().toISOString(),
+      timestamp: new Date(),
       message: `Successfully fetched data for ${processedStores.length} stores`,
     };
 
@@ -228,7 +222,8 @@ export async function GET(
         error: 'Internal server error',
         message:
           error instanceof Error ? error.message : 'Unknown error occurred',
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
+        data: [] as Store[],
       },
       { status: 500 }
     );
