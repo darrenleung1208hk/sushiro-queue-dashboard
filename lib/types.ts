@@ -71,20 +71,21 @@ export const STORE_STATUS = {
   OPEN: 'OPEN',
   CLOSED: 'CLOSED',
   BUSY: 'BUSY',
-  MAINTENANCE: 'MAINTENANCE'
+  MAINTENANCE: 'MAINTENANCE',
 } as const;
 
-export type StoreStatus = typeof STORE_STATUS[keyof typeof STORE_STATUS];
+export type StoreStatus = (typeof STORE_STATUS)[keyof typeof STORE_STATUS];
 
 // Queue priority levels based on waiting group size
 export const QUEUE_PRIORITY = {
-  LOW: 'LOW',      // 0-20 people
+  LOW: 'LOW', // 0-20 people
   MEDIUM: 'MEDIUM', // 21-50 people
-  HIGH: 'HIGH',    // 51-100 people
-  EXTREME: 'EXTREME' // 100+ people
+  HIGH: 'HIGH', // 51-100 people
+  EXTREME: 'EXTREME', // 100+ people
 } as const;
 
-export type QueuePriority = typeof QUEUE_PRIORITY[keyof typeof QUEUE_PRIORITY];
+export type QueuePriority =
+  (typeof QUEUE_PRIORITY)[keyof typeof QUEUE_PRIORITY];
 
 // Helper function to determine queue priority
 export function getQueuePriority(waitingGroup: number): QueuePriority {
@@ -99,10 +100,10 @@ export function getQueuePriority(waitingGroup: number): QueuePriority {
 export const STORE_REGIONS = {
   HONG_KONG_ISLAND: '香港島',
   KOWLOON: '九龍',
-  NEW_TERRITORIES: '新界'
+  NEW_TERRITORIES: '新界',
 } as const;
 
-export type StoreRegion = typeof STORE_REGIONS[keyof typeof STORE_REGIONS];
+export type StoreRegion = (typeof STORE_REGIONS)[keyof typeof STORE_REGIONS];
 
 // Store area constants (common areas in Hong Kong)
 export const STORE_AREAS = {
@@ -111,14 +112,14 @@ export const STORE_AREAS = {
   WAN_CHAI: '灣仔區',
   EASTERN: '東區',
   SOUTHERN: '南區',
-  
+
   // Kowloon
   YAU_TSIM_MONG: '油尖旺區',
   SHAM_SHUI_PO: '深水埗區',
   WONG_TAI_SIN: '黃大仙區',
   KOWLOON_CITY: '九龍城區',
   KWUN_TONG: '觀塘區',
-  
+
   // New Territories
   KWAI_TSING: '葵青區',
   TUEN_MUN: '屯門區',
@@ -127,10 +128,10 @@ export const STORE_AREAS = {
   TAI_PO: '大埔區',
   SHA_TIN: '沙田區',
   SAI_KUNG: '西貢區',
-  ISLANDS: '離島區'
+  ISLANDS: '離島區',
 } as const;
 
-export type StoreArea = typeof STORE_AREAS[keyof typeof STORE_AREAS];
+export type StoreArea = (typeof STORE_AREAS)[keyof typeof STORE_AREAS];
 
 // API response wrapper types
 export interface ApiResponse<T> {

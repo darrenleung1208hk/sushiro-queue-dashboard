@@ -1,6 +1,6 @@
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Clock, Users, MapPin } from "lucide-react";
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Clock, Users, MapPin } from 'lucide-react';
 
 export interface Store {
   shopId: number;
@@ -20,20 +20,20 @@ interface StoreCardProps {
 }
 
 export const StoreCard = ({ store }: StoreCardProps) => {
-  const isOpen = store.storeStatus === "OPEN";
+  const isOpen = store.storeStatus === 'OPEN';
   const queueLength = store.storeQueue.length;
   const hasHighWait = store.waitingGroup > 50;
 
   const getStatusVariant = () => {
-    if (!isOpen) return "destructive";
-    if (hasHighWait) return "secondary";
-    return "default";
+    if (!isOpen) return 'destructive';
+    if (hasHighWait) return 'secondary';
+    return 'default';
   };
 
   const formatTime = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
+    return new Date(timestamp).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
@@ -59,7 +59,9 @@ export const StoreCard = ({ store }: StoreCardProps) => {
               <Users className="h-4 w-4 text-primary" />
               <div>
                 <p className="text-xs text-muted-foreground">Waiting</p>
-                <p className="font-semibold text-foreground">{store.waitingGroup}</p>
+                <p className="font-semibold text-foreground">
+                  {store.waitingGroup}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/50 border border-border">
@@ -74,7 +76,9 @@ export const StoreCard = ({ store }: StoreCardProps) => {
           {/* Queue Details */}
           {queueLength > 0 && (
             <div className="space-y-2">
-              <p className="text-xs font-medium text-muted-foreground">Current Queue</p>
+              <p className="text-xs font-medium text-muted-foreground">
+                Current Queue
+              </p>
               <div className="flex flex-wrap gap-1">
                 {store.storeQueue.slice(0, 3).map((ticket, index) => (
                   <Badge key={index} variant="outline" className="text-xs">
@@ -94,8 +98,12 @@ export const StoreCard = ({ store }: StoreCardProps) => {
           <div className="flex items-start gap-2 pt-2 border-t border-border">
             <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
             <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">{store.region} • {store.area}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">{store.address}</p>
+              <p className="text-xs text-muted-foreground">
+                {store.region} • {store.area}
+              </p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {store.address}
+              </p>
             </div>
           </div>
 

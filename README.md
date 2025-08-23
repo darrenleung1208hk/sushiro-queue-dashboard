@@ -26,23 +26,26 @@ A real-time dashboard for monitoring Sushiro restaurant queue status across Hong
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/darrenleung1208hk/sushiro-queue-dashboard.git
    cd sushiro-queue-dashboard
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Start the development server**
+
    ```bash
    npm run dev
    ```
@@ -76,16 +79,16 @@ Each store in the dashboard includes:
 
 ```typescript
 interface Store {
-  shopId: number;           // Unique store identifier
-  storeStatus: "OPEN" | "CLOSED";  // Current store status
-  waitingGroup: number;     // Number of people waiting
-  storeQueue: string[];     // Current queue numbers
-  timestamp: string;        // Last update timestamp
-  name: string;            // Chinese store name
-  nameEn: string;          // English store name
-  address: string;         // Store address
-  region: string;          // Hong Kong region
-  area: string;            // District area
+  shopId: number; // Unique store identifier
+  storeStatus: 'OPEN' | 'CLOSED'; // Current store status
+  waitingGroup: number; // Number of people waiting
+  storeQueue: string[]; // Current queue numbers
+  timestamp: string; // Last update timestamp
+  name: string; // Chinese store name
+  nameEn: string; // English store name
+  address: string; // Store address
+  region: string; // Hong Kong region
+  area: string; // District area
 }
 ```
 
@@ -102,6 +105,7 @@ The dashboard uses a comprehensive set of UI components from shadcn/ui:
 ## 📱 Responsive Design
 
 The dashboard is fully responsive and optimized for:
+
 - Desktop computers
 - Tablets
 - Mobile phones
@@ -117,6 +121,7 @@ The dashboard is fully responsive and optimized for:
 ### Other Platforms
 
 The app can be deployed to any platform that supports Next.js:
+
 - Netlify
 - Railway
 - DigitalOcean App Platform
