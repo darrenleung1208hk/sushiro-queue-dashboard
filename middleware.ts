@@ -2,15 +2,13 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // Allowed origins for API access
-const ALLOWED_ORIGINS = [
-  'http://localhost:3000', // Development
-  'http://localhost:3001', // Alternative dev port
-  'https://your-domain.com', // Production - replace with your actual domain
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS?.split(',').map(origin => origin.trim()) || [
+  'http://localhost:3000', // Default fallback for development
 ];
 
 // Rate limiting configuration
-const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
-const RATE_LIMIT_MAX_REQUESTS = 100; // Max requests per window
+const RATE_LIMIT_WINDOW = parseInt(process.env.RATE_LIMIT_WINDOW || '60000'); // 1 minute default
+const RATE_LIMIT_MAX_REQUESTS = parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'); // Max requests per window
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
 /**
@@ -111,13 +109,14 @@ function checkRateLimit(request: NextRequest): boolean {
 
 export function middleware(request: NextRequest) {
   console.log('🔒 Middleware running for:', request.nextUrl.pathname);
-  
+  console.log('🌍 Allowed origins:', ALLOWED_ORIGINS);
+
   // Only apply to API routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
     console.log('📡 API route detected:', request.nextUrl.pathname);
     console.log('🌐 Origin:', request.headers.get('origin'));
     console.log('📄 Referer:', request.headers.get('referer'));
-    
+
     // Check rate limiting first
     if (!checkRateLimit(request)) {
       console.log('⏰ Rate limit exceeded');
@@ -129,7 +128,7 @@ export function middleware(request: NextRequest) {
       console.log('🚫 Unauthorized origin');
       return createUnauthorizedResponse();
     }
-    
+
     console.log('✅ Request authorized');
   }
 
