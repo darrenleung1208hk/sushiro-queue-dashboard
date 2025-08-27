@@ -14,6 +14,7 @@ export default function DashboardPage() {
   const [error, setError] = useState<Error | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [nextRefreshIn, setNextRefreshIn] = useState(60);
+  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
 
   // Data fetching function
   const fetchStores = useCallback(async () => {
@@ -51,15 +52,19 @@ export default function DashboardPage() {
 
   // Polling logic - refresh every minute
   useEffect(() => {
+    if (!autoRefreshEnabled) return;
+
     const interval = setInterval(() => {
       fetchStores();
     }, 60000); // 60 seconds
 
     return () => clearInterval(interval);
-  }, [fetchStores]);
+  }, [fetchStores, autoRefreshEnabled]);
 
   // Countdown timer
   useEffect(() => {
+    if (!autoRefreshEnabled) return;
+
     const countdown = setInterval(() => {
       setNextRefreshIn(prev => {
         if (prev <= 1) {
@@ -70,7 +75,7 @@ export default function DashboardPage() {
     }, 1000);
 
     return () => clearInterval(countdown);
-  }, []);
+  }, [autoRefreshEnabled]);
 
   // Tab visibility handling - pause countdown when tab is not visible
   useEffect(() => {
@@ -82,7 +87,8 @@ export default function DashboardPage() {
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    return () =>
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
   if (error && stores.length === 0) {
@@ -93,13 +99,15 @@ export default function DashboardPage() {
     return <DashboardLoading />;
   }
 
-  return (
-    <Dashboard
-      stores={stores}
-      isLoading={isLoading}
-      lastUpdated={lastUpdated}
-      nextRefreshIn={nextRefreshIn}
-      onManualRefresh={fetchStores}
-    />
-  );
+      return (
+      <Dashboard 
+        stores={stores} 
+        isLoading={isLoading}
+        lastUpdated={lastUpdated}
+        nextRefreshIn={nextRefreshIn}
+        autoRefreshEnabled={autoRefreshEnabled}
+        onAutoRefreshToggle={setAutoRefreshEnabled}
+        onManualRefresh={fetchStores}
+      />
+    );
 }

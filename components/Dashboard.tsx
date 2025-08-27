@@ -10,6 +10,8 @@ import {
   Users,
   Clock,
   RefreshCw,
+  Pause,
+  Play,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -18,6 +20,8 @@ interface DashboardProps {
   isLoading?: boolean;
   lastUpdated?: Date | null;
   nextRefreshIn?: number;
+  autoRefreshEnabled?: boolean;
+  onAutoRefreshToggle?: (enabled: boolean) => void;
   onManualRefresh?: () => void;
 }
 
@@ -26,6 +30,8 @@ export const Dashboard = ({
   isLoading = false,
   lastUpdated,
   nextRefreshIn = 60,
+  autoRefreshEnabled = true,
+  onAutoRefreshToggle,
   onManualRefresh,
 }: DashboardProps) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -108,18 +114,39 @@ export const Dashboard = ({
               </span>
             </div>
 
-            {onManualRefresh && (
-              <button
-                onClick={onManualRefresh}
-                disabled={isLoading}
-                className="ml-auto flex items-center gap-2 px-3 py-1 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <RefreshCw
-                  className={cn('h-4 w-4', isLoading && 'animate-spin')}
-                />
-                Refresh
-              </button>
-            )}
+            <div className="ml-auto flex items-center gap-2">
+              {onAutoRefreshToggle && (
+                <button
+                  onClick={() => onAutoRefreshToggle(!autoRefreshEnabled)}
+                  className="flex items-center gap-2 px-3 py-1 text-sm bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/80 transition-colors"
+                >
+                  {autoRefreshEnabled ? (
+                    <>
+                      <Pause className="h-4 w-4" />
+                      Pause
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4" />
+                      Resume
+                    </>
+                  )}
+                </button>
+              )}
+
+              {onManualRefresh && (
+                <button
+                  onClick={onManualRefresh}
+                  disabled={isLoading}
+                  className="flex items-center gap-2 px-3 py-1 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <RefreshCw
+                    className={cn('h-4 w-4', isLoading && 'animate-spin')}
+                  />
+                  Refresh
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
