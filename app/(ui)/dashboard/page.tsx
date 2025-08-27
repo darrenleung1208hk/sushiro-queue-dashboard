@@ -72,6 +72,19 @@ export default function DashboardPage() {
     return () => clearInterval(countdown);
   }, []);
 
+  // Tab visibility handling - pause countdown when tab is not visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Pause countdown when tab is not visible
+        setNextRefreshIn(60);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
   if (error && stores.length === 0) {
     return <DashboardError error={error} />;
   }

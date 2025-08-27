@@ -4,7 +4,13 @@ import { useState, useMemo } from 'react';
 import { StoreCard, type Store } from './StoreCard';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, Store as StoreIcon, Users, Clock, RefreshCw } from 'lucide-react';
+import {
+  Search,
+  Store as StoreIcon,
+  Users,
+  Clock,
+  RefreshCw,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface DashboardProps {
@@ -77,22 +83,24 @@ export const Dashboard = ({
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 bg-card rounded-lg border border-border">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <div className={cn(
-                  "w-2 h-2 rounded-full",
-                  isLoading ? "bg-yellow-500 animate-pulse" : "bg-green-500"
-                )} />
+                <div
+                  className={cn(
+                    'w-2 h-2 rounded-full',
+                    isLoading ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'
+                  )}
+                />
                 <span className="text-sm text-muted-foreground">
-                  {isLoading ? "Refreshing..." : "Connected"}
+                  {isLoading ? 'Refreshing...' : 'Connected'}
                 </span>
               </div>
-              
+
               {lastUpdated && (
                 <span className="text-sm text-muted-foreground">
                   Last updated: {lastUpdated.toLocaleTimeString()}
                 </span>
               )}
             </div>
-            
+
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">
@@ -106,7 +114,9 @@ export const Dashboard = ({
                 disabled={isLoading}
                 className="ml-auto flex items-center gap-2 px-3 py-1 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
+                <RefreshCw
+                  className={cn('h-4 w-4', isLoading && 'animate-spin')}
+                />
                 Refresh
               </button>
             )}
