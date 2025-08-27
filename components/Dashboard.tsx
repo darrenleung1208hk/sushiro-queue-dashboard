@@ -4,13 +4,36 @@ import { useState, useMemo } from 'react';
 import { StoreCard, type Store } from './StoreCard';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, Store as StoreIcon, Users, Clock } from 'lucide-react';
+import {
+  Search,
+  Store as StoreIcon,
+  Users,
+  Clock,
+  RefreshCw,
+  Pause,
+  Play,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface DashboardProps {
   stores: Store[];
+  isLoading?: boolean;
+  lastUpdated?: Date | null;
+  nextRefreshIn?: number;
+  autoRefreshEnabled?: boolean;
+  onAutoRefreshToggle?: (enabled: boolean) => void;
+  onManualRefresh?: () => void;
 }
 
-export const Dashboard = ({ stores }: DashboardProps) => {
+export const Dashboard = ({
+  stores,
+  isLoading = false,
+  lastUpdated,
+  nextRefreshIn = 60,
+  autoRefreshEnabled = true,
+  onAutoRefreshToggle,
+  onManualRefresh,
+}: DashboardProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
 
@@ -52,13 +75,79 @@ export const Dashboard = ({ stores }: DashboardProps) => {
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/30 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-foreground">
-            Store Queue Dashboard
-          </h1>
-          <p className="text-muted-foreground">
-            Monitor store queues and wait times in real-time
-          </p>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold text-foreground">
+              Store Queue Dashboard
+            </h1>
+            <p className="text-muted-foreground">
+              Monitor store queues and wait times in real-time
+            </p>
+          </div>
+
+          {/* Refresh Status Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 bg-card rounded-lg border border-border">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div
+                  className={cn(
+                    'w-2 h-2 rounded-full',
+                    isLoading ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'
+                  )}
+                />
+                <span className="text-sm text-muted-foreground">
+                  {isLoading ? 'Refreshing...' : 'Connected'}
+                </span>
+              </div>
+
+              {lastUpdated && (
+                <span className="text-sm text-muted-foreground">
+                  Last updated: {lastUpdated.toLocaleTimeString()}
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">
+                Next refresh in: {nextRefreshIn}s
+              </span>
+            </div>
+
+            <div className="ml-auto flex items-center gap-2">
+              {onAutoRefreshToggle && (
+                <button
+                  onClick={() => onAutoRefreshToggle(!autoRefreshEnabled)}
+                  className="flex items-center gap-2 px-3 py-1 text-sm bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/80 transition-colors"
+                >
+                  {autoRefreshEnabled ? (
+                    <>
+                      <Pause className="h-4 w-4" />
+                      Pause
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4" />
+                      Resume
+                    </>
+                  )}
+                </button>
+              )}
+
+              {onManualRefresh && (
+                <button
+                  onClick={onManualRefresh}
+                  disabled={isLoading}
+                  className="flex items-center gap-2 px-3 py-1 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <RefreshCw
+                    className={cn('h-4 w-4', isLoading && 'animate-spin')}
+                  />
+                  Refresh
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Stats Overview */}
