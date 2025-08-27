@@ -15,10 +15,15 @@ export default function DashboardPage() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [nextRefreshIn, setNextRefreshIn] = useState(60);
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
 
-  // Data fetching function
+  // Data fetching function with deduplication
   const fetchStores = useCallback(async () => {
+    // Prevent multiple simultaneous requests
+    if (isFetching) return;
+    
     try {
+      setIsFetching(true);
       setIsLoading(true);
       setError(null);
 
@@ -40,10 +45,12 @@ export default function DashboardPage() {
       setLastUpdated(new Date());
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Unknown error'));
+      console.error('Error fetching stores:', err);
     } finally {
       setIsLoading(false);
+      setIsFetching(false);
     }
-  }, []);
+  }, [isFetching]);
 
   // Initial load
   useEffect(() => {
@@ -99,15 +106,15 @@ export default function DashboardPage() {
     return <DashboardLoading />;
   }
 
-      return (
-      <Dashboard 
-        stores={stores} 
-        isLoading={isLoading}
-        lastUpdated={lastUpdated}
-        nextRefreshIn={nextRefreshIn}
-        autoRefreshEnabled={autoRefreshEnabled}
-        onAutoRefreshToggle={setAutoRefreshEnabled}
-        onManualRefresh={fetchStores}
-      />
-    );
+  return (
+    <Dashboard
+      stores={stores}
+      isLoading={isLoading}
+      lastUpdated={lastUpdated}
+      nextRefreshIn={nextRefreshIn}
+      autoRefreshEnabled={autoRefreshEnabled}
+      onAutoRefreshToggle={setAutoRefreshEnabled}
+      onManualRefresh={fetchStores}
+    />
+  );
 }
