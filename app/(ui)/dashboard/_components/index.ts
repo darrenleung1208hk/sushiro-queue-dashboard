@@ -1,2 +1,2 @@
-export { DashboardLoading } from './DashboardLoading';
 export { DashboardError } from './DashboardError';
+export { DashboardLoading } from './DashboardLoading';
