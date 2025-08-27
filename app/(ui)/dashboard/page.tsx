@@ -80,13 +80,13 @@ export default function DashboardPage() {
     return <DashboardLoading />;
   }
 
-      return (
-      <Dashboard 
-        stores={stores} 
-        isLoading={isLoading}
-        lastUpdated={lastUpdated}
-        nextRefreshIn={nextRefreshIn}
-        onManualRefresh={fetchStores}
-      />
-    );
+  return (
+    <Dashboard
+      stores={stores}
+      isLoading={isLoading}
+      lastUpdated={lastUpdated}
+      nextRefreshIn={nextRefreshIn}
+      onManualRefresh={fetchStores}
+    />
+  );
 }
