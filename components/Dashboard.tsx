@@ -13,11 +13,11 @@ interface DashboardProps {
   onManualRefresh?: () => void;
 }
 
-export const Dashboard = ({ 
-  stores, 
-  isLoading = false, 
-  lastUpdated, 
-  onManualRefresh 
+export const Dashboard = ({
+  stores,
+  isLoading = false,
+  lastUpdated,
+  onManualRefresh,
 }: DashboardProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | null>(null);

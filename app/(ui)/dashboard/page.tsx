@@ -19,11 +19,13 @@ export default function DashboardPage() {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       const response = await fetch('/api/stores/live');
-      
+
       if (!response.ok) {
-        throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `API request failed: ${response.status} ${response.statusText}`
+        );
       }
 
       const apiResponse = await response.json();
@@ -46,6 +48,15 @@ export default function DashboardPage() {
     fetchStores();
   }, [fetchStores]);
 
+  // Polling logic - refresh every minute
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchStores();
+    }, 60000); // 60 seconds
+
+    return () => clearInterval(interval);
+  }, [fetchStores]);
+
   if (error && stores.length === 0) {
     return <DashboardError error={error} />;
   }
@@ -55,8 +66,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <Dashboard 
-      stores={stores} 
+    <Dashboard
+      stores={stores}
       isLoading={isLoading}
       lastUpdated={lastUpdated}
       onManualRefresh={fetchStores}
