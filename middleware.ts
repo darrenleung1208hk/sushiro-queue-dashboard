@@ -19,17 +19,17 @@ const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 function isAllowedOrigin(request: NextRequest): boolean {
   const origin = request.headers.get('origin');
   const referer = request.headers.get('referer');
-  
+
   // Allow requests from the same origin (same-site requests)
   if (!origin && !referer) {
     return true;
   }
-  
+
   // Check if origin is in allowed list
   if (origin && ALLOWED_ORIGINS.includes(origin)) {
     return true;
   }
-  
+
   // Check if referer is from allowed domain
   if (referer) {
     try {
@@ -42,7 +42,7 @@ function isAllowedOrigin(request: NextRequest): boolean {
       return false;
     }
   }
-  
+
   return false;
 }
 
@@ -54,7 +54,8 @@ function createUnauthorizedResponse() {
     {
       success: false,
       error: 'UNAUTHORIZED',
-      message: 'Access denied. This API is only accessible from authorized origins.',
+      message:
+        'Access denied. This API is only accessible from authorized origins.',
       timestamp: new Date(),
       data: null,
     },
@@ -82,13 +83,14 @@ function createRateLimitResponse() {
  * Simple rate limiting implementation
  */
 function checkRateLimit(request: NextRequest): boolean {
-  const clientId = request.headers.get('x-forwarded-for') || 
-                   request.headers.get('x-real-ip') || 
-                   'unknown';
+  const clientId =
+    request.headers.get('x-forwarded-for') ||
+    request.headers.get('x-real-ip') ||
+    'unknown';
   const now = Date.now();
-  
+
   const rateLimit = rateLimitMap.get(clientId);
-  
+
   if (!rateLimit || now > rateLimit.resetTime) {
     // Reset or create new rate limit entry
     rateLimitMap.set(clientId, {
@@ -97,28 +99,38 @@ function checkRateLimit(request: NextRequest): boolean {
     });
     return true;
   }
-  
+
   if (rateLimit.count >= RATE_LIMIT_MAX_REQUESTS) {
     return false; // Rate limit exceeded
   }
-  
+
   // Increment count
   rateLimit.count++;
   return true;
 }
 
 export function middleware(request: NextRequest) {
+  console.log('🔒 Middleware running for:', request.nextUrl.pathname);
+  
   // Only apply to API routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
+    console.log('📡 API route detected:', request.nextUrl.pathname);
+    console.log('🌐 Origin:', request.headers.get('origin'));
+    console.log('📄 Referer:', request.headers.get('referer'));
+    
     // Check rate limiting first
     if (!checkRateLimit(request)) {
+      console.log('⏰ Rate limit exceeded');
       return createRateLimitResponse();
     }
-    
+
     // Validate request origin
     if (!isAllowedOrigin(request)) {
+      console.log('🚫 Unauthorized origin');
       return createUnauthorizedResponse();
     }
+    
+    console.log('✅ Request authorized');
   }
 
   return NextResponse.next();
@@ -127,13 +139,7 @@ export function middleware(request: NextRequest) {
 // Configure which routes to run middleware on
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!_next/static|_next/image|favicon.ico|public/).*)',
+    // Match all API routes
+    '/api/:path*',
   ],
 };
