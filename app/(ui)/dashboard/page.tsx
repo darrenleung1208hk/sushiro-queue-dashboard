@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Dashboard } from '@/components/Dashboard';
 import { Store } from '@/components/StoreCard';
 import {
@@ -15,15 +15,15 @@ export default function DashboardPage() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [nextRefreshIn, setNextRefreshIn] = useState(60);
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
-  const [isFetching, setIsFetching] = useState(false);
+  const isFetchingRef = useRef(false);
 
   // Data fetching function with deduplication
   const fetchStores = useCallback(async () => {
     // Prevent multiple simultaneous requests
-    if (isFetching) return;
+    if (isFetchingRef.current) return;
 
     try {
-      setIsFetching(true);
+      isFetchingRef.current = true;
       setIsLoading(true);
       setError(null);
 
@@ -48,9 +48,9 @@ export default function DashboardPage() {
       console.error('Error fetching stores:', err);
     } finally {
       setIsLoading(false);
-      setIsFetching(false);
+      isFetchingRef.current = false;
     }
-  }, [isFetching]);
+  }, []);
 
   // Initial load
   useEffect(() => {
