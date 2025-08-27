@@ -10,9 +10,7 @@ import {
 async function DashboardServer() {
   try {
     // Fetch live store data from the API
-    const response = await fetch(`${process.env.BASE_URL}/api/stores/live`, {
-      next: { revalidate: 30 }, // Revalidate every 30 seconds
-    });
+    const response = await fetch(`${process.env.BASE_URL}/api/stores/live`);
 
     if (!response.ok) {
       throw new Error(
