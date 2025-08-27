@@ -8,12 +8,16 @@ import {
   DashboardError,
 } from '@/app/(ui)/dashboard/_components';
 
+// Auto-refresh configuration
+const AUTO_REFRESH_INTERVAL_MS = 60000; // 60 seconds
+const AUTO_REFRESH_INTERVAL_SECONDS = AUTO_REFRESH_INTERVAL_MS / 1000;
+
 export default function DashboardPage() {
   const [stores, setStores] = useState<Store[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [nextRefreshIn, setNextRefreshIn] = useState(60);
+  const [nextRefreshIn, setNextRefreshIn] = useState(AUTO_REFRESH_INTERVAL_SECONDS);
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
   const isFetchingRef = useRef(false);
 
@@ -63,7 +67,7 @@ export default function DashboardPage() {
 
     const interval = setInterval(() => {
       fetchStores();
-    }, 60000); // 60 seconds
+    }, AUTO_REFRESH_INTERVAL_MS);
 
     return () => clearInterval(interval);
   }, [fetchStores, autoRefreshEnabled]);
@@ -75,7 +79,7 @@ export default function DashboardPage() {
     const countdown = setInterval(() => {
       setNextRefreshIn(prev => {
         if (prev <= 1) {
-          return 60;
+          return AUTO_REFRESH_INTERVAL_SECONDS;
         }
         return prev - 1;
       });
@@ -89,7 +93,7 @@ export default function DashboardPage() {
     const handleVisibilityChange = () => {
       if (document.hidden) {
         // Pause countdown when tab is not visible
-        setNextRefreshIn(60);
+        setNextRefreshIn(AUTO_REFRESH_INTERVAL_SECONDS);
       }
     };
 
