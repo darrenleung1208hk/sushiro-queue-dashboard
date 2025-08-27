@@ -13,6 +13,7 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [nextRefreshIn, setNextRefreshIn] = useState(60);
 
   // Data fetching function
   const fetchStores = useCallback(async () => {
@@ -57,6 +58,20 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, [fetchStores]);
 
+  // Countdown timer
+  useEffect(() => {
+    const countdown = setInterval(() => {
+      setNextRefreshIn(prev => {
+        if (prev <= 1) {
+          return 60;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(countdown);
+  }, []);
+
   if (error && stores.length === 0) {
     return <DashboardError error={error} />;
   }
@@ -65,12 +80,13 @@ export default function DashboardPage() {
     return <DashboardLoading />;
   }
 
-  return (
-    <Dashboard
-      stores={stores}
-      isLoading={isLoading}
-      lastUpdated={lastUpdated}
-      onManualRefresh={fetchStores}
-    />
-  );
+      return (
+      <Dashboard 
+        stores={stores} 
+        isLoading={isLoading}
+        lastUpdated={lastUpdated}
+        nextRefreshIn={nextRefreshIn}
+        onManualRefresh={fetchStores}
+      />
+    );
 }

@@ -10,6 +10,7 @@ interface DashboardProps {
   stores: Store[];
   isLoading?: boolean;
   lastUpdated?: Date | null;
+  nextRefreshIn?: number;
   onManualRefresh?: () => void;
 }
 
@@ -17,6 +18,7 @@ export const Dashboard = ({
   stores,
   isLoading = false,
   lastUpdated,
+  nextRefreshIn = 60,
   onManualRefresh,
 }: DashboardProps) => {
   const [searchTerm, setSearchTerm] = useState('');
