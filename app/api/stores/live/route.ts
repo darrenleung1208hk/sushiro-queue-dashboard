@@ -5,6 +5,7 @@ import {
   QueueResponse,
   ApiResponse,
 } from '@/lib/types';
+import { validateApiRequest, createUnauthorizedResponse } from '@/lib/api-security';
 
 // CORS proxy URL (same as n8n workflow)
 const CORS_PROXY = process.env.CORS_PROXY_URL as string;
@@ -132,6 +133,15 @@ export async function GET(
   request: Request
 ): Promise<NextResponse<ApiResponse<Store[]>>> {
   try {
+    // Validate request origin
+    const validation = validateApiRequest(request);
+    if (!validation.isValid) {
+      return NextResponse.json(
+        createUnauthorizedResponse<Store[]>(),
+        { status: 403 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
 
     // Parse query parameters
