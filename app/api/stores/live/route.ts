@@ -6,7 +6,7 @@ import {
   ApiResponse,
 } from '@/lib/types';
 import {
-  validateApiKey,
+  validateOrigin,
   createUnauthorizedResponse,
   checkRateLimit,
   createRateLimitResponse,
@@ -148,15 +148,15 @@ export async function GET(
       });
     }
 
-    // Validate API key
-    if (!validateApiKey(request)) {
-      console.log('🚫 Invalid API key');
+    // Validate request origin
+    if (!validateOrigin(request)) {
+      console.log('🚫 Unauthorized origin');
       return NextResponse.json(createUnauthorizedResponse<Store[]>(), {
         status: 403,
       });
     }
 
-    console.log('✅ API key validated successfully');
+    console.log('✅ Origin validated successfully');
 
     const { searchParams } = new URL(request.url);
 

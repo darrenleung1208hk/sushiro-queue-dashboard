@@ -27,6 +27,44 @@ export function validateApiKey(request: Request): boolean {
 }
 
 /**
+ * Validates request origin for additional security
+ */
+export function validateOrigin(request: Request): boolean {
+  const origin = request.headers.get('origin');
+  const referer = request.headers.get('referer');
+  
+  // Allow requests from the same origin (same-site requests)
+  if (!origin && !referer) {
+    return true;
+  }
+  
+  // Check if origin is from allowed domains
+  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',').map(o => o.trim()) || [
+    'http://localhost:3000',
+    'http://localhost:3001'
+  ];
+  
+  if (origin && allowedOrigins.includes(origin)) {
+    return true;
+  }
+  
+  // Check if referer is from allowed domain
+  if (referer) {
+    try {
+      const refererUrl = new URL(referer);
+      return allowedOrigins.some(allowedOrigin => {
+        const allowedUrl = new URL(allowedOrigin);
+        return refererUrl.hostname === allowedUrl.hostname;
+      });
+    } catch {
+      return false;
+    }
+  }
+  
+  return false;
+}
+
+/**
  * Creates a standardized unauthorized response
  */
 export function createUnauthorizedResponse<T = any>() {
