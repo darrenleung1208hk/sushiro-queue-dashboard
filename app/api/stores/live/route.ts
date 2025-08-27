@@ -5,6 +5,7 @@ import {
   QueueResponse,
   ApiResponse,
 } from '@/lib/types';
+import { validateApiKey, createUnauthorizedResponse, checkRateLimit, createRateLimitResponse } from '@/lib/api-auth';
 
 // CORS proxy URL (same as n8n workflow)
 const CORS_PROXY = process.env.CORS_PROXY_URL as string;
@@ -132,6 +133,22 @@ export async function GET(
   request: Request
 ): Promise<NextResponse<ApiResponse<Store[]>>> {
   try {
+    console.log('🔒 API request received:', request.url);
+    
+    // Check rate limiting first
+    if (!checkRateLimit(request)) {
+      console.log('⏰ Rate limit exceeded');
+      return NextResponse.json(createRateLimitResponse<Store[]>(), { status: 429 });
+    }
+    
+    // Validate API key
+    if (!validateApiKey(request)) {
+      console.log('🚫 Invalid API key');
+      return NextResponse.json(createUnauthorizedResponse<Store[]>(), { status: 403 });
+    }
+    
+    console.log('✅ API key validated successfully');
+    
     const { searchParams } = new URL(request.url);
 
     // Parse query parameters

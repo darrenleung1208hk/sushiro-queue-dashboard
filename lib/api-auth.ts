@@ -29,26 +29,26 @@ export function validateApiKey(request: Request): boolean {
 /**
  * Creates a standardized unauthorized response
  */
-export function createUnauthorizedResponse() {
+export function createUnauthorizedResponse<T = any>() {
   return {
     success: false,
     error: 'UNAUTHORIZED',
     message: 'Access denied. Valid API key required.',
     timestamp: new Date(),
-    data: null,
+    data: [] as T,
   };
 }
 
 /**
  * Creates a rate limit exceeded response
  */
-export function createRateLimitResponse() {
+export function createRateLimitResponse<T = any>() {
   return {
     success: false,
     error: 'RATE_LIMIT_EXCEEDED',
     message: 'Too many requests. Please try again later.',
     timestamp: new Date(),
-    data: null,
+    data: [] as T,
   };
 }
 
