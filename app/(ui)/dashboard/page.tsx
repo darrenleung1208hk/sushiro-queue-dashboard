@@ -21,7 +21,7 @@ export default function DashboardPage() {
   const fetchStores = useCallback(async () => {
     // Prevent multiple simultaneous requests
     if (isFetching) return;
-    
+
     try {
       setIsFetching(true);
       setIsLoading(true);
