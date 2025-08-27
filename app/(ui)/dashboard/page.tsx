@@ -31,7 +31,11 @@ export default function DashboardPage() {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch('/api/stores/live');
+      const response = await fetch('/api/stores/live', {
+        headers: {
+          'x-api-key': process.env.NEXT_PUBLIC_API_KEY || '',
+        },
+      });
 
       if (!response.ok) {
         throw new Error(
