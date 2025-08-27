@@ -8,9 +8,17 @@ import { Search, Store as StoreIcon, Users, Clock } from 'lucide-react';
 
 interface DashboardProps {
   stores: Store[];
+  isLoading?: boolean;
+  lastUpdated?: Date | null;
+  onManualRefresh?: () => void;
 }
 
-export const Dashboard = ({ stores }: DashboardProps) => {
+export const Dashboard = ({ 
+  stores, 
+  isLoading = false, 
+  lastUpdated, 
+  onManualRefresh 
+}: DashboardProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
 
