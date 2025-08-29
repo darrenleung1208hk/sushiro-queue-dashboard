@@ -216,22 +216,27 @@ export const Dashboard = ({
 
       {/* Floating Refresh Status Bar */}
       <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
-        <div className="bg-card/95 backdrop-blur-sm rounded-full border border-border shadow-lg px-6 py-3 flex items-center gap-6">
+        <div className="bg-card/95 backdrop-blur-sm rounded-full border border-border shadow-lg px-4 py-3 flex items-center gap-6">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <div
                 className={cn(
-                  'w-2 h-2 rounded-full',
+                  'block w-2 h-2 rounded-full',
                   isLoading ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'
                 )}
               />
-              <span className="text-sm text-muted-foreground w-[100px]">
+              <span
+                className={cn(
+                  'text-xs font-semibold',
+                  isLoading ? 'text-yellow-500' : 'text-green-500'
+                )}
+              >
                 {isLoading ? 'Refreshing...' : 'Connected'}
               </span>
             </div>
 
             {lastUpdated && (
-              <span className="text-sm text-muted-foreground">
+              <span className="hidden sm:inline text-sm text-muted-foreground">
                 Last: {lastUpdated.toLocaleTimeString()}
               </span>
             )}
@@ -258,12 +263,12 @@ export const Dashboard = ({
                 {autoRefreshEnabled ? (
                   <>
                     <Pause className="h-4 w-4" />
-                    Pause
+                    <span className="hidden sm:inline">Pause</span>
                   </>
                 ) : (
                   <>
                     <Play className="h-4 w-4" />
-                    Resume
+                    <span className="hidden sm:inline">Resume</span>
                   </>
                 )}
               </button>
@@ -278,7 +283,7 @@ export const Dashboard = ({
                 <RefreshCw
                   className={cn('h-4 w-4', isLoading && 'animate-spin')}
                 />
-                Refresh
+                <span className="hidden sm:inline">Refresh</span>
               </button>
             )}
           </div>
