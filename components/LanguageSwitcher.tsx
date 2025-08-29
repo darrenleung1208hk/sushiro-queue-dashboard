@@ -1,41 +1,54 @@
-'use client'
+'use client';
 
-import { useLocale, useTranslations } from 'next-intl'
-import { useRouter, usePathname } from 'next/navigation'
-import { Button } from '@/components/ui/button'
+import { useLocale, useTranslations } from 'next-intl';
+import { useRouter, usePathname } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Globe } from 'lucide-react'
+} from '@/components/ui/dropdown-menu';
+import { Globe } from 'lucide-react';
 
 const languageNames = {
   en: 'English',
-  'zh-HK': '繁體中文'
-}
+  'zh-HK': '繁體中文',
+};
 
 export function LanguageSwitcher() {
-  const locale = useLocale()
-  const router = useRouter()
-  const pathname = usePathname()
-  const t = useTranslations()
+  const locale = useLocale();
+  const router = useRouter();
+  const pathname = usePathname();
+  const t = useTranslations();
 
   const handleLanguageChange = (newLocale: string) => {
-    // Extract the pathname segment after the locale
-    const segments = pathname.split('/')
+    // Get the current pathname
+    const currentPath = pathname;
     
-    // If first segment is a locale, remove it; otherwise keep the full path
-    const pathWithoutLocale = segments[0] === locale 
-      ? segments.slice(1).join('/') 
-      : segments.join('/')
+    // Check if current path starts with a locale prefix
+    const localePrefix = `/${locale}`;
+    const hasLocalePrefix = currentPath.startsWith(localePrefix);
     
-    // Construct new path, ensuring proper slash handling
-    const newPath = `/${newLocale}${pathWithoutLocale ? `/${pathWithoutLocale}` : ''}`
+    // Extract the path without locale
+    let pathWithoutLocale = '';
+    if (hasLocalePrefix) {
+      // Remove the locale prefix and any trailing slash
+      pathWithoutLocale = currentPath.replace(localePrefix, '');
+      // Ensure we don't have a leading slash
+      if (pathWithoutLocale.startsWith('/')) {
+        pathWithoutLocale = pathWithoutLocale.substring(1);
+      }
+    } else {
+      // No locale prefix, use the full path (remove leading slash)
+      pathWithoutLocale = currentPath.startsWith('/') ? currentPath.substring(1) : currentPath;
+    }
     
-    router.push(newPath)
-  }
+    // Construct the new path
+    const newPath = `/${newLocale}${pathWithoutLocale ? `/${pathWithoutLocale}` : ''}`;
+    
+    router.push(newPath);
+  };
 
   return (
     <DropdownMenu>
@@ -57,5 +70,5 @@ export function LanguageSwitcher() {
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
