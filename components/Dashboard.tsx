@@ -93,7 +93,7 @@ export const Dashboard = ({
       (sum, store) => sum + store.waitingGroup,
       0
     );
-    const totalQueue = stores.reduce(
+    const totalCurrentQueue = stores.reduce(
       (sum, store) => sum + store.storeQueue.length,
       0
     );
@@ -101,7 +101,12 @@ export const Dashboard = ({
       (store) => store.storeStatus === 'OPEN'
     ).length;
 
-    return { totalWaiting, totalQueue, openStores, totalStores: stores.length };
+    return {
+      totalWaiting,
+      totalCurrentQueue,
+      openStores,
+      totalStores: stores.length,
+    };
   }, [stores]);
 
   const uniqueStatuses = Array.from(
@@ -163,11 +168,11 @@ export const Dashboard = ({
                 <Clock className="h-5 w-5 text-success" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Active Tickets</p>
+                <p className="text-sm text-muted-foreground">Current Queue</p>
                 <p className="text-2xl font-bold text-foreground">
-                  {stats.totalQueue}
+                  {stats.totalCurrentQueue}
                 </p>
-                <p className="text-xs text-muted-foreground">In queue</p>
+                <p className="text-xs text-muted-foreground">Active tickets</p>
               </div>
             </div>
           </div>
@@ -265,13 +270,9 @@ export const Dashboard = ({
 
             {/* List View */}
             {viewMode === 'list' && (
-              <div className="space-y-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+              <div className="space-y-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
                 {filteredStores.map((store) => (
-                  <StoreListItem
-                    key={store.shopId}
-                    store={store}
-                    isCompact={false}
-                  />
+                  <StoreListItem key={store.shopId} store={store} />
                 ))}
               </div>
             )}
