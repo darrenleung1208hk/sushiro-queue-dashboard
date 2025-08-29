@@ -39,19 +39,40 @@ export const Dashboard = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [isViewTransitioning, setIsViewTransitioning] = useState(false);
 
   // Load view mode preference from localStorage
   useEffect(() => {
-    const savedView = localStorage.getItem('dashboard-view-mode');
-    if (savedView === 'grid' || savedView === 'list') {
-      setViewMode(savedView);
+    try {
+      const savedView = localStorage.getItem('dashboard-view-mode');
+      if (savedView === 'grid' || savedView === 'list') {
+        setViewMode(savedView);
+      }
+    } catch (error) {
+      // Fallback to default grid view if localStorage is unavailable
+      console.warn('Unable to load view mode preference:', error);
     }
   }, []);
 
   // Save view mode preference to localStorage
   useEffect(() => {
-    localStorage.setItem('dashboard-view-mode', viewMode);
+    try {
+      localStorage.setItem('dashboard-view-mode', viewMode);
+    } catch (error) {
+      // Silently fail if localStorage is unavailable
+      console.warn('Unable to save view mode preference:', error);
+    }
   }, [viewMode]);
+
+  // Handle view mode change with transition state
+  const handleViewModeChange = (mode: 'grid' | 'list') => {
+    if (mode !== viewMode) {
+      setIsViewTransitioning(true);
+      setViewMode(mode);
+      // Reset transition state after animation completes
+      setTimeout(() => setIsViewTransitioning(false), 300);
+    }
+  };
 
   const filteredStores = useMemo(() => {
     return stores.filter(store => {
@@ -210,7 +231,7 @@ export const Dashboard = ({
               ))}
             </div>
             
-            <ViewToggle viewMode={viewMode} onViewChange={setViewMode} />
+            <ViewToggle viewMode={viewMode} onViewChange={handleViewModeChange} />
           </div>
         </div>
 
