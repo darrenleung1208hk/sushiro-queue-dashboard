@@ -75,7 +75,7 @@ export const Dashboard = ({
   };
 
   const filteredStores = useMemo(() => {
-    return stores.filter(store => {
+    return stores.filter((store) => {
       const matchesSearch =
         store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         store.nameEn.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -98,14 +98,14 @@ export const Dashboard = ({
       0
     );
     const openStores = stores.filter(
-      store => store.storeStatus === 'OPEN'
+      (store) => store.storeStatus === 'OPEN'
     ).length;
 
     return { totalWaiting, totalQueue, openStores, totalStores: stores.length };
   }, [stores]);
 
   const uniqueStatuses = Array.from(
-    new Set(stores.map(store => store.storeStatus))
+    new Set(stores.map((store) => store.storeStatus))
   );
 
   return (
@@ -197,7 +197,7 @@ export const Dashboard = ({
             <Input
               placeholder="Search stores by name, region, or area..."
               value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
             />
           </div>
@@ -211,7 +211,7 @@ export const Dashboard = ({
               >
                 All
               </Badge>
-              {uniqueStatuses.map(status => (
+              {uniqueStatuses.map((status) => (
                 <Badge
                   key={status}
                   variant={
@@ -230,14 +230,12 @@ export const Dashboard = ({
                 </Badge>
               ))}
             </div>
-            
-            <ViewToggle viewMode={viewMode} onViewChange={handleViewModeChange} />
           </div>
         </div>
 
-        {/* View Mode Indicator */}
+        {/* View Mode Indicator and Toggle */}
         {filteredStores.length > 0 && (
-          <div className="flex items-center justify-between">
+          <div className="flex items-end justify-between">
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">
                 Showing {filteredStores.length} stores
@@ -246,6 +244,10 @@ export const Dashboard = ({
                 in {viewMode === 'grid' ? 'grid' : 'list'} view
               </span>
             </div>
+            <ViewToggle
+              viewMode={viewMode}
+              onViewChange={handleViewModeChange}
+            />
           </div>
         )}
 
@@ -255,7 +257,7 @@ export const Dashboard = ({
             {/* Grid View */}
             {viewMode === 'grid' && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
-                {filteredStores.map(store => (
+                {filteredStores.map((store) => (
                   <StoreCard key={store.shopId} store={store} />
                 ))}
               </div>
@@ -264,10 +266,10 @@ export const Dashboard = ({
             {/* List View */}
             {viewMode === 'list' && (
               <div className="space-y-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
-                {filteredStores.map(store => (
-                  <StoreListItem 
-                    key={store.shopId} 
-                    store={store} 
+                {filteredStores.map((store) => (
+                  <StoreListItem
+                    key={store.shopId}
+                    store={store}
                     isCompact={false}
                   />
                 ))}
