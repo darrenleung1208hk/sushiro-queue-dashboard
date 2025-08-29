@@ -17,17 +17,13 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale}>
-      <body>
-        <NextIntlClientProvider messages={messages}>
-          <Providers>
-            {children}
-            <Toaster />
-            <Sonner />
-          </Providers>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider messages={messages}>
+      <Providers>
+        {children}
+        <Toaster />
+        <Sonner />
+      </Providers>
+    </NextIntlClientProvider>
   );
 }
 
