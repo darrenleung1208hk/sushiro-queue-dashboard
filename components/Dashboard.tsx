@@ -216,33 +216,31 @@ export const Dashboard = ({
 
       {/* Floating Refresh Status Bar */}
       <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
-        <div className="bg-card/95 backdrop-blur-sm rounded-full border border-border shadow-lg px-4 py-3 flex items-center gap-6">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <div
-                className={cn(
-                  'block w-2 h-2 rounded-full',
-                  isLoading ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'
-                )}
-              />
-              <span
-                className={cn(
-                  'text-xs font-semibold',
-                  isLoading ? 'text-yellow-500' : 'text-green-500'
-                )}
-              >
-                {isLoading ? 'Refreshing...' : 'Connected'}
-              </span>
-            </div>
-
-            {lastUpdated && (
-              <span className="hidden sm:inline text-sm text-muted-foreground">
-                Last: {lastUpdated.toLocaleTimeString()}
-              </span>
-            )}
+        <div className="bg-card/95 backdrop-blur-sm rounded-full border border-border shadow-lg px-4 py-3 flex items-center gap-2 sm:gap-6">
+          <div className="flex items-center gap-2">
+            <div
+              className={cn(
+                'block w-2 h-2 rounded-full',
+                isLoading ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'
+              )}
+            />
+            <span
+              className={cn(
+                'text-xs font-semibold',
+                isLoading ? 'text-yellow-500' : 'text-green-500'
+              )}
+            >
+              {isLoading ? 'Refreshing...' : 'Connected'}
+            </span>
           </div>
 
-          <div className="flex items-center gap-2">
+          {lastUpdated && (
+            <span className="hidden sm:inline text-sm text-muted-foreground w-max">
+              Last: {lastUpdated.toLocaleTimeString()}
+            </span>
+          )}
+
+          <div className="flex items-center gap-2 pr-2 sm:pr-0">
             <Clock className="h-4 w-4 text-muted-foreground" />
             <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
               <div
