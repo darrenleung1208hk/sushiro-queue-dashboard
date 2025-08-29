@@ -1,19 +1,20 @@
-import { NextIntlClientProvider } from 'next-intl'
-import { getMessages } from 'next-intl/server'
-import { Toaster } from '@/components/ui/toaster'
-import { Toaster as Sonner } from '@/components/ui/sonner'
-import { Providers } from '../providers'
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
+import { Toaster } from '@/components/ui/toaster';
+import { Toaster as Sonner } from '@/components/ui/sonner';
+import { Providers } from '../providers';
 
 interface LocaleLayoutProps {
-  children: React.ReactNode
-  params: { locale: string }
+  children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }
 
 export default async function LocaleLayout({
   children,
-  params: { locale }
+  params,
 }: LocaleLayoutProps) {
-  const messages = await getMessages()
+  const { locale } = await params;
+  const messages = await getMessages();
 
   return (
     <html lang={locale}>
@@ -27,12 +28,9 @@ export default async function LocaleLayout({
         </NextIntlClientProvider>
       </body>
     </html>
-  )
+  );
 }
 
 export function generateStaticParams() {
-  return [
-    { locale: 'en' },
-    { locale: 'zh-HK' }
-  ]
+  return [{ locale: 'en' }, { locale: 'zh-HK' }];
 }

@@ -1,9 +1,10 @@
-import { redirect } from 'next/navigation'
+import { redirect } from 'next/navigation';
 
 interface HomePageProps {
-  params: { locale: string }
+  params: Promise<{ locale: string }>;
 }
 
-export default function HomePage({ params: { locale } }: HomePageProps) {
-  redirect(`/${locale}/dashboard`)
+export default async function HomePage({ params }: HomePageProps) {
+  const { locale } = await params;
+  redirect(`/${locale}/dashboard`);
 }
