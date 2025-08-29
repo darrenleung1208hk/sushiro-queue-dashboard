@@ -243,7 +243,7 @@ export const Dashboard = ({
               <div
                 className="h-full bg-primary transition-all duration-1000 ease-linear"
                 style={{
-                  width: `${Math.max(0, Math.min(100, (nextRefreshIn / 60) * 100))}%`,
+                  width: `${Math.max(0, Math.min(100, ((60 - nextRefreshIn) / 60) * 100))}%`,
                 }}
               />
             </div>
