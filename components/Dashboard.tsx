@@ -225,7 +225,7 @@ export const Dashboard = ({
                   isLoading ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'
                 )}
               />
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-muted-foreground w-[100px]">
                 {isLoading ? 'Refreshing...' : 'Connected'}
               </span>
             </div>
