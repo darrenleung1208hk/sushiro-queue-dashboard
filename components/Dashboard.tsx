@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { StoreCard, type Store } from './StoreCard';
+import { StoreListItem } from './StoreListItem';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ViewToggle } from '@/components/ui/view-toggle';
@@ -200,13 +201,27 @@ export const Dashboard = ({
           </div>
         </div>
 
-        {/* Store Grid */}
+        {/* Store Display */}
         {filteredStores.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredStores.map(store => (
-              <StoreCard key={store.shopId} store={store} />
-            ))}
-          </div>
+          <>
+            {/* Grid View */}
+            {viewMode === 'grid' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredStores.map(store => (
+                  <StoreCard key={store.shopId} store={store} />
+                ))}
+              </div>
+            )}
+
+            {/* List View */}
+            {viewMode === 'list' && (
+              <div className="space-y-3">
+                {filteredStores.map(store => (
+                  <StoreListItem key={store.shopId} store={store} />
+                ))}
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-12">
             <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
