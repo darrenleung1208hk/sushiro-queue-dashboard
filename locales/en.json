@@ -1,0 +1,68 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "refresh": "Refresh",
+    "pause": "Pause",
+    "resume": "Resume",
+    "connected": "Connected",
+    "refreshing": "Refreshing...",
+    "last": "Last",
+    "open": "Open"
+  },
+  "dashboard": {
+    "title": "Store Queue Dashboard",
+    "subtitle": "Monitor store queues and wait times in real-time",
+    "stats": {
+      "totalStores": "Total Stores",
+      "totalWaiting": "Total Waiting",
+      "currentQueue": "Current Queue",
+      "filteredResults": "Filtered Results",
+      "openStores": "Open",
+      "acrossAllStores": "Across all stores",
+      "activeTickets": "Active tickets",
+      "showing": "Showing"
+    },
+    "filters": {
+      "searchPlaceholder": "Search stores by name, region, or area...",
+      "allRegions": "All Regions",
+      "allWaitTimes": "All Wait Times",
+      "lowWait": "Low Wait",
+      "mediumWait": "Medium Wait",
+      "highWait": "High Wait",
+      "extremeWait": "Extreme Wait"
+    },
+    "viewMode": {
+      "grid": "grid",
+      "list": "list",
+      "showingStores": "Showing {count} stores",
+      "inViewMode": "in {mode} view"
+    },
+    "noResults": {
+      "title": "No stores found",
+      "message": "Try adjusting your search or filter criteria"
+    }
+  },
+  "store": {
+    "status": {
+      "open": "OPEN",
+      "closed": "CLOSED"
+    },
+    "waiting": "Waiting",
+    "current": "Current",
+    "queue": "Queue"
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard"
+  },
+  "errors": {
+    "general": "Something went wrong",
+    "notFound": "Page not found",
+    "networkError": "Network error occurred"
+  }
+}

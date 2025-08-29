@@ -1,0 +1,68 @@
+{
+  "common": {
+    "loading": "載入中...",
+    "error": "錯誤",
+    "retry": "重試",
+    "close": "關閉",
+    "save": "儲存",
+    "cancel": "取消",
+    "refresh": "重新整理",
+    "pause": "暫停",
+    "resume": "繼續",
+    "connected": "已連接",
+    "refreshing": "重新整理中...",
+    "last": "最後",
+    "open": "營業中"
+  },
+  "dashboard": {
+    "title": "壽司郎排隊儀表板",
+    "subtitle": "實時監控壽司郎餐廳排隊狀況",
+    "stats": {
+      "totalStores": "總店舖數",
+      "totalWaiting": "總等候人數",
+      "currentQueue": "當前排隊",
+      "filteredResults": "篩選結果",
+      "openStores": "營業中",
+      "acrossAllStores": "所有店舖",
+      "activeTickets": "活躍票號",
+      "showing": "顯示"
+    },
+    "filters": {
+      "searchPlaceholder": "按店舖名稱、地區或區域搜尋...",
+      "allRegions": "所有地區",
+      "allWaitTimes": "所有等候時間",
+      "lowWait": "短等候",
+      "mediumWait": "中等等候",
+      "highWait": "長等候",
+      "extremeWait": "極長等候"
+    },
+    "viewMode": {
+      "grid": "網格",
+      "list": "列表",
+      "showingStores": "顯示 {count} 間店舖",
+      "inViewMode": "以{mode}模式顯示"
+    },
+    "noResults": {
+      "title": "找不到店舖",
+      "message": "請嘗試調整搜尋或篩選條件"
+    }
+  },
+  "store": {
+    "status": {
+      "open": "營業中",
+      "closed": "休息中"
+    },
+    "waiting": "等候",
+    "current": "當前",
+    "queue": "排隊"
+  },
+  "navigation": {
+    "home": "首頁",
+    "dashboard": "儀表板"
+  },
+  "errors": {
+    "general": "發生錯誤",
+    "notFound": "找不到頁面",
+    "networkError": "網路錯誤"
+  }
+}
