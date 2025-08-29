@@ -309,7 +309,7 @@ export const Dashboard = ({
         {filteredStores.length > 0 && (
           <div className="flex items-end justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-muted-foreground">
+              <span className="text-sm text-muted-foreground">
                 {t('dashboard.viewMode.showingStores', {
                   count: filteredStores.length,
                 })}
@@ -352,7 +352,7 @@ export const Dashboard = ({
           <div className="text-center py-8">
             <Search className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
             <h3 className="text-base font-semibold text-foreground mb-1">
-              {t('dashboard.noResults.title')}
+              No stores found
             </h3>
             <p className="text-muted-foreground">
               {t('dashboard.noResults.message')}
@@ -432,7 +432,7 @@ export const Dashboard = ({
                 <RefreshCw
                   className={cn('h-4 w-4', isLoading && 'animate-spin')}
                 />
-                <span className="hidden sm:inline">{t('common.refresh')}</span>
+                <span className="hidden sm:inline">Refresh</span>
               </button>
             )}
           </div>
