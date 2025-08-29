@@ -239,9 +239,14 @@ export const Dashboard = ({
 
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">
-              {nextRefreshIn}s
-            </span>
+            <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-primary transition-all duration-1000 ease-linear"
+                style={{
+                  width: `${Math.max(0, Math.min(100, (nextRefreshIn / 60) * 100))}%`,
+                }}
+              />
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
