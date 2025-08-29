@@ -2,19 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Clock, Users, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-export interface Store {
-  shopId: number;
-  storeStatus: string;
-  waitingGroup: number;
-  storeQueue: string[];
-  timestamp: string;
-  name: string;
-  nameEn: string;
-  address: string;
-  region: string;
-  area: string;
-}
+import { Store } from '@/lib/types';
 
 interface StoreCardProps {
   store: Store;
