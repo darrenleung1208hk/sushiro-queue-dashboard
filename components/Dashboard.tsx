@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { StoreCard, type Store } from './StoreCard';
 import { StoreListItem } from './StoreListItem';
 import { Input } from '@/components/ui/input';
@@ -39,6 +39,19 @@ export const Dashboard = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
+  // Load view mode preference from localStorage
+  useEffect(() => {
+    const savedView = localStorage.getItem('dashboard-view-mode');
+    if (savedView === 'grid' || savedView === 'list') {
+      setViewMode(savedView);
+    }
+  }, []);
+
+  // Save view mode preference to localStorage
+  useEffect(() => {
+    localStorage.setItem('dashboard-view-mode', viewMode);
+  }, [viewMode]);
 
   const filteredStores = useMemo(() => {
     return stores.filter(store => {
