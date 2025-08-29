@@ -35,29 +35,29 @@ export const StoreCard = ({ store }: StoreCardProps) => {
   const waitTier = getWaitTier(waitingGroup);
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 border border-border shadow-sm bg-card">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between mb-4">
+    <Card className="group hover:shadow-md transition-all duration-200 border border-border shadow-sm bg-card">
+      <CardContent className="p-3">
+        <div className="flex items-start justify-between mb-1">
           <div className="space-y-1">
-            <h3 className="font-semibold text-lg leading-tight text-foreground">
+            <h3 className="font-semibold text-sm leading-tight text-foreground">
               {store.name}
             </h3>
-            <p className="text-sm text-muted-foreground">{store.nameEn}</p>
+            <p className="text-xs text-muted-foreground">{store.nameEn}</p>
           </div>
           <Badge
             variant={isOpen ? 'default' : 'destructive'}
-            className="shrink-0"
+            className="shrink-0 text-[10px] px-1.5 py-0.5 h-5"
           >
             {store.storeStatus}
           </Badge>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-2">
           {/* Metrics */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-2">
             <div
               className={cn(
-                'flex items-center gap-2 p-3 rounded-lg border',
+                'flex items-center gap-2 p-1.5 rounded-md border',
                 waitTier === 'high' &&
                   'bg-destructive/10 border-destructive/20',
                 waitTier === 'medium' && 'bg-warning/10 border-warning/20',
@@ -66,17 +66,17 @@ export const StoreCard = ({ store }: StoreCardProps) => {
             >
               <Users
                 className={cn(
-                  'h-4 w-4',
+                  'h-3 w-3',
                   waitTier === 'high' && 'text-destructive',
                   waitTier === 'medium' && 'text-warning',
                   waitTier === 'low' && 'text-primary'
                 )}
               />
               <div>
-                <p className="text-xs text-muted-foreground">Waiting</p>
+                <p className="text-[10px] text-muted-foreground">Waiting</p>
                 <p
                   className={cn(
-                    'font-semibold',
+                    'font-semibold text-xs',
                     waitTier === 'high' && 'text-destructive',
                     waitTier === 'medium' && 'text-warning',
                     waitTier === 'low' && 'text-foreground'
@@ -86,11 +86,11 @@ export const StoreCard = ({ store }: StoreCardProps) => {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/30 border border-border">
-              <Clock className="h-4 w-4 text-muted-foreground" />
+            <div className="flex items-center gap-2 p-1.5 rounded-md bg-accent/30 border border-border">
+              <Clock className="h-3 w-3 text-muted-foreground" />
               <div>
-                <p className="text-xs text-muted-foreground">Current</p>
-                <p className="font-semibold text-foreground">
+                <p className="text-[10px] text-muted-foreground">Current</p>
+                <p className="font-semibold text-xs text-foreground">
                   {store.storeQueue.length > 0
                     ? `#${store.storeQueue[0]}`
                     : '--'}
@@ -101,18 +101,25 @@ export const StoreCard = ({ store }: StoreCardProps) => {
 
           {/* Queue Details */}
           {queueLength > 0 && (
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-muted-foreground">
+            <div className="space-y-1">
+              <p className="text-[10px] font-medium text-muted-foreground">
                 Current Queue
               </p>
               <div className="flex flex-wrap gap-1">
                 {store.storeQueue.slice(0, 3).map((ticket, index) => (
-                  <Badge key={index} variant="outline" className="text-xs">
+                  <Badge
+                    key={index}
+                    variant="outline"
+                    className="text-[10px] px-1.5 py-0.5 h-5"
+                  >
                     #{ticket}
                   </Badge>
                 ))}
                 {queueLength > 3 && (
-                  <Badge variant="outline" className="text-xs">
+                  <Badge
+                    variant="outline"
+                    className="text-[10px] px-1.5 py-0.5 h-5"
+                  >
                     +{queueLength - 3} more
                   </Badge>
                 )}
@@ -121,13 +128,13 @@ export const StoreCard = ({ store }: StoreCardProps) => {
           )}
 
           {/* Location */}
-          <div className="flex items-start gap-2 pt-4 border-t border-border">
-            <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+          <div className="flex items-start gap-2 pt-2 border-t border-border">
+            <MapPin className="h-3 w-3 text-muted-foreground mt-0.5 shrink-0" />
             <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[10px] text-muted-foreground">
                 {store.region} • {store.area}
               </p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-[10px] text-muted-foreground leading-relaxed">
                 {store.address}
               </p>
             </div>
