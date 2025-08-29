@@ -72,12 +72,10 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/) specificatio
 #### Format
 
 ```
-<type>[optional scope]: <description>
-
-[optional body]
-
-[optional footer(s)]
+<type>: <description>
 ```
+
+**Always use concise format without optional scope or body.**
 
 #### Types
 
@@ -94,7 +92,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/) specificatio
 
 ```
 feat: add store search functionality
-fix(dashboard): resolve queue number display issue
+fix: resolve queue number display issue
 docs: update API documentation
 style: format code with prettier
 refactor: extract store card component
@@ -109,8 +107,8 @@ chore: update dependencies
 2. Use imperative mood: "move cursor to..." not "moves cursor to..."
 3. Don't capitalize the first letter: "add feature" not "Add feature"
 4. No period at the end: "add feature" not "add feature."
-5. Keep it concise: Under 50 characters for the subject line
-6. Use body for detailed explanation when needed
+5. Keep it concise: Use 1 sentence to conclude the changes
+6. **Never use optional scope or body - always use simple format: `<type>: <description>`**
 
 ## 🏪 Store Data Structure
 

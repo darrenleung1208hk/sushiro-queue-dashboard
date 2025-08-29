@@ -23,7 +23,16 @@ interface StoreCardProps {
 export const StoreCard = ({ store }: StoreCardProps) => {
   const isOpen = store.storeStatus === 'OPEN';
   const queueLength = store.storeQueue.length;
-  const hasHighWait = store.waitingGroup >= 20;
+  const waitingGroup = store.waitingGroup;
+
+  // 3-tier waiting system
+  const getWaitTier = (waiting: number) => {
+    if (waiting <= 15) return 'low';
+    if (waiting <= 30) return 'medium';
+    return 'high';
+  };
+
+  const waitTier = getWaitTier(waitingGroup);
 
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 border border-border shadow-sm bg-card">
@@ -49,15 +58,18 @@ export const StoreCard = ({ store }: StoreCardProps) => {
             <div
               className={cn(
                 'flex items-center gap-2 p-3 rounded-lg border',
-                hasHighWait
-                  ? 'bg-destructive/10 border-destructive/20'
-                  : 'bg-success/10 border-success/20'
+                waitTier === 'high' &&
+                  'bg-destructive/10 border-destructive/20',
+                waitTier === 'medium' && 'bg-warning/10 border-warning/20',
+                waitTier === 'low' && 'bg-success/10 border-success/20'
               )}
             >
               <Users
                 className={cn(
                   'h-4 w-4',
-                  hasHighWait ? 'text-destructive' : 'text-primary'
+                  waitTier === 'high' && 'text-destructive',
+                  waitTier === 'medium' && 'text-warning',
+                  waitTier === 'low' && 'text-primary'
                 )}
               />
               <div>
@@ -65,10 +77,12 @@ export const StoreCard = ({ store }: StoreCardProps) => {
                 <p
                   className={cn(
                     'font-semibold',
-                    hasHighWait ? 'text-destructive' : 'text-foreground'
+                    waitTier === 'high' && 'text-destructive',
+                    waitTier === 'medium' && 'text-warning',
+                    waitTier === 'low' && 'text-foreground'
                   )}
                 >
-                  {store.waitingGroup}
+                  {waitingGroup}
                 </p>
               </div>
             </div>

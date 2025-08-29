@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { StoreCard, type Store } from './StoreCard';
+import { StoreListItem } from './StoreListItem';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { ViewToggle } from '@/components/ui/view-toggle';
 import {
   Search,
   Store as StoreIcon,
@@ -36,9 +38,44 @@ export const Dashboard = ({
 }: DashboardProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [isViewTransitioning, setIsViewTransitioning] = useState(false);
+
+  // Load view mode preference from localStorage
+  useEffect(() => {
+    try {
+      const savedView = localStorage.getItem('dashboard-view-mode');
+      if (savedView === 'grid' || savedView === 'list') {
+        setViewMode(savedView);
+      }
+    } catch (error) {
+      // Fallback to default grid view if localStorage is unavailable
+      console.warn('Unable to load view mode preference:', error);
+    }
+  }, []);
+
+  // Save view mode preference to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('dashboard-view-mode', viewMode);
+    } catch (error) {
+      // Silently fail if localStorage is unavailable
+      console.warn('Unable to save view mode preference:', error);
+    }
+  }, [viewMode]);
+
+  // Handle view mode change with transition state
+  const handleViewModeChange = (mode: 'grid' | 'list') => {
+    if (mode !== viewMode) {
+      setIsViewTransitioning(true);
+      setViewMode(mode);
+      // Reset transition state after animation completes
+      setTimeout(() => setIsViewTransitioning(false), 300);
+    }
+  };
 
   const filteredStores = useMemo(() => {
-    return stores.filter(store => {
+    return stores.filter((store) => {
       const matchesSearch =
         store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         store.nameEn.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -56,19 +93,24 @@ export const Dashboard = ({
       (sum, store) => sum + store.waitingGroup,
       0
     );
-    const totalQueue = stores.reduce(
+    const totalCurrentQueue = stores.reduce(
       (sum, store) => sum + store.storeQueue.length,
       0
     );
     const openStores = stores.filter(
-      store => store.storeStatus === 'OPEN'
+      (store) => store.storeStatus === 'OPEN'
     ).length;
 
-    return { totalWaiting, totalQueue, openStores, totalStores: stores.length };
+    return {
+      totalWaiting,
+      totalCurrentQueue,
+      openStores,
+      totalStores: stores.length,
+    };
   }, [stores]);
 
   const uniqueStatuses = Array.from(
-    new Set(stores.map(store => store.storeStatus))
+    new Set(stores.map((store) => store.storeStatus))
   );
 
   return (
@@ -126,11 +168,11 @@ export const Dashboard = ({
                 <Clock className="h-5 w-5 text-success" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Active Tickets</p>
+                <p className="text-sm text-muted-foreground">Current Queue</p>
                 <p className="text-2xl font-bold text-foreground">
-                  {stats.totalQueue}
+                  {stats.totalCurrentQueue}
                 </p>
-                <p className="text-xs text-muted-foreground">In queue</p>
+                <p className="text-xs text-muted-foreground">Active tickets</p>
               </div>
             </div>
           </div>
@@ -160,47 +202,81 @@ export const Dashboard = ({
             <Input
               placeholder="Search stores by name, region, or area..."
               value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
             />
           </div>
 
-          <div className="flex gap-2 flex-wrap">
-            <Badge
-              variant={statusFilter === null ? 'primary' : 'outline'}
-              className="cursor-pointer"
-              onClick={() => setStatusFilter(null)}
-            >
-              All
-            </Badge>
-            {uniqueStatuses.map(status => (
+          <div className="flex gap-2 flex-wrap items-center">
+            <div className="flex gap-2 flex-wrap">
               <Badge
-                key={status}
-                variant={
-                  statusFilter === status
-                    ? status === 'OPEN'
-                      ? 'default'
-                      : 'destructive'
-                    : 'outline'
-                }
+                variant={statusFilter === null ? 'primary' : 'outline'}
                 className="cursor-pointer"
-                onClick={() =>
-                  setStatusFilter(statusFilter === status ? null : status)
-                }
+                onClick={() => setStatusFilter(null)}
               >
-                {status}
+                All
               </Badge>
-            ))}
+              {uniqueStatuses.map((status) => (
+                <Badge
+                  key={status}
+                  variant={
+                    statusFilter === status
+                      ? status === 'OPEN'
+                        ? 'default'
+                        : 'destructive'
+                      : 'outline'
+                  }
+                  className="cursor-pointer"
+                  onClick={() =>
+                    setStatusFilter(statusFilter === status ? null : status)
+                  }
+                >
+                  {status}
+                </Badge>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Store Grid */}
-        {filteredStores.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredStores.map(store => (
-              <StoreCard key={store.shopId} store={store} />
-            ))}
+        {/* View Mode Indicator and Toggle */}
+        {filteredStores.length > 0 && (
+          <div className="flex items-end justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                Showing {filteredStores.length} stores
+              </span>
+              <span className="text-xs text-muted-foreground">
+                in {viewMode === 'grid' ? 'grid' : 'list'} view
+              </span>
+            </div>
+            <ViewToggle
+              viewMode={viewMode}
+              onViewChange={handleViewModeChange}
+            />
           </div>
+        )}
+
+        {/* Store Display */}
+        {filteredStores.length > 0 ? (
+          <>
+            {/* Grid View */}
+            {viewMode === 'grid' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+                {filteredStores.map((store) => (
+                  <StoreCard key={store.shopId} store={store} />
+                ))}
+              </div>
+            )}
+
+            {/* List View */}
+            {viewMode === 'list' && (
+              <div className="space-y-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+                {filteredStores.map((store) => (
+                  <StoreListItem key={store.shopId} store={store} />
+                ))}
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-12">
             <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
