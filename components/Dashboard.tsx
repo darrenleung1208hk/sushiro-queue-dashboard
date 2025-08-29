@@ -72,7 +72,7 @@ export const Dashboard = ({
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/30 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/30 p-6 pb-24">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="space-y-4">
@@ -83,70 +83,6 @@ export const Dashboard = ({
             <p className="text-muted-foreground">
               Monitor store queues and wait times in real-time
             </p>
-          </div>
-
-          {/* Refresh Status Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 bg-card rounded-lg border border-border">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div
-                  className={cn(
-                    'w-2 h-2 rounded-full',
-                    isLoading ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'
-                  )}
-                />
-                <span className="text-sm text-muted-foreground">
-                  {isLoading ? 'Refreshing...' : 'Connected'}
-                </span>
-              </div>
-
-              {lastUpdated && (
-                <span className="text-sm text-muted-foreground">
-                  Last updated: {lastUpdated.toLocaleTimeString()}
-                </span>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
-                Next refresh in: {nextRefreshIn}s
-              </span>
-            </div>
-
-            <div className="ml-auto flex items-center gap-2">
-              {onAutoRefreshToggle && (
-                <button
-                  onClick={() => onAutoRefreshToggle(!autoRefreshEnabled)}
-                  className="flex items-center gap-2 px-3 py-1 text-sm bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/80 transition-colors"
-                >
-                  {autoRefreshEnabled ? (
-                    <>
-                      <Pause className="h-4 w-4" />
-                      Pause
-                    </>
-                  ) : (
-                    <>
-                      <Play className="h-4 w-4" />
-                      Resume
-                    </>
-                  )}
-                </button>
-              )}
-
-              {onManualRefresh && (
-                <button
-                  onClick={onManualRefresh}
-                  disabled={isLoading}
-                  className="flex items-center gap-2 px-3 py-1 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  <RefreshCw
-                    className={cn('h-4 w-4', isLoading && 'animate-spin')}
-                  />
-                  Refresh
-                </button>
-              )}
-            </div>
           </div>
         </div>
 
@@ -276,6 +212,72 @@ export const Dashboard = ({
             </p>
           </div>
         )}
+      </div>
+
+      {/* Floating Refresh Status Bar */}
+      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+        <div className="bg-card/95 backdrop-blur-sm rounded-full border border-border shadow-lg px-6 py-3 flex items-center gap-6">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <div
+                className={cn(
+                  'w-2 h-2 rounded-full',
+                  isLoading ? 'bg-yellow-500 animate-pulse' : 'bg-green-500'
+                )}
+              />
+              <span className="text-sm text-muted-foreground">
+                {isLoading ? 'Refreshing...' : 'Connected'}
+              </span>
+            </div>
+
+            {lastUpdated && (
+              <span className="text-sm text-muted-foreground">
+                Last: {lastUpdated.toLocaleTimeString()}
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">
+              {nextRefreshIn}s
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {onAutoRefreshToggle && (
+              <button
+                onClick={() => onAutoRefreshToggle(!autoRefreshEnabled)}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-secondary text-secondary-foreground rounded-full hover:bg-secondary/80 transition-colors"
+              >
+                {autoRefreshEnabled ? (
+                  <>
+                    <Pause className="h-4 w-4" />
+                    Pause
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-4 w-4" />
+                    Resume
+                  </>
+                )}
+              </button>
+            )}
+
+            {onManualRefresh && (
+              <button
+                onClick={onManualRefresh}
+                disabled={isLoading}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-full hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <RefreshCw
+                  className={cn('h-4 w-4', isLoading && 'animate-spin')}
+                />
+                Refresh
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
