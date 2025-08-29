@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { StoreCard, type Store } from './StoreCard';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { ViewToggle } from '@/components/ui/view-toggle';
 import {
   Search,
   Store as StoreIcon,
@@ -36,6 +37,7 @@ export const Dashboard = ({
 }: DashboardProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   const filteredStores = useMemo(() => {
     return stores.filter(store => {
@@ -165,32 +167,36 @@ export const Dashboard = ({
             />
           </div>
 
-          <div className="flex gap-2 flex-wrap">
-            <Badge
-              variant={statusFilter === null ? 'primary' : 'outline'}
-              className="cursor-pointer"
-              onClick={() => setStatusFilter(null)}
-            >
-              All
-            </Badge>
-            {uniqueStatuses.map(status => (
+          <div className="flex gap-2 flex-wrap items-center">
+            <div className="flex gap-2 flex-wrap">
               <Badge
-                key={status}
-                variant={
-                  statusFilter === status
-                    ? status === 'OPEN'
-                      ? 'default'
-                      : 'destructive'
-                    : 'outline'
-                }
+                variant={statusFilter === null ? 'primary' : 'outline'}
                 className="cursor-pointer"
-                onClick={() =>
-                  setStatusFilter(statusFilter === status ? null : status)
-                }
+                onClick={() => setStatusFilter(null)}
               >
-                {status}
+                All
               </Badge>
-            ))}
+              {uniqueStatuses.map(status => (
+                <Badge
+                  key={status}
+                  variant={
+                    statusFilter === status
+                      ? status === 'OPEN'
+                        ? 'default'
+                        : 'destructive'
+                      : 'outline'
+                  }
+                  className="cursor-pointer"
+                  onClick={() =>
+                    setStatusFilter(statusFilter === status ? null : status)
+                  }
+                >
+                  {status}
+                </Badge>
+              ))}
+            </div>
+            
+            <ViewToggle viewMode={viewMode} onViewChange={setViewMode} />
           </div>
         </div>
 
