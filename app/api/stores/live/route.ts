@@ -105,7 +105,7 @@ function processStoreData(
   storeList: StoreListResponse[],
   queueData: Map<number, QueueResponse | null>
 ): Store[] {
-  return storeList.map(store => {
+  return storeList.map((store) => {
     const queue = queueData.get(store.id);
 
     return {
@@ -148,7 +148,10 @@ export async function GET(
       region: searchParams.get('region') || undefined,
     };
 
-    console.log('Fetching live store data with params:', params);
+    console.log(
+      'Fetching live store data with params:',
+      JSON.stringify(params)
+    );
 
     // Step 1: Fetch store list (equivalent to "Fetch Shops Data" in n8n)
     let storeList: StoreListResponse[];
@@ -197,7 +200,7 @@ export async function GET(
     }
 
     for (const chunk of chunks) {
-      const promises = chunk.map(async store => {
+      const promises = chunk.map(async (store) => {
         try {
           const queueData = await fetchStoreQueue(
             store.id,
@@ -226,7 +229,7 @@ export async function GET(
 
       // Small delay between chunks to be respectful to the API
       if (chunks.indexOf(chunk) < chunks.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
     }
 
