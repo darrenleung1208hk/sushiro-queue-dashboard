@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Dashboard } from '@/components/Dashboard';
-import { Store } from '@/components/StoreCard';
+import { Store } from '@/lib/types';
 import {
   DashboardLoading,
   DashboardError,
-} from '@/app/(ui)/dashboard/_components';
+} from '@/app/[locale]/dashboard/_components';
 
 // Auto-refresh configuration
 const AUTO_REFRESH_INTERVAL_MS = 60000; // 60 seconds
@@ -17,7 +17,9 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [nextRefreshIn, setNextRefreshIn] = useState(AUTO_REFRESH_INTERVAL_SECONDS);
+  const [nextRefreshIn, setNextRefreshIn] = useState(
+    AUTO_REFRESH_INTERVAL_SECONDS
+  );
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
   const isFetchingRef = useRef(false);
 
@@ -77,7 +79,7 @@ export default function DashboardPage() {
     if (!autoRefreshEnabled) return;
 
     const countdown = setInterval(() => {
-      setNextRefreshIn(prev => {
+      setNextRefreshIn((prev) => {
         if (prev <= 1) {
           return AUTO_REFRESH_INTERVAL_SECONDS;
         }
