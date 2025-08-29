@@ -23,9 +23,17 @@ export function LanguageSwitcher() {
   const t = useTranslations()
 
   const handleLanguageChange = (newLocale: string) => {
-    // Remove current locale from pathname if present
-    const pathnameWithoutLocale = pathname.replace(`/${locale}`, '')
-    const newPath = `/${newLocale}${pathnameWithoutLocale}`
+    // Extract the pathname segment after the locale
+    const segments = pathname.split('/')
+    
+    // If first segment is a locale, remove it; otherwise keep the full path
+    const pathWithoutLocale = segments[0] === locale 
+      ? segments.slice(1).join('/') 
+      : segments.join('/')
+    
+    // Construct new path, ensuring proper slash handling
+    const newPath = `/${newLocale}${pathWithoutLocale ? `/${pathWithoutLocale}` : ''}`
+    
     router.push(newPath)
   }
 
