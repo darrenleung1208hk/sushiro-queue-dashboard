@@ -214,6 +214,20 @@ export const Dashboard = ({
           </div>
         </div>
 
+        {/* View Mode Indicator */}
+        {filteredStores.length > 0 && (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                Showing {filteredStores.length} stores
+              </span>
+              <span className="text-xs text-muted-foreground">
+                in {viewMode === 'grid' ? 'grid' : 'list'} view
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Store Display */}
         {filteredStores.length > 0 ? (
           <>
@@ -230,7 +244,11 @@ export const Dashboard = ({
             {viewMode === 'list' && (
               <div className="space-y-3">
                 {filteredStores.map(store => (
-                  <StoreListItem key={store.shopId} store={store} />
+                  <StoreListItem 
+                    key={store.shopId} 
+                    store={store} 
+                    isCompact={false}
+                  />
                 ))}
               </div>
             )}
