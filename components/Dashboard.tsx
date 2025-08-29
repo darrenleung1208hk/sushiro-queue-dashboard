@@ -18,6 +18,8 @@ import { StoreListItem } from './StoreListItem';
 import { ViewToggle } from './ui/view-toggle';
 import { Store, getQueuePriority } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { useTranslations, useLocale } from 'next-intl';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 interface DashboardProps {
   stores: Store[];
@@ -38,6 +40,9 @@ export const Dashboard = ({
   onAutoRefreshToggle,
   onManualRefresh,
 }: DashboardProps) => {
+  const t = useTranslations();
+  const locale = useLocale();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [regionFilter, setRegionFilter] = useState<string | null>(null);
   const [waitingStatusFilter, setWaitingStatusFilter] = useState<string | null>(
@@ -129,13 +134,14 @@ export const Dashboard = ({
       <div className="max-w-7xl mx-auto space-y-4">
         {/* Header */}
         <div className="space-y-2">
-          <div className="space-y-1">
-            <h1 className="text-2xl font-bold text-foreground">
-              Store Queue Dashboard
-            </h1>
-            <p className="text-muted-foreground">
-              Monitor store queues and wait times in real-time
-            </p>
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <h1 className="text-2xl font-bold text-foreground">
+                {t('dashboard.title')}
+              </h1>
+              <p className="text-muted-foreground">{t('dashboard.subtitle')}</p>
+            </div>
+            <LanguageSwitcher />
           </div>
         </div>
 
@@ -148,12 +154,14 @@ export const Dashboard = ({
                   <StoreIcon className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Total Stores</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t('dashboard.stats.totalStores')}
+                  </p>
                   <p className="text-lg font-bold text-foreground">
                     {stats.totalStores}
                   </p>
                   <p className="text-[10px] text-success">
-                    {stats.openStores} Open
+                    {stats.openStores} {t('dashboard.stats.openStores')}
                   </p>
                 </div>
               </div>
@@ -167,12 +175,14 @@ export const Dashboard = ({
                   <Users className="h-4 w-4 text-warning" />
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Total Waiting</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t('dashboard.stats.totalWaiting')}
+                  </p>
                   <p className="text-lg font-bold text-foreground">
                     {stats.totalWaiting}
                   </p>
                   <p className="text-[10px] text-muted-foreground">
-                    Across all stores
+                    {t('dashboard.stats.acrossAllStores')}
                   </p>
                 </div>
               </div>
@@ -186,12 +196,14 @@ export const Dashboard = ({
                   <Clock className="h-4 w-4 text-success" />
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Current Queue</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t('dashboard.stats.currentQueue')}
+                  </p>
                   <p className="text-lg font-bold text-foreground">
                     {stats.totalCurrentQueue}
                   </p>
-                  <p className="text-[10px] text-muted-foreground">
-                    Active tickets
+                  <p className="text-xs text-muted-foreground">
+                    {t('dashboard.stats.activeTickets')}
                   </p>
                 </div>
               </div>
@@ -206,12 +218,14 @@ export const Dashboard = ({
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">
-                    Filtered Results
+                    {t('dashboard.stats.filteredResults')}
                   </p>
                   <p className="text-lg font-bold text-foreground">
                     {filteredStores.length}
                   </p>
-                  <p className="text-xs text-muted-foreground">Showing</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t('dashboard.stats.showing')}
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -223,7 +237,7 @@ export const Dashboard = ({
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search stores by name, region, or area..."
+              placeholder={t('dashboard.filters.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -238,7 +252,7 @@ export const Dashboard = ({
                 className="cursor-pointer"
                 onClick={() => setRegionFilter(null)}
               >
-                All Regions
+                {t('dashboard.filters.allRegions')}
               </Badge>
               {uniqueRegions.map((region) => (
                 <Badge
@@ -261,7 +275,7 @@ export const Dashboard = ({
                 className="cursor-pointer"
                 onClick={() => setWaitingStatusFilter(null)}
               >
-                All Wait Times
+                {t('dashboard.filters.allWaitTimes')}
               </Badge>
               {waitingStatusOptions.map((status) => (
                 <Badge
@@ -284,13 +298,7 @@ export const Dashboard = ({
                     )
                   }
                 >
-                  {status === 'LOW'
-                    ? 'Low Wait'
-                    : status === 'MEDIUM'
-                      ? 'Medium Wait'
-                      : status === 'HIGH'
-                        ? 'High Wait'
-                        : 'Extreme Wait'}
+                  {t(`dashboard.filters.${status.toLowerCase()}Wait`)}
                 </Badge>
               ))}
             </div>
@@ -302,10 +310,14 @@ export const Dashboard = ({
           <div className="flex items-end justify-between">
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground">
-                Showing {filteredStores.length} stores
+                {t('dashboard.viewMode.showingStores', {
+                  count: filteredStores.length,
+                })}
               </span>
               <span className="text-xs text-muted-foreground">
-                in {viewMode === 'grid' ? 'grid' : 'list'} view
+                {t('dashboard.viewMode.inViewMode', {
+                  mode: t(`dashboard.viewMode.${viewMode}`),
+                })}
               </span>
             </div>
             <ViewToggle
@@ -340,10 +352,10 @@ export const Dashboard = ({
           <div className="text-center py-8">
             <Search className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
             <h3 className="text-base font-semibold text-foreground mb-1">
-              No stores found
+              {t('dashboard.noResults.title')}
             </h3>
             <p className="text-muted-foreground">
-              Try adjusting your search or filter criteria
+              {t('dashboard.noResults.message')}
             </p>
           </div>
         )}
@@ -365,13 +377,13 @@ export const Dashboard = ({
                 isLoading ? 'text-yellow-500' : 'text-green-500'
               )}
             >
-              {isLoading ? 'Refreshing...' : 'Connected'}
+              {isLoading ? t('common.refreshing') : t('common.connected')}
             </span>
           </div>
 
           {lastUpdated && (
             <span className="hidden sm:inline text-muted-foreground w-max">
-              Last: {lastUpdated.toLocaleTimeString()}
+              {t('common.last')}: {lastUpdated.toLocaleTimeString()}
             </span>
           )}
 
@@ -396,12 +408,16 @@ export const Dashboard = ({
                 {autoRefreshEnabled ? (
                   <>
                     <Pause className="h-4 w-4" />
-                    <span className="hidden sm:inline">Pause</span>
+                    <span className="hidden sm:inline">
+                      {t('common.pause')}
+                    </span>
                   </>
                 ) : (
                   <>
                     <Play className="h-4 w-4" />
-                    <span className="hidden sm:inline">Resume</span>
+                    <span className="hidden sm:inline">
+                      {t('common.resume')}
+                    </span>
                   </>
                 )}
               </button>
@@ -416,7 +432,7 @@ export const Dashboard = ({
                 <RefreshCw
                   className={cn('h-4 w-4', isLoading && 'animate-spin')}
                 />
-                <span className="hidden sm:inline">Refresh</span>
+                <span className="hidden sm:inline">{t('common.refresh')}</span>
               </button>
             )}
           </div>
