@@ -233,7 +233,7 @@ export const Dashboard = ({
           <>
             {/* Grid View */}
             {viewMode === 'grid' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
                 {filteredStores.map(store => (
                   <StoreCard key={store.shopId} store={store} />
                 ))}
@@ -242,7 +242,7 @@ export const Dashboard = ({
 
             {/* List View */}
             {viewMode === 'list' && (
-              <div className="space-y-3">
+              <div className="space-y-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
                 {filteredStores.map(store => (
                   <StoreListItem 
                     key={store.shopId} 
