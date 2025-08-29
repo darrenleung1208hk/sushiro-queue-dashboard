@@ -1,20 +1,21 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
-import { StoreCard, type Store } from './StoreCard';
-import { StoreListItem } from './StoreListItem';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { ViewToggle } from '@/components/ui/view-toggle';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Search,
-  Store as StoreIcon,
+  StoreIcon,
   Users,
   Clock,
-  RefreshCw,
   Pause,
   Play,
+  RefreshCw,
 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { StoreCard } from './StoreCard';
+import { StoreListItem } from './StoreListItem';
+import { ViewToggle } from './ui/view-toggle';
+import { Store, getQueuePriority } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 interface DashboardProps {
@@ -37,7 +38,10 @@ export const Dashboard = ({
   onManualRefresh,
 }: DashboardProps) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [regionFilter, setRegionFilter] = useState<string | null>(null);
+  const [waitingStatusFilter, setWaitingStatusFilter] = useState<string | null>(
+    null
+  );
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isViewTransitioning, setIsViewTransitioning] = useState(false);
 
@@ -82,11 +86,15 @@ export const Dashboard = ({
         store.region.toLowerCase().includes(searchTerm.toLowerCase()) ||
         store.area.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesStatus = !statusFilter || store.storeStatus === statusFilter;
+      const matchesRegion = !regionFilter || store.region === regionFilter;
 
-      return matchesSearch && matchesStatus;
+      const matchesWaitingStatus =
+        !waitingStatusFilter ||
+        getQueuePriority(store.waitingGroup) === waitingStatusFilter;
+
+      return matchesSearch && matchesRegion && matchesWaitingStatus;
     });
-  }, [stores, searchTerm, statusFilter]);
+  }, [stores, searchTerm, regionFilter, waitingStatusFilter]);
 
   const stats = useMemo(() => {
     const totalWaiting = stores.reduce(
@@ -109,9 +117,11 @@ export const Dashboard = ({
     };
   }, [stores]);
 
-  const uniqueStatuses = Array.from(
-    new Set(stores.map((store) => store.storeStatus))
+  const uniqueRegions = Array.from(
+    new Set(stores.map((store) => store.region))
   );
+
+  const waitingStatusOptions = ['LOW', 'MEDIUM', 'HIGH', 'EXTREME'];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/30 p-4 pb-24">
@@ -212,30 +222,66 @@ export const Dashboard = ({
           </div>
 
           <div className="flex gap-2 flex-wrap items-center">
+            {/* Region Filters */}
             <div className="flex gap-2 flex-wrap">
               <Badge
-                variant={statusFilter === null ? 'primary' : 'outline'}
+                variant={regionFilter === null ? 'primary' : 'outline'}
                 className="cursor-pointer"
-                onClick={() => setStatusFilter(null)}
+                onClick={() => setRegionFilter(null)}
               >
-                All
+                All Regions
               </Badge>
-              {uniqueStatuses.map((status) => (
+              {uniqueRegions.map((region) => (
+                <Badge
+                  key={region}
+                  variant={regionFilter === region ? 'default' : 'outline'}
+                  className="cursor-pointer"
+                  onClick={() =>
+                    setRegionFilter(regionFilter === region ? null : region)
+                  }
+                >
+                  {region}
+                </Badge>
+              ))}
+            </div>
+
+            {/* Waiting Status Filters */}
+            <div className="flex gap-2 flex-wrap">
+              <Badge
+                variant={waitingStatusFilter === null ? 'primary' : 'outline'}
+                className="cursor-pointer"
+                onClick={() => setWaitingStatusFilter(null)}
+              >
+                All Wait Times
+              </Badge>
+              {waitingStatusOptions.map((status) => (
                 <Badge
                   key={status}
                   variant={
-                    statusFilter === status
-                      ? status === 'OPEN'
+                    waitingStatusFilter === status
+                      ? status === 'LOW'
                         ? 'default'
-                        : 'destructive'
+                        : status === 'MEDIUM'
+                          ? 'secondary'
+                          : status === 'HIGH'
+                            ? 'destructive'
+                            : 'destructive'
                       : 'outline'
                   }
                   className="cursor-pointer"
                   onClick={() =>
-                    setStatusFilter(statusFilter === status ? null : status)
+                    setWaitingStatusFilter(
+                      waitingStatusFilter === status ? null : status
+                    )
                   }
                 >
-                  {status}
+                  {status === 'LOW'
+                    ? 'Low Wait'
+                    : status === 'MEDIUM'
+                      ? 'Medium Wait'
+                      : status === 'HIGH'
+                        ? 'High Wait'
+                        : 'Extreme Wait'}
                 </Badge>
               ))}
             </div>
