@@ -7,54 +7,50 @@ interface ViewToggleProps {
 }
 
 export const ViewToggle = ({ viewMode, onViewChange }: ViewToggleProps) => {
-  const handleKeyDown = (event: React.KeyboardEvent, mode: 'grid' | 'list') => {
+  const handleToggle = () => {
+    const newMode = viewMode === 'grid' ? 'list' : 'grid';
+    onViewChange(newMode);
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      onViewChange(mode);
+      handleToggle();
     }
   };
 
   return (
-    <div 
-      className="flex rounded-lg border border-border bg-muted p-1"
-      role="tablist"
-      aria-label="View mode selection"
+    <button
+      onClick={handleToggle}
+      onKeyDown={handleKeyDown}
+      className="flex rounded-md border border-border bg-muted p-0.5 cursor-pointer"
+      role="tab"
+      aria-label={`Switch to ${viewMode === 'grid' ? 'list' : 'grid'} view`}
+      aria-selected={false}
+      tabIndex={0}
     >
-      <button
-        onClick={() => onViewChange('grid')}
-        onKeyDown={(e) => handleKeyDown(e, 'grid')}
+      <div
         className={cn(
-          'flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
-          viewMode === 'grid' 
-            ? 'bg-background text-foreground shadow-sm' 
-            : 'text-muted-foreground hover:text-foreground'
+          'flex items-center gap-1 px-1.5 py-1 rounded-sm text-xs transition-all duration-200',
+          viewMode === 'grid'
+            ? 'bg-background text-foreground shadow-sm'
+            : 'text-muted-foreground'
         )}
-        aria-label="Grid view"
-        aria-selected={viewMode === 'grid'}
-        role="tab"
-        tabIndex={0}
       >
-        <Grid3X3 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+        <Grid3X3 className="h-3 w-3" />
         <span className="hidden sm:inline">Grid</span>
-      </button>
-      
-      <button
-        onClick={() => onViewChange('list')}
-        onKeyDown={(e) => handleKeyDown(e, 'list')}
+      </div>
+      <div
         className={cn(
-          'flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
-          viewMode === 'list' 
-            ? 'bg-background text-foreground shadow-sm' 
-            : 'text-muted-foreground hover:text-foreground'
+          'flex items-center gap-1 px-1.5 py-1 rounded-sm text-xs transition-all duration-200',
+          viewMode === 'list'
+            ? 'bg-background text-foreground shadow-sm'
+            : 'text-muted-foreground'
         )}
-        aria-label="List view"
-        aria-selected={viewMode === 'list'}
-        role="tab"
-        tabIndex={0}
       >
-        <List className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+        <List className="h-3 w-3" />
         <span className="hidden sm:inline">List</span>
-      </button>
-    </div>
+      </div>
+    </button>
   );
 };
