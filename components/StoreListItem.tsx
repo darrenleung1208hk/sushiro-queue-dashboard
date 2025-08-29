@@ -25,7 +25,7 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
               </h3>
               <Badge
                 variant={isOpen ? 'default' : 'destructive'}
-                className="shrink-0 text-xs"
+                className="shrink-0 text-[10px] px-1.5 py-0.5 h-5"
               >
                 {store.storeStatus}
               </Badge>
@@ -36,27 +36,39 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
           </div>
 
           {/* Metrics */}
-          <div className="flex items-center gap-6 text-sm shrink-0">
-            <div className="text-center">
-              <div className="flex items-center gap-1 justify-center mb-1">
-                <Users className="h-3 w-3 text-muted-foreground" />
-                <p className="text-xs text-muted-foreground">Waiting</p>
+          <div className="grid grid-cols-2 gap-2 text-sm shrink-0">
+            <div
+              className={cn(
+                'flex flex-col items-center justify-center gap-1 p-1.5 rounded-md border text-center',
+                hasHighWait
+                  ? 'bg-destructive/10 border-destructive/20'
+                  : 'bg-success/10 border-success/20'
+              )}
+            >
+              <div className="flex items-center gap-1 text-center">
+                <Users
+                  className={cn(
+                    'h-3 w-3',
+                    hasHighWait ? 'text-destructive' : 'text-primary'
+                  )}
+                />
+                <p className="text-[10px] text-muted-foreground">Waiting</p>
               </div>
               <p
                 className={cn(
-                  'font-semibold text-sm',
+                  'font-semibold text-xs',
                   hasHighWait ? 'text-destructive' : 'text-foreground'
                 )}
               >
                 {store.waitingGroup}
               </p>
             </div>
-            <div className="text-center">
-              <div className="flex items-center gap-1 justify-center mb-1">
+            <div className="flex flex-col items-center justify-center gap-1 p-1.5 rounded-md bg-accent/30 border border-border text-center">
+              <div className="flex items-center gap-1 text-center">
                 <Clock className="h-3 w-3 text-muted-foreground" />
-                <p className="text-xs text-muted-foreground">Current</p>
+                <p className="text-[10px] text-muted-foreground">Current</p>
               </div>
-              <p className="font-semibold text-sm text-foreground">
+              <p className="font-semibold text-xs text-foreground">
                 {queueLength > 0 ? `#${store.storeQueue[0]}` : '--'}
               </p>
             </div>
