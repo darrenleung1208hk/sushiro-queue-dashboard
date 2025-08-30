@@ -64,7 +64,14 @@ export function LanguageSwitcher() {
 
     // Construct the new path
     const newPath = `/${newLocale}${pathWithoutLocale ? `/${pathWithoutLocale}` : ''}`;
+    
+    // Use router.push for navigation
     router.push(newPath);
+    
+    // Force a page refresh to ensure translations update properly
+    setTimeout(() => {
+      window.location.href = newPath;
+    }, 100);
   };
 
   return (

@@ -10,8 +10,8 @@ export default createMiddleware({
   // Locale detection strategy
   localeDetection: true,
 
-  // Locale prefix strategy
-  localePrefix: 'as-needed',
+  // Locale prefix strategy - use 'always' for more reliable locale handling
+  localePrefix: 'always',
 });
 
 export const config = {
