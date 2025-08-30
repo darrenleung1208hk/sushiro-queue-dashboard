@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Clock, Users, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Store } from '@/lib/types';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface StoreCardProps {
   store: Store;
@@ -11,9 +11,13 @@ interface StoreCardProps {
 
 export const StoreCard = ({ store }: StoreCardProps) => {
   const t = useTranslations();
+  const locale = useLocale();
   const isOpen = store.storeStatus === 'OPEN';
   const queueLength = store.storeQueue.length;
   const waitingGroup = store.waitingGroup;
+
+  // Get localized store name based on current locale
+  const storeName = locale === 'zh-HK' ? store.name : store.nameEn;
 
   // 3-tier waiting system
   const getWaitTier = (waiting: number) => {
@@ -29,10 +33,9 @@ export const StoreCard = ({ store }: StoreCardProps) => {
       <CardContent className="p-3">
         <div className="flex items-start justify-between mb-1">
           <div className="space-y-1">
-            <h3 className="font-semibold leading-tight text-foreground">
-              {store.name}
+            <h3 className="font-semibold text-sm leading-tight text-foreground">
+              {storeName}
             </h3>
-            <p className="text-xs text-muted-foreground">{store.nameEn}</p>
           </div>
           <Badge
             variant={isOpen ? 'default' : 'destructive'}
