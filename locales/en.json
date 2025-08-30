@@ -54,7 +54,9 @@
     },
     "waiting": "Waiting",
     "current": "Current",
-    "queue": "Queue"
+    "queue": "Queue",
+    "currentQueue": "Current Queue",
+    "moreTickets": "+{count} more"
   },
   "navigation": {
     "home": "Home",
@@ -63,6 +65,14 @@
   "errors": {
     "general": "Something went wrong",
     "notFound": "Page not found",
-    "networkError": "Network error occurred"
+    "networkError": "Network error occurred",
+    "failedToLoadData": "Failed to Load Data",
+    "unableToFetchStores": "Unable to fetch store information from the server.",
+    "unknownError": "An unknown error occurred"
+  },
+  "ui": {
+    "grid": "Grid",
+    "list": "List",
+    "switchToView": "Switch to {view} view"
   }
 }

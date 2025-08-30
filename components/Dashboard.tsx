@@ -316,7 +316,7 @@ export const Dashboard = ({
               </span>
               <span className="text-xs text-muted-foreground">
                 {t('dashboard.viewMode.inViewMode', {
-                  mode: t(`dashboard.viewMode.${viewMode}`),
+                  mode: t(`ui.${viewMode}`),
                 })}
               </span>
             </div>

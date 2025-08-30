@@ -54,7 +54,9 @@
     },
     "waiting": "等候",
     "current": "當前",
-    "queue": "排隊"
+    "queue": "排隊",
+    "currentQueue": "當前排隊",
+    "moreTickets": "+{count} 更多"
   },
   "navigation": {
     "home": "首頁",
@@ -63,6 +65,14 @@
   "errors": {
     "general": "發生錯誤",
     "notFound": "找不到頁面",
-    "networkError": "網路錯誤"
+    "networkError": "網路錯誤",
+    "failedToLoadData": "載入資料失敗",
+    "unableToFetchStores": "無法從伺服器取得店舖資訊。",
+    "unknownError": "發生未知錯誤"
+  },
+  "ui": {
+    "grid": "網格",
+    "list": "列表",
+    "switchToView": "切換至{view}檢視"
   }
 }

@@ -3,12 +3,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Clock, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Store } from '@/lib/types';
+import { useTranslations } from 'next-intl';
 
 interface StoreListItemProps {
   store: Store;
 }
 
 export const StoreListItem = ({ store }: StoreListItemProps) => {
+  const t = useTranslations();
   const isOpen = store.storeStatus === 'OPEN';
   const queueLength = store.storeQueue.length;
   const waitingGroup = store.waitingGroup;
@@ -64,7 +66,9 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
                     waitTier === 'low' && 'text-primary'
                   )}
                 />
-                <p className="text-[10px] text-muted-foreground">Waiting</p>
+                <p className="text-[10px] text-muted-foreground">
+                  {t('store.waiting')}
+                </p>
               </div>
               <p
                 className={cn(
@@ -80,7 +84,9 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
             <div className="flex flex-col items-center justify-center gap-1 p-1.5 rounded-md bg-accent/30 border border-border text-center">
               <div className="flex items-center gap-1 text-center">
                 <Clock className="h-3 w-3 text-muted-foreground" />
-                <p className="text-[10px] text-muted-foreground">Current</p>
+                <p className="text-[10px] text-muted-foreground">
+                  {t('store.current')}
+                </p>
               </div>
               <p className="font-semibold text-sm text-foreground">
                 {queueLength > 0 ? `#${store.storeQueue[0]}` : '--'}

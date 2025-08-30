@@ -1,12 +1,9 @@
+import { cookies } from 'next/headers';
 import { getRequestConfig } from 'next-intl/server';
-import { notFound } from 'next/navigation';
 
-// Can be imported from a shared config
-const locales = ['en', 'zh-HK'];
-
-export default getRequestConfig(async ({ locale = 'en' }) => {
-  // Validate that the incoming `locale` parameter is valid
-  if (!locales.includes(locale)) notFound();
+export default getRequestConfig(async () => {
+  const store = await cookies();
+  const locale = store.get('locale')?.value || 'en';
 
   return {
     locale,
