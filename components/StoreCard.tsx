@@ -87,43 +87,49 @@ export const StoreCard = ({ store }: StoreCardProps) => {
             </div>
           </div>
 
-          {/* Queue Details */}
-          {queueLength > 0 && (
-            <div className="space-y-1">
-              <p className="text-[10px] font-medium text-muted-foreground">
-                Current Queue
-              </p>
-              <div className="flex flex-wrap gap-1">
-                {store.storeQueue.slice(0, 3).map((ticket, index) => (
-                  <Badge
-                    key={index}
-                    variant="outline"
-                    className="text-[10px] px-1.5 py-0.5 h-5"
-                  >
-                    #{ticket}
-                  </Badge>
-                ))}
-                {queueLength > 3 && (
-                  <Badge
-                    variant="outline"
-                    className="text-[10px] px-1.5 py-0.5 h-5"
-                  >
-                    +{queueLength - 3} more
-                  </Badge>
-                )}
-              </div>
+          {/* Queue Details - Always show for consistent layout */}
+          <div className="space-y-1">
+            <p className="text-[10px] font-medium text-muted-foreground">
+              Current Queue
+            </p>
+            <div className="flex flex-wrap gap-1">
+              {queueLength > 0 ? (
+                <>
+                  {store.storeQueue.slice(0, 3).map((ticket, index) => (
+                    <Badge
+                      key={index}
+                      variant="outline"
+                      className="text-[10px] px-1.5 py-0.5 h-5"
+                    >
+                      #{ticket}
+                    </Badge>
+                  ))}
+                  {queueLength > 3 && (
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] px-1.5 py-0.5 h-5"
+                    >
+                      +{queueLength - 3} more
+                    </Badge>
+                  )}
+                </>
+              ) : (
+                <Badge
+                  variant="outline"
+                  className="text-[10px] px-1.5 py-0.5 h-5 text-muted-foreground"
+                >
+                  No tickets
+                </Badge>
+              )}
             </div>
-          )}
+          </div>
 
           {/* Location */}
           <div className="flex items-start gap-2 pt-2 border-t border-border">
             <MapPin className="h-3 w-3 text-muted-foreground mt-0.5 shrink-0" />
-            <div className="space-y-1">
+            <div>
               <p className="text-[10px] text-muted-foreground">
                 {store.region} • {store.area}
-              </p>
-              <p className="text-[10px] text-muted-foreground leading-relaxed">
-                {store.address}
               </p>
             </div>
           </div>

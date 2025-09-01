@@ -143,24 +143,23 @@ export function DashboardLoading() {
                     </div>
                   </div>
 
-                  {/* Queue Details Skeleton - Always show in loading for consistent layout */}
-                  <div className="space-y-1">
-                    <Skeleton className="h-2.5 w-24" />
-                    <div className="flex flex-wrap gap-1">
-                      <Skeleton className="h-5 w-12" />
-                      <Skeleton className="h-5 w-12" />
-                      <Skeleton className="h-5 w-12" />
-                    </div>
-                  </div>
+                                     {/* Queue Details Skeleton - Always show for consistent layout */}
+                   <div className="space-y-1">
+                     <Skeleton className="h-2.5 w-24" />
+                     <div className="flex flex-wrap gap-1">
+                       <Skeleton className="h-5 w-12" />
+                       <Skeleton className="h-5 w-12" />
+                       <Skeleton className="h-5 w-12" />
+                     </div>
+                   </div>
 
-                  {/* Location Skeleton */}
-                  <div className="flex items-start gap-2 pt-2 border-t border-border">
-                    <Skeleton className="h-3 w-3 mt-0.5 shrink-0" />
-                    <div className="space-y-1">
-                      <Skeleton className="h-2.5 w-32" />
-                      <Skeleton className="h-2.5 w-24" />
-                    </div>
-                  </div>
+                                     {/* Location Skeleton */}
+                   <div className="flex items-start gap-2 pt-2 border-t border-border">
+                     <Skeleton className="h-3 w-3 mt-0.5 shrink-0" />
+                     <div>
+                       <Skeleton className="h-2.5 w-32" />
+                     </div>
+                   </div>
                 </div>
               </CardContent>
             </Card>
