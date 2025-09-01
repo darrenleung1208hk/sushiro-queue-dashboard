@@ -8,23 +8,9 @@ export function DashboardLoading() {
       <div className="max-w-7xl mx-auto space-y-4">
         {/* Header Skeleton */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <div>
-              <Skeleton className="h-9 w-80" />
-            </div>
-
-            {/* Connection Status and Controls Skeleton */}
-            <div className="flex items-center gap-3">
-              <Skeleton className="h-6 w-20" />
-              <Skeleton className="h-5 w-32" />
-              <Skeleton className="h-9 w-24" />
-            </div>
-          </div>
-
-          {/* Update Timer Skeleton */}
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-4 w-4" />
-            <Skeleton className="h-4 w-40" />
+          <div className="space-y-1">
+            <Skeleton className="h-8 w-80" />
+            <Skeleton className="h-6 w-96" />
           </div>
         </div>
 
@@ -37,10 +23,10 @@ export function DashboardLoading() {
                 <div className="p-1.5 bg-primary/10 rounded-md">
                   <StoreIcon className="h-4 w-4 text-primary" />
                 </div>
-                <div className="space-y-2 flex-1">
-                  <Skeleton className="h-4 w-20" />
-                  <Skeleton className="h-8 w-16" />
-                  <Skeleton className="h-3 w-12" />
+                <div className="flex-1 space-y-[6px]">
+                  <Skeleton className="h-3 w-20" />
+                  <Skeleton className="h-7 w-16" />
+                  <Skeleton className="h-2.5 w-12" />
                 </div>
               </div>
             </CardContent>
@@ -53,10 +39,10 @@ export function DashboardLoading() {
                 <div className="p-1.5 bg-warning/10 rounded-md">
                   <Users className="h-4 w-4 text-warning" />
                 </div>
-                <div className="space-y-2 flex-1">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-8 w-16" />
-                  <Skeleton className="h-3 w-28" />
+                <div className="flex-1 space-y-[6px]">
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-7 w-16" />
+                  <Skeleton className="h-2.5 w-28" />
                 </div>
               </div>
             </CardContent>
@@ -69,10 +55,10 @@ export function DashboardLoading() {
                 <div className="p-1.5 bg-success/10 rounded-md">
                   <Clock className="h-4 w-4 text-success" />
                 </div>
-                <div className="space-y-2 flex-1">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-8 w-16" />
-                  <Skeleton className="h-3 w-16" />
+                <div className="flex-1 space-y-[6px]">
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-7 w-16" />
+                  <Skeleton className="h-2.5 w-16" />
                 </div>
               </div>
             </CardContent>
@@ -85,10 +71,10 @@ export function DashboardLoading() {
                 <div className="p-1.5 bg-destructive/10 rounded-md">
                   <Search className="h-4 w-4 text-destructive" />
                 </div>
-                <div className="space-y-2 flex-1">
-                  <Skeleton className="h-4 w-28" />
-                  <Skeleton className="h-8 w-16" />
-                  <Skeleton className="h-3 w-16" />
+                <div className="flex-1 space-y-[6px]">
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-7 w-16" />
+                  <Skeleton className="h-2.5 w-16" />
                 </div>
               </div>
             </CardContent>
@@ -96,21 +82,19 @@ export function DashboardLoading() {
         </div>
 
         {/* Filters Skeleton */}
-        <Card className="border border-border">
-          <CardContent className="p-3">
-            <div className="flex flex-col sm:flex-row gap-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Skeleton className="h-10 w-full pl-10" />
-              </div>
-              <div className="flex gap-2 flex-wrap">
-                <Skeleton className="h-8 w-16" />
-                <Skeleton className="h-8 w-20" />
-                <Skeleton className="h-8 w-24" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex flex-col sm:flex-row gap-2 bg-card rounded-lg p-3 border border-border">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Skeleton className="h-10 w-full pl-10" />
+          </div>
+          <div className="flex gap-2 flex-wrap items-center">
+            <Skeleton className="h-8 w-20" />
+            <Skeleton className="h-8 w-24" />
+            <Skeleton className="h-8 w-28" />
+            <Skeleton className="h-8 w-20" />
+            <Skeleton className="h-8 w-24" />
+          </div>
+        </div>
 
         {/* View Toggle Skeleton */}
         <div className="flex items-end justify-between">
@@ -133,11 +117,11 @@ export function DashboardLoading() {
             >
               <CardContent className="p-3">
                 <div className="flex items-start justify-between mb-1">
-                  <div className="space-y-2 flex-1">
-                    <Skeleton className="h-6 w-32" />
-                    <Skeleton className="h-4 w-24" />
+                  <div className="space-y-1 flex-1">
+                    <Skeleton className="h-5 w-32" />
+                    <Skeleton className="h-3 w-24" />
                   </div>
-                  <Skeleton className="h-6 w-16 shrink-0" />
+                  <Skeleton className="h-5 w-16 shrink-0" />
                 </div>
 
                 <div className="space-y-2">
@@ -146,22 +130,22 @@ export function DashboardLoading() {
                     <div className="flex items-center gap-2 p-1.5 rounded-md border">
                       <Skeleton className="h-3 w-3" />
                       <div className="space-y-1">
-                        <Skeleton className="h-3 w-16" />
-                        <Skeleton className="h-4 w-12" />
+                        <Skeleton className="h-2.5 w-16" />
+                        <Skeleton className="h-3.5 w-12" />
                       </div>
                     </div>
                     <div className="flex items-center gap-2 p-1.5 rounded-md border">
                       <Skeleton className="h-3 w-3" />
                       <div className="space-y-1">
-                        <Skeleton className="h-3 w-16" />
-                        <Skeleton className="h-4 w-8" />
+                        <Skeleton className="h-2.5 w-16" />
+                        <Skeleton className="h-3.5 w-8" />
                       </div>
                     </div>
                   </div>
 
                   {/* Queue Details Skeleton - Always show in loading for consistent layout */}
                   <div className="space-y-1">
-                    <Skeleton className="h-3 w-24" />
+                    <Skeleton className="h-2.5 w-24" />
                     <div className="flex flex-wrap gap-1">
                       <Skeleton className="h-5 w-12" />
                       <Skeleton className="h-5 w-12" />
@@ -171,10 +155,10 @@ export function DashboardLoading() {
 
                   {/* Location Skeleton */}
                   <div className="flex items-start gap-2 pt-2 border-t border-border">
-                    <Skeleton className="h-4 w-4 mt-0.5 shrink-0" />
+                    <Skeleton className="h-3 w-3 mt-0.5 shrink-0" />
                     <div className="space-y-1 flex-1">
-                      <Skeleton className="h-4 w-32" />
-                      <Skeleton className="h-3 w-24" />
+                      <Skeleton className="h-2.5 w-32" />
+                      <Skeleton className="h-2.5 w-24" />
                     </div>
                   </div>
                 </div>
