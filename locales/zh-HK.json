@@ -56,7 +56,8 @@
     "current": "當前",
     "queue": "排隊",
     "currentQueue": "當前排隊",
-    "moreTickets": "+{count} 更多"
+    "moreTickets": "+{count} 更多",
+    "noTickets": "無票號"
   },
   "navigation": {
     "home": "首頁",

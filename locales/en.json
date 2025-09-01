@@ -56,7 +56,8 @@
     "current": "Current",
     "queue": "Queue",
     "currentQueue": "Current Queue",
-    "moreTickets": "+{count} more"
+    "moreTickets": "+{count} more",
+    "noTickets": "No tickets"
   },
   "navigation": {
     "home": "Home",
