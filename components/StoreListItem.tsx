@@ -88,6 +88,45 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
             </div>
           </div>
         </div>
+
+        {/* Current Queue - Always show for consistent layout */}
+        <div className="mt-3 pt-3 border-t border-border">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-medium text-muted-foreground">
+              Current Queue
+            </p>
+            <div className="flex flex-wrap gap-1">
+              {queueLength > 0 ? (
+                <>
+                  {store.storeQueue.slice(0, 3).map((ticket, index) => (
+                    <Badge
+                      key={index}
+                      variant="outline"
+                      className="text-[10px] px-1.5 py-0.5 h-5"
+                    >
+                      #{ticket}
+                    </Badge>
+                  ))}
+                  {queueLength > 3 && (
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] px-1.5 py-0.5 h-5"
+                    >
+                      +{queueLength - 3} more
+                    </Badge>
+                  )}
+                </>
+              ) : (
+                <Badge
+                  variant="outline"
+                  className="text-[10px] px-1.5 py-0.5 h-5 text-muted-foreground"
+                >
+                  No tickets
+                </Badge>
+              )}
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
