@@ -27,7 +27,7 @@ export const StoreCard = ({ store }: StoreCardProps) => {
       <CardContent className="p-3">
         <div className="flex items-start justify-between mb-1">
           <div className="space-y-1">
-            <h3 className="font-semibold text-sm leading-tight text-foreground">
+            <h3 className="font-semibold leading-tight text-foreground">
               {store.name}
             </h3>
             <p className="text-xs text-muted-foreground">{store.nameEn}</p>
@@ -64,7 +64,7 @@ export const StoreCard = ({ store }: StoreCardProps) => {
                 <p className="text-[10px] text-muted-foreground">Waiting</p>
                 <p
                   className={cn(
-                    'font-semibold text-xs',
+                    'font-semibold text-sm',
                     waitTier === 'high' && 'text-destructive',
                     waitTier === 'medium' && 'text-warning',
                     waitTier === 'low' && 'text-foreground'
@@ -78,7 +78,7 @@ export const StoreCard = ({ store }: StoreCardProps) => {
               <Clock className="h-3 w-3 text-muted-foreground" />
               <div>
                 <p className="text-[10px] text-muted-foreground">Current</p>
-                <p className="font-semibold text-xs text-foreground">
+                <p className="font-semibold text-sm text-foreground">
                   {store.storeQueue.length > 0
                     ? `#${store.storeQueue[0]}`
                     : '--'}

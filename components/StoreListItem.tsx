@@ -29,7 +29,7 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
           {/* Store Info */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-semibold text-sm text-foreground truncate">
+              <h3 className="font-semibold text-foreground truncate">
                 {store.name}
               </h3>
               <Badge
@@ -45,7 +45,7 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
           </div>
 
           {/* Metrics */}
-          <div className="grid grid-cols-2 gap-2 text-sm shrink-0">
+          <div className="grid grid-cols-2 gap-2 shrink-0">
             <div
               className={cn(
                 'flex flex-col items-center justify-center gap-1 p-1.5 rounded-md border text-center',
@@ -68,7 +68,7 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
               </div>
               <p
                 className={cn(
-                  'font-semibold text-xs',
+                  'font-semibold text-sm',
                   waitTier === 'high' && 'text-destructive',
                   waitTier === 'medium' && 'text-warning',
                   waitTier === 'low' && 'text-foreground'
@@ -82,7 +82,7 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
                 <Clock className="h-3 w-3 text-muted-foreground" />
                 <p className="text-[10px] text-muted-foreground">Current</p>
               </div>
-              <p className="font-semibold text-xs text-foreground">
+              <p className="font-semibold text-sm text-foreground">
                 {queueLength > 0 ? `#${store.storeQueue[0]}` : '--'}
               </p>
             </div>
