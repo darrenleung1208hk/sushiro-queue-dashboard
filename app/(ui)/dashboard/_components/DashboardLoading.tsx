@@ -99,8 +99,8 @@ export function DashboardLoading() {
         {/* View Toggle Skeleton */}
         <div className="flex items-end justify-between">
           <div className="flex items-center gap-2">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-6 w-32" />
+            <Skeleton className="h-4 w-20" />
           </div>
           <div className="flex gap-1">
             <Skeleton className="h-8 w-16" />
@@ -117,9 +117,9 @@ export function DashboardLoading() {
             >
               <CardContent className="p-3">
                 <div className="flex items-start justify-between mb-1">
-                  <div className="space-y-1 flex-1">
+                  <div className="space-y-1">
                     <Skeleton className="h-5 w-32" />
-                    <Skeleton className="h-3 w-24" />
+                    <Skeleton className="h-4 w-24" />
                   </div>
                   <Skeleton className="h-5 w-16 shrink-0" />
                 </div>
@@ -127,18 +127,18 @@ export function DashboardLoading() {
                 <div className="space-y-2">
                   {/* Metrics Skeleton */}
                   <div className="grid grid-cols-2 gap-2">
-                    <div className="flex items-center gap-2 p-1.5 rounded-md border">
+                    <div className="flex items-center gap-2 p-2 rounded-md border">
                       <Skeleton className="h-3 w-3" />
                       <div className="space-y-1">
                         <Skeleton className="h-2.5 w-16" />
-                        <Skeleton className="h-3.5 w-12" />
+                        <Skeleton className="h-4 w-12" />
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 p-1.5 rounded-md border">
+                    <div className="flex items-center gap-2 p-2 rounded-md border">
                       <Skeleton className="h-3 w-3" />
                       <div className="space-y-1">
                         <Skeleton className="h-2.5 w-16" />
-                        <Skeleton className="h-3.5 w-8" />
+                        <Skeleton className="h-4 w-12" />
                       </div>
                     </div>
                   </div>
@@ -156,7 +156,7 @@ export function DashboardLoading() {
                   {/* Location Skeleton */}
                   <div className="flex items-start gap-2 pt-2 border-t border-border">
                     <Skeleton className="h-3 w-3 mt-0.5 shrink-0" />
-                    <div className="space-y-1 flex-1">
+                    <div className="space-y-1">
                       <Skeleton className="h-2.5 w-32" />
                       <Skeleton className="h-2.5 w-24" />
                     </div>
