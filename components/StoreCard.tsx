@@ -122,7 +122,7 @@ export const StoreCard = ({ store }: StoreCardProps) => {
                 )}
               </div>
             </div>
-          </div>
+          )}
 
           {/* Location */}
           <div className="flex items-start gap-2 pt-2 border-t border-border">
