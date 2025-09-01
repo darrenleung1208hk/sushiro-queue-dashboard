@@ -430,7 +430,7 @@ export const Dashboard = ({
                 <RefreshCw
                   className={cn('h-4 w-4', isLoading && 'animate-spin')}
                 />
-                <span className="hidden sm:inline">Refresh</span>
+                <span className="hidden sm:inline">{t('common.refresh')}</span>
               </button>
             )}
           </div>
