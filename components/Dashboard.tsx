@@ -11,6 +11,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { StoreCard } from './StoreCard';
 import { StoreListItem } from './StoreListItem';
@@ -132,7 +133,7 @@ export const Dashboard = ({
             <h1 className="text-2xl font-bold text-foreground">
               Store Queue Dashboard
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground">
               Monitor store queues and wait times in real-time
             </p>
           </div>
@@ -140,73 +141,81 @@ export const Dashboard = ({
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
-          <div className="bg-card rounded-lg p-3 border border-border shadow-sm">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-primary/10 rounded-md">
-                <StoreIcon className="h-4 w-4 text-primary" />
+          <Card className="border border-border shadow-sm">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-primary/10 rounded-md">
+                  <StoreIcon className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Total Stores</p>
+                  <p className="text-lg font-bold text-foreground">
+                    {stats.totalStores}
+                  </p>
+                  <p className="text-[10px] text-success">
+                    {stats.openStores} Open
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Total Stores</p>
-                <p className="text-lg font-bold text-foreground">
-                  {stats.totalStores}
-                </p>
-                <p className="text-[10px] text-success">
-                  {stats.openStores} Open
-                </p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-card rounded-lg p-3 border border-border shadow-sm">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-warning/10 rounded-md">
-                <Users className="h-4 w-4 text-warning" />
+          <Card className="border border-border shadow-sm">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-warning/10 rounded-md">
+                  <Users className="h-4 w-4 text-warning" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Total Waiting</p>
+                  <p className="text-lg font-bold text-foreground">
+                    {stats.totalWaiting}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground">
+                    Across all stores
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Total Waiting</p>
-                <p className="text-lg font-bold text-foreground">
-                  {stats.totalWaiting}
-                </p>
-                <p className="text-[10px] text-muted-foreground">
-                  Across all stores
-                </p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-card rounded-lg p-3 border border-border shadow-sm">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-success/10 rounded-md">
-                <Clock className="h-4 w-4 text-success" />
+          <Card className="border border-border shadow-sm">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-success/10 rounded-md">
+                  <Clock className="h-4 w-4 text-success" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Current Queue</p>
+                  <p className="text-lg font-bold text-foreground">
+                    {stats.totalCurrentQueue}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground">
+                    Active tickets
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Current Queue</p>
-                <p className="text-lg font-bold text-foreground">
-                  {stats.totalCurrentQueue}
-                </p>
-                <p className="text-[10px] text-muted-foreground">
-                  Active tickets
-                </p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-card rounded-lg p-3 border border-border shadow-sm">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-destructive/10 rounded-md">
-                <Search className="h-4 w-4 text-destructive" />
+          <Card className="border border-border shadow-sm">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-destructive/10 rounded-md">
+                  <Search className="h-4 w-4 text-destructive" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">
+                    Filtered Results
+                  </p>
+                  <p className="text-lg font-bold text-foreground">
+                    {filteredStores.length}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Showing</p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground">
-                  Filtered Results
-                </p>
-                <p className="text-lg font-bold text-foreground">
-                  {filteredStores.length}
-                </p>
-                <p className="text-[10px] text-muted-foreground">Showing</p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Filters */}
@@ -292,7 +301,7 @@ export const Dashboard = ({
         {filteredStores.length > 0 && (
           <div className="flex items-end justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">
+              <span className="text-muted-foreground">
                 Showing {filteredStores.length} stores
               </span>
               <span className="text-xs text-muted-foreground">
@@ -333,7 +342,7 @@ export const Dashboard = ({
             <h3 className="text-base font-semibold text-foreground mb-1">
               No stores found
             </h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground">
               Try adjusting your search or filter criteria
             </p>
           </div>
@@ -361,7 +370,7 @@ export const Dashboard = ({
           </div>
 
           {lastUpdated && (
-            <span className="hidden sm:inline text-sm text-muted-foreground w-max">
+            <span className="hidden sm:inline text-muted-foreground w-max">
               Last: {lastUpdated.toLocaleTimeString()}
             </span>
           )}
@@ -382,7 +391,7 @@ export const Dashboard = ({
             {onAutoRefreshToggle && (
               <button
                 onClick={() => onAutoRefreshToggle(!autoRefreshEnabled)}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-secondary text-secondary-foreground rounded-full hover:bg-secondary/80 transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 bg-secondary text-secondary-foreground rounded-full hover:bg-secondary/80 transition-colors"
               >
                 {autoRefreshEnabled ? (
                   <>
@@ -402,7 +411,7 @@ export const Dashboard = ({
               <button
                 onClick={onManualRefresh}
                 disabled={isLoading}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-full hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <RefreshCw
                   className={cn('h-4 w-4', isLoading && 'animate-spin')}

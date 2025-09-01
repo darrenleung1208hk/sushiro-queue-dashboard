@@ -27,7 +27,7 @@ export const StoreCard = ({ store }: StoreCardProps) => {
       <CardContent className="p-3">
         <div className="flex items-start justify-between mb-1">
           <div className="space-y-1">
-            <h3 className="font-semibold text-sm leading-tight text-foreground">
+            <h3 className="font-semibold leading-tight text-foreground">
               {store.name}
             </h3>
             <p className="text-xs text-muted-foreground">{store.nameEn}</p>
@@ -64,7 +64,7 @@ export const StoreCard = ({ store }: StoreCardProps) => {
                 <p className="text-[10px] text-muted-foreground">Waiting</p>
                 <p
                   className={cn(
-                    'font-semibold text-xs',
+                    'font-semibold text-sm',
                     waitTier === 'high' && 'text-destructive',
                     waitTier === 'medium' && 'text-warning',
                     waitTier === 'low' && 'text-foreground'
@@ -78,7 +78,7 @@ export const StoreCard = ({ store }: StoreCardProps) => {
               <Clock className="h-3 w-3 text-muted-foreground" />
               <div>
                 <p className="text-[10px] text-muted-foreground">Current</p>
-                <p className="font-semibold text-xs text-foreground">
+                <p className="font-semibold text-sm text-foreground">
                   {store.storeQueue.length > 0
                     ? `#${store.storeQueue[0]}`
                     : '--'}
@@ -87,43 +87,49 @@ export const StoreCard = ({ store }: StoreCardProps) => {
             </div>
           </div>
 
-          {/* Queue Details */}
-          {queueLength > 0 && (
-            <div className="space-y-1">
-              <p className="text-[10px] font-medium text-muted-foreground">
-                Current Queue
-              </p>
-              <div className="flex flex-wrap gap-1">
-                {store.storeQueue.slice(0, 3).map((ticket, index) => (
-                  <Badge
-                    key={index}
-                    variant="outline"
-                    className="text-[10px] px-1.5 py-0.5 h-5"
-                  >
-                    #{ticket}
-                  </Badge>
-                ))}
-                {queueLength > 3 && (
-                  <Badge
-                    variant="outline"
-                    className="text-[10px] px-1.5 py-0.5 h-5"
-                  >
-                    +{queueLength - 3} more
-                  </Badge>
-                )}
-              </div>
+          {/* Queue Details - Always show for consistent layout */}
+          <div className="space-y-1">
+            <p className="text-[10px] font-medium text-muted-foreground">
+              Current Queue
+            </p>
+            <div className="flex flex-wrap gap-1">
+              {queueLength > 0 ? (
+                <>
+                  {store.storeQueue.slice(0, 3).map((ticket, index) => (
+                    <Badge
+                      key={index}
+                      variant="outline"
+                      className="text-[10px] px-1.5 py-0.5 h-5"
+                    >
+                      #{ticket}
+                    </Badge>
+                  ))}
+                  {queueLength > 3 && (
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] px-1.5 py-0.5 h-5"
+                    >
+                      +{queueLength - 3} more
+                    </Badge>
+                  )}
+                </>
+              ) : (
+                <Badge
+                  variant="outline"
+                  className="text-[10px] px-1.5 py-0.5 h-5 text-muted-foreground"
+                >
+                  No tickets
+                </Badge>
+              )}
             </div>
-          )}
+          </div>
 
           {/* Location */}
           <div className="flex items-start gap-2 pt-2 border-t border-border">
             <MapPin className="h-3 w-3 text-muted-foreground mt-0.5 shrink-0" />
-            <div className="space-y-1">
+            <div>
               <p className="text-[10px] text-muted-foreground">
                 {store.region} • {store.area}
-              </p>
-              <p className="text-[10px] text-muted-foreground leading-relaxed">
-                {store.address}
               </p>
             </div>
           </div>

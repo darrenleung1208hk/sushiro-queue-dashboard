@@ -32,7 +32,7 @@ export function DashboardError({ error }: DashboardErrorProps) {
         <p className="text-muted-foreground mb-4">
           Unable to fetch store information from the server.
         </p>
-        <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
+        <p className="text-muted-foreground mb-6 max-w-md mx-auto">
           {errorMessage}
         </p>
       </div>
