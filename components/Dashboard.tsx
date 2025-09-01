@@ -11,6 +11,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { StoreCard } from './StoreCard';
 import { StoreListItem } from './StoreListItem';
@@ -140,73 +141,81 @@ export const Dashboard = ({
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
-          <div className="bg-card rounded-lg p-3 border border-border shadow-sm">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-primary/10 rounded-md">
-                <StoreIcon className="h-4 w-4 text-primary" />
+          <Card className="border border-border shadow-sm">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-primary/10 rounded-md">
+                  <StoreIcon className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Total Stores</p>
+                  <p className="text-lg font-bold text-foreground">
+                    {stats.totalStores}
+                  </p>
+                  <p className="text-[10px] text-success">
+                    {stats.openStores} Open
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Total Stores</p>
-                <p className="text-lg font-bold text-foreground">
-                  {stats.totalStores}
-                </p>
-                <p className="text-[10px] text-success">
-                  {stats.openStores} Open
-                </p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-card rounded-lg p-3 border border-border shadow-sm">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-warning/10 rounded-md">
-                <Users className="h-4 w-4 text-warning" />
+          <Card className="border border-border shadow-sm">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-warning/10 rounded-md">
+                  <Users className="h-4 w-4 text-warning" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Total Waiting</p>
+                  <p className="text-lg font-bold text-foreground">
+                    {stats.totalWaiting}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground">
+                    Across all stores
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Total Waiting</p>
-                <p className="text-lg font-bold text-foreground">
-                  {stats.totalWaiting}
-                </p>
-                <p className="text-[10px] text-muted-foreground">
-                  Across all stores
-                </p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-card rounded-lg p-3 border border-border shadow-sm">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-success/10 rounded-md">
-                <Clock className="h-4 w-4 text-success" />
+          <Card className="border border-border shadow-sm">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-success/10 rounded-md">
+                  <Clock className="h-4 w-4 text-success" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Current Queue</p>
+                  <p className="text-lg font-bold text-foreground">
+                    {stats.totalCurrentQueue}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground">
+                    Active tickets
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Current Queue</p>
-                <p className="text-lg font-bold text-foreground">
-                  {stats.totalCurrentQueue}
-                </p>
-                <p className="text-[10px] text-muted-foreground">
-                  Active tickets
-                </p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div className="bg-card rounded-lg p-3 border border-border shadow-sm">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-destructive/10 rounded-md">
-                <Search className="h-4 w-4 text-destructive" />
+          <Card className="border border-border shadow-sm">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-destructive/10 rounded-md">
+                  <Search className="h-4 w-4 text-destructive" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">
+                    Filtered Results
+                  </p>
+                  <p className="text-lg font-bold text-foreground">
+                    {filteredStores.length}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Showing</p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground">
-                  Filtered Results
-                </p>
-                <p className="text-lg font-bold text-foreground">
-                  {filteredStores.length}
-                </p>
-                <p className="text-[10px] text-muted-foreground">Showing</p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Filters */}
