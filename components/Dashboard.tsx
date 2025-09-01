@@ -132,7 +132,7 @@ export const Dashboard = ({
             <h1 className="text-2xl font-bold text-foreground">
               Store Queue Dashboard
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground">
               Monitor store queues and wait times in real-time
             </p>
           </div>
@@ -292,7 +292,7 @@ export const Dashboard = ({
         {filteredStores.length > 0 && (
           <div className="flex items-end justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">
+              <span className="text-muted-foreground">
                 Showing {filteredStores.length} stores
               </span>
               <span className="text-xs text-muted-foreground">
@@ -333,7 +333,7 @@ export const Dashboard = ({
             <h3 className="text-base font-semibold text-foreground mb-1">
               No stores found
             </h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground">
               Try adjusting your search or filter criteria
             </p>
           </div>
@@ -361,7 +361,7 @@ export const Dashboard = ({
           </div>
 
           {lastUpdated && (
-            <span className="hidden sm:inline text-sm text-muted-foreground w-max">
+            <span className="hidden sm:inline text-muted-foreground w-max">
               Last: {lastUpdated.toLocaleTimeString()}
             </span>
           )}
@@ -382,7 +382,7 @@ export const Dashboard = ({
             {onAutoRefreshToggle && (
               <button
                 onClick={() => onAutoRefreshToggle(!autoRefreshEnabled)}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-secondary text-secondary-foreground rounded-full hover:bg-secondary/80 transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 bg-secondary text-secondary-foreground rounded-full hover:bg-secondary/80 transition-colors"
               >
                 {autoRefreshEnabled ? (
                   <>
@@ -402,7 +402,7 @@ export const Dashboard = ({
               <button
                 onClick={onManualRefresh}
                 disabled={isLoading}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-full hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <RefreshCw
                   className={cn('h-4 w-4', isLoading && 'animate-spin')}
