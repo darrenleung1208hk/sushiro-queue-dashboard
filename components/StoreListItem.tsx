@@ -103,7 +103,7 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
         <div className="mt-3 pt-3 border-t border-border">
           <div className="flex items-center justify-between">
             <p className="text-[10px] font-medium text-muted-foreground">
-              Current Queue
+              {t('store.currentQueue')}
             </p>
             <div className="flex flex-wrap gap-1">
               {queueLength > 0 ? (
@@ -122,7 +122,7 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
                       variant="outline"
                       className="text-[10px] px-1.5 py-0.5 h-5"
                     >
-                      +{queueLength - 3} more
+                      {t('store.moreTickets', { count: queueLength - 3 })}
                     </Badge>
                   )}
                 </>
@@ -131,7 +131,7 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
                   variant="outline"
                   className="text-[10px] px-1.5 py-0.5 h-5 text-muted-foreground"
                 >
-                  No tickets
+                  {t('store.noTickets')}
                 </Badge>
               )}
             </div>
