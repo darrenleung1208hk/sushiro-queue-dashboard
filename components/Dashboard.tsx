@@ -164,7 +164,6 @@ export const Dashboard = ({
                     {stats.openStores} {t('dashboard.stats.openStores')}
                   </p>
                 </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -185,7 +184,6 @@ export const Dashboard = ({
                     {t('dashboard.stats.acrossAllStores')}
                   </p>
                 </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -206,7 +204,6 @@ export const Dashboard = ({
                     {t('dashboard.stats.activeTickets')}
                   </p>
                 </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -310,9 +307,7 @@ export const Dashboard = ({
           <div className="flex items-end justify-between">
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">
-                {t('dashboard.viewMode.showingStores', {
-                  count: filteredStores.length,
-                })}
+                Showing {filteredStores.length} stores
               </span>
               <span className="text-xs text-muted-foreground">
                 {t('dashboard.viewMode.inViewMode', {

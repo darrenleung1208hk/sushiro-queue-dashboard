@@ -33,7 +33,7 @@ export const StoreCard = ({ store }: StoreCardProps) => {
       <CardContent className="p-3">
         <div className="flex items-start justify-between mb-1">
           <div className="space-y-1">
-            <h3 className="font-semibold text-sm leading-tight text-foreground">
+            <h3 className="font-semibold leading-tight text-foreground">
               {storeName}
             </h3>
           </div>
@@ -87,7 +87,7 @@ export const StoreCard = ({ store }: StoreCardProps) => {
                 <p className="text-[10px] text-muted-foreground">
                   {t('store.current')}
                 </p>
-                <p className="font-semibold text-xs text-foreground">
+                <p className="font-semibold text-sm text-foreground">
                   {store.storeQueue.length > 0
                     ? `#${store.storeQueue[0]}`
                     : '--'}
@@ -122,7 +122,7 @@ export const StoreCard = ({ store }: StoreCardProps) => {
                 )}
               </div>
             </div>
-          )}
+          </div>
 
           {/* Location */}
           <div className="flex items-start gap-2 pt-2 border-t border-border">
