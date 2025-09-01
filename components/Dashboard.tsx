@@ -164,6 +164,7 @@ export const Dashboard = ({
                     {stats.openStores} {t('dashboard.stats.openStores')}
                   </p>
                 </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -184,6 +185,7 @@ export const Dashboard = ({
                     {t('dashboard.stats.acrossAllStores')}
                   </p>
                 </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -204,6 +206,7 @@ export const Dashboard = ({
                     {t('dashboard.stats.activeTickets')}
                   </p>
                 </div>
+              </div>
             </CardContent>
           </Card>
 
