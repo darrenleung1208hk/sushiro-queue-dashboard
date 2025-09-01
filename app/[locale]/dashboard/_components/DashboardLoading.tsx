@@ -154,8 +154,8 @@ export function DashboardLoading() {
                   </div>
 
                   {/* Location Skeleton */}
-                  <div className="flex items-start gap-2 pt-2 border-t border-border">
-                    <Skeleton className="h-3 w-3 mt-0.5 shrink-0" />
+                  <div className="flex items-center gap-2 pt-2 border-t border-border">
+                    <Skeleton className="h-3 w-3 shrink-0" />
                     <div>
                       <Skeleton className="h-2.5 w-32" />
                     </div>
