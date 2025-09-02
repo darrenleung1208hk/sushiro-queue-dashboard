@@ -16,7 +16,8 @@ import { Input } from '@/components/ui/input';
 import { StoreCard } from './StoreCard';
 import { StoreListItem } from './StoreListItem';
 import { ViewToggle } from './ui/view-toggle';
-import { Store, getQueuePriority } from '@/lib/types';
+import { Store } from '@/lib/types';
+import { getQueuePriority } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { useTranslations, useLocale } from 'next-intl';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -127,7 +128,7 @@ export const Dashboard = ({
     new Set(stores.map((store) => store.region))
   );
 
-  const waitingStatusOptions = ['LOW', 'MEDIUM', 'HIGH', 'EXTREME'];
+  const waitingStatusOptions = ['LOW', 'MEDIUM', 'HIGH'];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/30 p-4 pb-24">
