@@ -147,7 +147,7 @@ export const Dashboard = ({
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           <StatCard
             icon={StoreIcon}
             iconBgColor="bg-primary/10"
