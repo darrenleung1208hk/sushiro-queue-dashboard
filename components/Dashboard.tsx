@@ -11,10 +11,10 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { StoreCard } from './StoreCard';
 import { StoreListItem } from './StoreListItem';
+import { StatCard } from './StatCard';
 import { ViewToggle } from './ui/view-toggle';
 import { Store } from '@/lib/types';
 import { getQueuePriority } from '@/lib/utils';
@@ -147,90 +147,46 @@ export const Dashboard = ({
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
-          <Card className="border border-border shadow-sm">
-            <CardContent className="p-3">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-primary/10 rounded-md">
-                  <StoreIcon className="h-4 w-4 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">
-                    {t('dashboard.stats.totalStores')}
-                  </p>
-                  <p className="text-lg font-bold text-foreground">
-                    {stats.totalStores}
-                  </p>
-                  <p className="text-[10px] text-success">
-                    {stats.openStores} {t('dashboard.stats.openStores')}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          <StatCard
+            icon={StoreIcon}
+            iconBgColor="bg-primary/10"
+            iconColor="text-primary"
+            title={t('dashboard.stats.totalStores')}
+            value={stats.totalStores}
+            subtitle={t('dashboard.stats.openStores')}
+            isLoading={isLoading}
+          />
 
-          <Card className="border border-border shadow-sm">
-            <CardContent className="p-3">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-warning/10 rounded-md">
-                  <Users className="h-4 w-4 text-warning" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">
-                    {t('dashboard.stats.totalWaiting')}
-                  </p>
-                  <p className="text-lg font-bold text-foreground">
-                    {stats.totalWaiting}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground">
-                    {t('dashboard.stats.acrossAllStores')}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <StatCard
+            icon={Users}
+            iconBgColor="bg-warning/10"
+            iconColor="text-warning"
+            title={t('dashboard.stats.totalWaiting')}
+            value={stats.totalWaiting}
+            subtitle={t('dashboard.stats.acrossAllStores')}
+            isLoading={isLoading}
+          />
 
-          <Card className="border border-border shadow-sm">
-            <CardContent className="p-3">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-success/10 rounded-md">
-                  <Clock className="h-4 w-4 text-success" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">
-                    {t('dashboard.stats.currentQueue')}
-                  </p>
-                  <p className="text-lg font-bold text-foreground">
-                    {stats.totalCurrentQueue}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {t('dashboard.stats.activeTickets')}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <StatCard
+            icon={Clock}
+            iconBgColor="bg-success/10"
+            iconColor="text-success"
+            title={t('dashboard.stats.currentQueue')}
+            value={stats.totalCurrentQueue}
+            subtitle={t('dashboard.stats.activeTickets')}
+            isLoading={isLoading}
+          />
 
-          <Card className="border border-border shadow-sm">
-            <CardContent className="p-3">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-destructive/10 rounded-md">
-                  <Search className="h-4 w-4 text-destructive" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">
-                    {t('dashboard.stats.filteredResults')}
-                  </p>
-                  <p className="text-lg font-bold text-foreground">
-                    {filteredStores.length}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {t('dashboard.stats.showing')}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <StatCard
+            icon={Search}
+            iconBgColor="bg-destructive/10"
+            iconColor="text-destructive"
+            title={t('dashboard.stats.filteredResults')}
+            value={filteredStores.length}
+            subtitle={t('dashboard.stats.showing')}
+            isLoading={isLoading}
+          />
         </div>
 
         {/* Filters */}
