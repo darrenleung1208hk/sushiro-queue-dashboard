@@ -3,15 +3,21 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Clock, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Store } from '@/lib/types';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface StoreListItemProps {
   store: Store;
 }
 
 export const StoreListItem = ({ store }: StoreListItemProps) => {
+  const t = useTranslations();
+  const locale = useLocale();
   const isOpen = store.storeStatus === 'OPEN';
   const queueLength = store.storeQueue.length;
   const waitingGroup = store.waitingGroup;
+
+  // Get localized store name based on current locale
+  const storeName = locale === 'zh-HK' ? store.name : store.nameEn;
 
   // 3-tier waiting system
   const getWaitTier = (waiting: number) => {
@@ -30,7 +36,7 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <h3 className="font-semibold text-foreground truncate">
-                {store.name}
+                {storeName}
               </h3>
               <Badge
                 variant={isOpen ? 'default' : 'destructive'}
@@ -40,7 +46,8 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground truncate">
-              {store.area}, {store.region}
+              {t(`common.areas.${store.area}`)},{' '}
+              {t(`common.regions.${store.region}`)}
             </p>
           </div>
 
@@ -64,7 +71,9 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
                     waitTier === 'low' && 'text-primary'
                   )}
                 />
-                <p className="text-[10px] text-muted-foreground">Waiting</p>
+                <p className="text-[10px] text-muted-foreground">
+                  {t('store.waiting')}
+                </p>
               </div>
               <p
                 className={cn(
@@ -80,7 +89,9 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
             <div className="flex flex-col items-center justify-center gap-1 p-1.5 rounded-md bg-accent/30 border border-border text-center">
               <div className="flex items-center gap-1 text-center">
                 <Clock className="h-3 w-3 text-muted-foreground" />
-                <p className="text-[10px] text-muted-foreground">Current</p>
+                <p className="text-[10px] text-muted-foreground">
+                  {t('store.current')}
+                </p>
               </div>
               <p className="font-semibold text-sm text-foreground">
                 {queueLength > 0 ? `#${store.storeQueue[0]}` : '--'}
@@ -93,7 +104,7 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
         <div className="mt-3 pt-3 border-t border-border">
           <div className="flex items-center justify-between">
             <p className="text-[10px] font-medium text-muted-foreground">
-              Current Queue
+              {t('store.currentQueue')}
             </p>
             <div className="flex flex-wrap gap-1">
               {queueLength > 0 ? (
@@ -112,7 +123,7 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
                       variant="outline"
                       className="text-[10px] px-1.5 py-0.5 h-5"
                     >
-                      +{queueLength - 3} more
+                      {t('store.moreTickets', { count: queueLength - 3 })}
                     </Badge>
                   )}
                 </>
@@ -121,7 +132,7 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
                   variant="outline"
                   className="text-[10px] px-1.5 py-0.5 h-5 text-muted-foreground"
                 >
-                  No tickets
+                  {t('store.noTickets')}
                 </Badge>
               )}
             </div>

@@ -3,15 +3,21 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Clock, Users, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Store } from '@/lib/types';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface StoreCardProps {
   store: Store;
 }
 
 export const StoreCard = ({ store }: StoreCardProps) => {
+  const t = useTranslations();
+  const locale = useLocale();
   const isOpen = store.storeStatus === 'OPEN';
   const queueLength = store.storeQueue.length;
   const waitingGroup = store.waitingGroup;
+
+  // Get localized store name based on current locale
+  const storeName = locale === 'zh-HK' ? store.name : store.nameEn;
 
   // 3-tier waiting system
   const getWaitTier = (waiting: number) => {
@@ -28,9 +34,8 @@ export const StoreCard = ({ store }: StoreCardProps) => {
         <div className="flex items-start justify-between mb-1">
           <div className="space-y-1">
             <h3 className="font-semibold leading-tight text-foreground">
-              {store.name}
+              {storeName}
             </h3>
-            <p className="text-xs text-muted-foreground">{store.nameEn}</p>
           </div>
           <Badge
             variant={isOpen ? 'default' : 'destructive'}
@@ -61,7 +66,9 @@ export const StoreCard = ({ store }: StoreCardProps) => {
                 )}
               />
               <div>
-                <p className="text-[10px] text-muted-foreground">Waiting</p>
+                <p className="text-[10px] text-muted-foreground">
+                  {t('store.waiting')}
+                </p>
                 <p
                   className={cn(
                     'font-semibold text-sm',
@@ -77,7 +84,9 @@ export const StoreCard = ({ store }: StoreCardProps) => {
             <div className="flex items-center gap-2 p-1.5 rounded-md bg-accent/30 border border-border">
               <Clock className="h-3 w-3 text-muted-foreground" />
               <div>
-                <p className="text-[10px] text-muted-foreground">Current</p>
+                <p className="text-[10px] text-muted-foreground">
+                  {t('store.current')}
+                </p>
                 <p className="font-semibold text-sm text-foreground">
                   {store.storeQueue.length > 0
                     ? `#${store.storeQueue[0]}`
@@ -87,10 +96,10 @@ export const StoreCard = ({ store }: StoreCardProps) => {
             </div>
           </div>
 
-          {/* Queue Details - Always show for consistent layout */}
+          {/* Queue Details */}
           <div className="space-y-1">
             <p className="text-[10px] font-medium text-muted-foreground">
-              Current Queue
+              {t('store.currentQueue')}
             </p>
             <div className="flex flex-wrap gap-1">
               {queueLength > 0 ? (
@@ -109,7 +118,7 @@ export const StoreCard = ({ store }: StoreCardProps) => {
                       variant="outline"
                       className="text-[10px] px-1.5 py-0.5 h-5"
                     >
-                      +{queueLength - 3} more
+                      {t('store.moreTickets', { count: queueLength - 3 })}
                     </Badge>
                   )}
                 </>
@@ -118,18 +127,19 @@ export const StoreCard = ({ store }: StoreCardProps) => {
                   variant="outline"
                   className="text-[10px] px-1.5 py-0.5 h-5 text-muted-foreground"
                 >
-                  No tickets
+                  {t('store.noTickets')}
                 </Badge>
               )}
             </div>
           </div>
 
           {/* Location */}
-          <div className="flex items-start gap-2 pt-2 border-t border-border">
-            <MapPin className="h-3 w-3 text-muted-foreground mt-0.5 shrink-0" />
+          <div className="flex items-center gap-2 pt-2 border-t border-border">
+            <MapPin className="h-3 w-3 text-muted-foreground shrink-0" />
             <div>
               <p className="text-[10px] text-muted-foreground">
-                {store.region} • {store.area}
+                {t(`common.regions.${store.region}`)} •{' '}
+                {t(`common.areas.${store.area}`)}
               </p>
             </div>
           </div>

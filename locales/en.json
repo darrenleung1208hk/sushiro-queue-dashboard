@@ -1,0 +1,110 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "refresh": "Refresh",
+    "pause": "Pause",
+    "resume": "Resume",
+    "connected": "Connected",
+    "refreshing": "Refreshing...",
+    "last": "Last",
+    "open": "Open",
+    "languages": {
+      "en": "English",
+      "zh-HK": "繁體中文"
+    },
+    "regions": {
+      "香港島": "Hong Kong Island",
+      "九龍": "Kowloon",
+      "新界": "New Territories"
+    },
+    "areas": {
+      "中西區": "Central and Western District",
+      "灣仔區": "Wan Chai District",
+      "東區": "Eastern District",
+      "南區": "Southern District",
+      "油尖旺區": "Yau Tsim Mong District",
+      "深水埗區": "Sham Shui Po District",
+      "黃大仙區": "Wong Tai Sin District",
+      "九龍城區": "Kowloon City District",
+      "觀塘區": "Kwun Tong District",
+      "葵青區": "Kwai Tsing District",
+      "荃灣區": "Tsuen Wan District",
+      "屯門區": "Tuen Mun District",
+      "元朗區": "Yuen Long District",
+      "北區": "North District",
+      "大埔區": "Tai Po District",
+      "沙田區": "Sha Tin District",
+      "西貢區": "Sai Kung District",
+      "離島區": "Islands District"
+    }
+  },
+  "dashboard": {
+    "title": "Store Queue Dashboard",
+    "subtitle": "Monitor store queues and wait times in real-time",
+    "stats": {
+      "totalStores": "Total Stores",
+      "totalWaiting": "Total Waiting",
+      "currentQueue": "Current Queue",
+      "filteredResults": "Filtered Results",
+      "openStores": "Open",
+      "acrossAllStores": "Across all stores",
+      "activeTickets": "Active tickets",
+      "showing": "Showing"
+    },
+    "filters": {
+      "searchPlaceholder": "Search stores by name, region, or area...",
+      "allRegions": "All Regions",
+      "allWaitTimes": "All Wait Times",
+      "lowWait": "Low Wait",
+      "mediumWait": "Medium Wait",
+      "highWait": "High Wait",
+      "extremeWait": "Extreme Wait"
+    },
+    "viewMode": {
+      "grid": "grid",
+      "list": "list",
+      "showingStores": "Showing {count} stores",
+      "inViewMode": "in {mode} view"
+    },
+    "noResults": {
+      "title": "No stores found",
+      "message": "Try adjusting your search or filter criteria"
+    }
+  },
+  "store": {
+    "status": {
+      "open": "OPEN",
+      "closed": "CLOSED"
+    },
+    "waiting": "Waiting",
+    "current": "Current",
+    "queue": "Queue",
+    "currentQueue": "Current Queue",
+    "moreTickets": "+{count} more",
+    "noTickets": "No tickets"
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard"
+  },
+  "errors": {
+    "general": "Something went wrong",
+    "notFound": "Page not found",
+    "networkError": "Network error occurred",
+    "failedToLoadData": "Failed to Load Data",
+    "unableToFetchStores": "Unable to fetch store information from the server.",
+    "unableToLoadData": "Unable to load data",
+    "apiRequestFailed": "API request failed",
+    "unknownError": "An unknown error occurred"
+  },
+  "ui": {
+    "grid": "Grid",
+    "list": "List",
+    "switchToView": "Switch to {view} view"
+  }
+}

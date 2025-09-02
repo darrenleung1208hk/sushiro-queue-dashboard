@@ -1,5 +1,6 @@
 import { Grid3X3, List } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 interface ViewToggleProps {
   viewMode: 'grid' | 'list';
@@ -7,6 +8,8 @@ interface ViewToggleProps {
 }
 
 export const ViewToggle = ({ viewMode, onViewChange }: ViewToggleProps) => {
+  const t = useTranslations();
+
   const handleToggle = () => {
     const newMode = viewMode === 'grid' ? 'list' : 'grid';
     onViewChange(newMode);
@@ -25,7 +28,9 @@ export const ViewToggle = ({ viewMode, onViewChange }: ViewToggleProps) => {
       onKeyDown={handleKeyDown}
       className="flex rounded-md border border-border bg-muted p-0.5 cursor-pointer"
       role="tab"
-      aria-label={`Switch to ${viewMode === 'grid' ? 'list' : 'grid'} view`}
+      aria-label={t('ui.switchToView', {
+        view: viewMode === 'grid' ? t('ui.grid') : t('ui.list'),
+      })}
       aria-selected={false}
       tabIndex={0}
     >
@@ -38,7 +43,7 @@ export const ViewToggle = ({ viewMode, onViewChange }: ViewToggleProps) => {
         )}
       >
         <Grid3X3 className="h-3 w-3" />
-        <span className="hidden sm:inline">Grid</span>
+        <span className="hidden sm:inline">{t('ui.grid')}</span>
       </div>
       <div
         className={cn(
@@ -49,7 +54,7 @@ export const ViewToggle = ({ viewMode, onViewChange }: ViewToggleProps) => {
         )}
       >
         <List className="h-3 w-3" />
-        <span className="hidden sm:inline">List</span>
+        <span className="hidden sm:inline">{t('ui.list')}</span>
       </div>
     </button>
   );
