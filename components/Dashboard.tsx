@@ -154,7 +154,7 @@ export const Dashboard = ({
             iconColor="text-primary"
             title={t('dashboard.stats.totalStores')}
             value={stats.totalStores}
-            subtitle={`${stats.openStores} ${t('dashboard.stats.openStores')}`}
+            subtitle={t('dashboard.stats.openStores')}
           />
 
           <StatCard
