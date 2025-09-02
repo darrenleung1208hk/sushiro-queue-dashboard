@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
 interface StatCardProps {
@@ -9,6 +10,7 @@ interface StatCardProps {
   title: string;
   value: string | number;
   subtitle: string;
+  isLoading?: boolean;
 }
 
 export const StatCard: React.FC<StatCardProps> = ({
@@ -18,6 +20,7 @@ export const StatCard: React.FC<StatCardProps> = ({
   title,
   value,
   subtitle,
+  isLoading = false,
 }) => {
   const Component = icon;
   return (
@@ -29,7 +32,11 @@ export const StatCard: React.FC<StatCardProps> = ({
           </div>
           <div>
             <p className="text-xs text-muted-foreground">{title}</p>
-            <p className="text-lg font-bold text-foreground">{value}</p>
+            {isLoading ? (
+              <Skeleton className="h-5 w-12 my-1" />
+            ) : (
+              <p className="text-lg font-bold text-foreground">{value}</p>
+            )}
             <p className="text-xs text-muted-foreground">{subtitle}</p>
           </div>
         </div>

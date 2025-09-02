@@ -155,6 +155,7 @@ export const Dashboard = ({
             title={t('dashboard.stats.totalStores')}
             value={stats.totalStores}
             subtitle={t('dashboard.stats.openStores')}
+            isLoading={isLoading}
           />
 
           <StatCard
@@ -164,6 +165,7 @@ export const Dashboard = ({
             title={t('dashboard.stats.totalWaiting')}
             value={stats.totalWaiting}
             subtitle={t('dashboard.stats.acrossAllStores')}
+            isLoading={isLoading}
           />
 
           <StatCard
@@ -173,6 +175,7 @@ export const Dashboard = ({
             title={t('dashboard.stats.currentQueue')}
             value={stats.totalCurrentQueue}
             subtitle={t('dashboard.stats.activeTickets')}
+            isLoading={isLoading}
           />
 
           <StatCard
@@ -182,6 +185,7 @@ export const Dashboard = ({
             title={t('dashboard.stats.filteredResults')}
             value={filteredStores.length}
             subtitle={t('dashboard.stats.showing')}
+            isLoading={isLoading}
           />
         </div>
 
