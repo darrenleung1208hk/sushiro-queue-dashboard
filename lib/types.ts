@@ -3,6 +3,8 @@
  * Based on n8n workflow "get-store-queue-status"
  */
 
+import { QUEUE_PRIORITY } from '@/lib/constants';
+
 // Raw API response types
 export interface StoreListResponse {
   id: number;
@@ -82,25 +84,8 @@ export const STORE_STATUS = {
 
 export type StoreStatus = (typeof STORE_STATUS)[keyof typeof STORE_STATUS];
 
-// Queue priority levels based on waiting group size
-export const QUEUE_PRIORITY = {
-  LOW: 'LOW', // 0-20 people
-  MEDIUM: 'MEDIUM', // 21-50 people
-  HIGH: 'HIGH', // 51-100 people
-  EXTREME: 'EXTREME', // 100+ people
-} as const;
-
 export type QueuePriority =
   (typeof QUEUE_PRIORITY)[keyof typeof QUEUE_PRIORITY];
-
-// Helper function to determine queue priority
-export function getQueuePriority(waitingGroup: number): QueuePriority {
-  if (waitingGroup === 0) return QUEUE_PRIORITY.LOW;
-  if (waitingGroup <= 20) return QUEUE_PRIORITY.LOW;
-  if (waitingGroup <= 50) return QUEUE_PRIORITY.MEDIUM;
-  if (waitingGroup <= 100) return QUEUE_PRIORITY.HIGH;
-  return QUEUE_PRIORITY.EXTREME;
-}
 
 // Store region constants
 export const STORE_REGIONS = {

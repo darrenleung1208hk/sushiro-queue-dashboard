@@ -1,8 +1,9 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Clock, Users, MapPin } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, getQueuePriority } from '@/lib/utils';
 import { Store } from '@/lib/types';
+import { QUEUE_PRIORITY } from '@/lib/constants';
 import { useTranslations, useLocale } from 'next-intl';
 
 interface StoreCardProps {
@@ -18,15 +19,7 @@ export const StoreCard = ({ store }: StoreCardProps) => {
 
   // Get localized store name based on current locale
   const storeName = locale === 'zh-HK' ? store.name : store.nameEn;
-
-  // 3-tier waiting system
-  const getWaitTier = (waiting: number) => {
-    if (waiting <= 15) return 'low';
-    if (waiting <= 30) return 'medium';
-    return 'high';
-  };
-
-  const waitTier = getWaitTier(waitingGroup);
+  const waitTier = getQueuePriority(waitingGroup);
 
   return (
     <Card className="group hover:shadow-md transition-all duration-200 border border-border shadow-sm bg-card">
@@ -51,18 +44,20 @@ export const StoreCard = ({ store }: StoreCardProps) => {
             <div
               className={cn(
                 'flex items-center gap-2 p-1.5 rounded-md border',
-                waitTier === 'high' &&
+                waitTier === QUEUE_PRIORITY.HIGH &&
                   'bg-destructive/10 border-destructive/20',
-                waitTier === 'medium' && 'bg-warning/10 border-warning/20',
-                waitTier === 'low' && 'bg-success/10 border-success/20'
+                waitTier === QUEUE_PRIORITY.MEDIUM &&
+                  'bg-warning/10 border-warning/20',
+                waitTier === QUEUE_PRIORITY.LOW &&
+                  'bg-success/10 border-success/20'
               )}
             >
               <Users
                 className={cn(
                   'h-3 w-3',
-                  waitTier === 'high' && 'text-destructive',
-                  waitTier === 'medium' && 'text-warning',
-                  waitTier === 'low' && 'text-primary'
+                  waitTier === QUEUE_PRIORITY.HIGH && 'text-destructive',
+                  waitTier === QUEUE_PRIORITY.MEDIUM && 'text-warning',
+                  waitTier === QUEUE_PRIORITY.LOW && 'text-primary'
                 )}
               />
               <div>
@@ -72,9 +67,9 @@ export const StoreCard = ({ store }: StoreCardProps) => {
                 <p
                   className={cn(
                     'font-semibold text-sm',
-                    waitTier === 'high' && 'text-destructive',
-                    waitTier === 'medium' && 'text-warning',
-                    waitTier === 'low' && 'text-foreground'
+                    waitTier === QUEUE_PRIORITY.HIGH && 'text-destructive',
+                    waitTier === QUEUE_PRIORITY.MEDIUM && 'text-warning',
+                    waitTier === QUEUE_PRIORITY.LOW && 'text-foreground'
                   )}
                 >
                   {waitingGroup}
