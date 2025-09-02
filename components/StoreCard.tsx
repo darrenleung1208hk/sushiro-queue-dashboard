@@ -138,7 +138,8 @@ export const StoreCard = ({ store }: StoreCardProps) => {
             <MapPin className="h-3 w-3 text-muted-foreground shrink-0" />
             <div>
               <p className="text-[10px] text-muted-foreground">
-                {store.region} • {store.area}
+                {t(`common.regions.${store.region}`)} •{' '}
+                {t(`common.areas.${store.area}`)}
               </p>
             </div>
           </div>

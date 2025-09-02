@@ -16,6 +16,31 @@
     "languages": {
       "en": "English",
       "zh-HK": "繁體中文"
+    },
+    "regions": {
+      "香港島": "Hong Kong Island",
+      "九龍": "Kowloon",
+      "新界": "New Territories"
+    },
+    "areas": {
+      "中西區": "Central and Western District",
+      "灣仔區": "Wan Chai District",
+      "東區": "Eastern District",
+      "南區": "Southern District",
+      "油尖旺區": "Yau Tsim Mong District",
+      "深水埗區": "Sham Shui Po District",
+      "黃大仙區": "Wong Tai Sin District",
+      "九龍城區": "Kowloon City District",
+      "觀塘區": "Kwun Tong District",
+      "葵青區": "Kwai Tsing District",
+      "荃灣區": "Tsuen Wan District",
+      "屯門區": "Tuen Mun District",
+      "元朗區": "Yuen Long District",
+      "北區": "North District",
+      "大埔區": "Tai Po District",
+      "沙田區": "Sha Tin District",
+      "西貢區": "Sai Kung District",
+      "離島區": "Islands District"
     }
   },
   "dashboard": {

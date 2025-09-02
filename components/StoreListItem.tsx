@@ -46,7 +46,8 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground truncate">
-              {store.area}, {store.region}
+              {t(`common.areas.${store.area}`)},{' '}
+              {t(`common.regions.${store.region}`)}
             </p>
           </div>
 

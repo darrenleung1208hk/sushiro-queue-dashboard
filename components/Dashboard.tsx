@@ -263,7 +263,7 @@ export const Dashboard = ({
                     setRegionFilter(regionFilter === region ? null : region)
                   }
                 >
-                  {region}
+                  {t(`common.regions.${region}`)}
                 </Badge>
               ))}
             </div>
