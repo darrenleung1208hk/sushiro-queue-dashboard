@@ -12,7 +12,11 @@
     "connected": "Connected",
     "refreshing": "Refreshing...",
     "last": "Last",
-    "open": "Open"
+    "open": "Open",
+    "languages": {
+      "en": "English",
+      "zh-HK": "繁體中文"
+    }
   },
   "dashboard": {
     "title": "Store Queue Dashboard",
@@ -69,6 +73,8 @@
     "networkError": "Network error occurred",
     "failedToLoadData": "Failed to Load Data",
     "unableToFetchStores": "Unable to fetch store information from the server.",
+    "unableToLoadData": "Unable to load data",
+    "apiRequestFailed": "API request failed",
     "unknownError": "An unknown error occurred"
   },
   "ui": {

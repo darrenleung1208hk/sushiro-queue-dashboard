@@ -5,8 +5,8 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Queue Watch Hub',
-  description: 'Monitor store queues and wait times in real-time',
+  title: 'Sushiro Queue Dashboard',
+  description: 'Real-time queue monitoring for Sushiro restaurants',
 };
 
 export default function RootLayout({
@@ -16,9 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html>
-      <body className={inter.className}>
-        {children}
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }

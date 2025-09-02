@@ -1,10 +1,13 @@
+import { useTranslations } from 'next-intl';
+
 interface DashboardErrorProps {
   error: unknown;
 }
 
 export function DashboardError({ error }: DashboardErrorProps) {
+  const t = useTranslations();
   const errorMessage =
-    error instanceof Error ? error.message : 'An unknown error occurred';
+    error instanceof Error ? error.message : t('errors.unknownError');
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -27,10 +30,10 @@ export function DashboardError({ error }: DashboardErrorProps) {
           </div>
         </div>
         <h2 className="text-2xl font-bold text-destructive mb-2">
-          Failed to Load Data
+          {t('errors.failedToLoadData')}
         </h2>
         <p className="text-muted-foreground mb-4">
-          Unable to fetch store information from the server.
+          {t('errors.unableToFetchStores')}
         </p>
         <p className="text-muted-foreground mb-6 max-w-md mx-auto">
           {errorMessage}

@@ -7,12 +7,14 @@ import {
   DashboardLoading,
   DashboardError,
 } from '@/app/[locale]/dashboard/_components';
+import { useTranslations } from 'next-intl';
 
 // Auto-refresh configuration
 const AUTO_REFRESH_INTERVAL_MS = 60000; // 60 seconds
 const AUTO_REFRESH_INTERVAL_SECONDS = AUTO_REFRESH_INTERVAL_MS / 1000;
 
 export default function DashboardPage() {
+  const t = useTranslations();
   const [stores, setStores] = useState<Store[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -37,26 +39,28 @@ export default function DashboardPage() {
 
       if (!response.ok) {
         throw new Error(
-          `API request failed: ${response.status} ${response.statusText}`
+          `${t('errors.apiRequestFailed')}: ${response.status} ${response.statusText}`
         );
       }
 
       const apiResponse = await response.json();
 
       if (!apiResponse.success) {
-        throw new Error(apiResponse.message || 'Failed to fetch store data');
+        throw new Error(apiResponse.message || t('errors.failedToLoadData'));
       }
 
       setStores(apiResponse.data);
       setLastUpdated(new Date());
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Unknown error'));
+      setError(
+        err instanceof Error ? err : new Error(t('errors.unknownError'))
+      );
       console.error('Error fetching stores:', err);
     } finally {
       setIsLoading(false);
       isFetchingRef.current = false;
     }
-  }, []);
+  }, [t]);
 
   // Initial load
   useEffect(() => {

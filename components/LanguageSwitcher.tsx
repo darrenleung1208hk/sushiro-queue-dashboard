@@ -12,11 +12,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Globe } from 'lucide-react';
 
-const languageNames = {
-  en: 'English',
-  'zh-HK': '繁體中文',
-};
-
 export function LanguageSwitcher() {
   const locale = useLocale();
   const router = useRouter();
@@ -64,10 +59,10 @@ export function LanguageSwitcher() {
 
     // Construct the new path
     const newPath = `/${newLocale}${pathWithoutLocale ? `/${pathWithoutLocale}` : ''}`;
-    
+
     // Use router.push for navigation
     router.push(newPath);
-    
+
     // Force a page refresh to ensure translations update properly
     setTimeout(() => {
       window.location.href = newPath;
@@ -79,17 +74,17 @@ export function LanguageSwitcher() {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm">
           <Globe className="h-4 w-4 mr-2" />
-          {languageNames[currentLocale as keyof typeof languageNames]}
+          {t(`common.languages.${currentLocale}`)}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {Object.entries(languageNames).map(([code, name]) => (
+        {(['en', 'zh-HK'] as const).map((code) => (
           <DropdownMenuItem
             key={code}
             onClick={() => handleLanguageChange(code)}
             className={currentLocale === code ? 'bg-accent' : ''}
           >
-            {name}
+            {t(`common.languages.${code}`)}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

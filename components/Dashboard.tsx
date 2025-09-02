@@ -60,9 +60,9 @@ export const Dashboard = ({
       }
     } catch (error) {
       // Fallback to default grid view if localStorage is unavailable
-      console.warn('Unable to load view mode preference:', error);
+      console.warn(t('errors.unableToLoadData'), error);
     }
-  }, []);
+  }, [t]);
 
   // Save view mode preference to localStorage
   useEffect(() => {
@@ -70,9 +70,9 @@ export const Dashboard = ({
       localStorage.setItem('dashboard-view-mode', viewMode);
     } catch (error) {
       // Silently fail if localStorage is unavailable
-      console.warn('Unable to save view mode preference:', error);
+      console.warn(t('errors.unableToLoadData'), error);
     }
-  }, [viewMode]);
+  }, [viewMode, t]);
 
   // Handle view mode change with transition state
   const handleViewModeChange = (mode: 'grid' | 'list') => {
@@ -310,7 +310,9 @@ export const Dashboard = ({
           <div className="flex items-end justify-between">
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">
-                Showing {filteredStores.length} stores
+                {t('dashboard.viewMode.showingStores', {
+                  count: filteredStores.length,
+                })}
               </span>
               <span className="text-xs text-muted-foreground">
                 {t('dashboard.viewMode.inViewMode', {
@@ -350,7 +352,7 @@ export const Dashboard = ({
           <div className="text-center py-8">
             <Search className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
             <h3 className="text-base font-semibold text-foreground mb-1">
-              No stores found
+              {t('dashboard.noResults.title')}
             </h3>
             <p className="text-muted-foreground">
               {t('dashboard.noResults.message')}

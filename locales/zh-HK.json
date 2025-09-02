@@ -12,7 +12,11 @@
     "connected": "已連接",
     "refreshing": "重新整理中...",
     "last": "最後",
-    "open": "營業中"
+    "open": "營業中",
+    "languages": {
+      "en": "English",
+      "zh-HK": "繁體中文"
+    }
   },
   "dashboard": {
     "title": "壽司郎排隊儀表板",
@@ -69,6 +73,8 @@
     "networkError": "網路錯誤",
     "failedToLoadData": "載入資料失敗",
     "unableToFetchStores": "無法從伺服器取得店舖資訊。",
+    "unableToLoadData": "無法載入資料",
+    "apiRequestFailed": "API 請求失敗",
     "unknownError": "發生未知錯誤"
   },
   "ui": {
