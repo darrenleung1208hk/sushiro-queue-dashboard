@@ -19,8 +19,7 @@ import { ViewToggle } from './ui/view-toggle';
 import { Store } from '@/lib/types';
 import { getQueuePriority } from '@/lib/utils';
 import { cn } from '@/lib/utils';
-import { useTranslations, useLocale } from 'next-intl';
-import { LanguageSwitcher } from './LanguageSwitcher';
+import { useTranslations } from 'next-intl';
 
 interface DashboardProps {
   stores: Store[];
@@ -42,7 +41,6 @@ export const Dashboard = ({
   onManualRefresh,
 }: DashboardProps) => {
   const t = useTranslations();
-  const locale = useLocale();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [regionFilter, setRegionFilter] = useState<string | null>(null);
@@ -50,7 +48,6 @@ export const Dashboard = ({
     null
   );
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [isViewTransitioning, setIsViewTransitioning] = useState(false);
 
   // Load view mode preference from localStorage
   useEffect(() => {
@@ -75,13 +72,10 @@ export const Dashboard = ({
     }
   }, [viewMode, t]);
 
-  // Handle view mode change with transition state
+  // Handle view mode change
   const handleViewModeChange = (mode: 'grid' | 'list') => {
     if (mode !== viewMode) {
-      setIsViewTransitioning(true);
       setViewMode(mode);
-      // Reset transition state after animation completes
-      setTimeout(() => setIsViewTransitioning(false), 300);
     }
   };
 
@@ -131,192 +125,174 @@ export const Dashboard = ({
   const waitingStatusOptions = ['LOW', 'MEDIUM', 'HIGH'];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/30 p-4 pb-24">
-      <div className="max-w-7xl mx-auto space-y-4">
-        {/* Header */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <h1 className="text-2xl font-bold text-foreground">
-                {t('dashboard.title')}
-              </h1>
-              <p className="text-muted-foreground">{t('dashboard.subtitle')}</p>
-            </div>
-            <LanguageSwitcher />
-          </div>
-        </div>
+    <div className="space-y-4">
+      {/* Stats Overview */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <StatCard
+          icon={StoreIcon}
+          iconBgColor="bg-primary/10"
+          iconColor="text-primary"
+          title={t('dashboard.stats.totalStores')}
+          value={stats.totalStores}
+          subtitle={t('dashboard.stats.openStores')}
+          isLoading={isLoading}
+        />
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-          <StatCard
-            icon={StoreIcon}
-            iconBgColor="bg-primary/10"
-            iconColor="text-primary"
-            title={t('dashboard.stats.totalStores')}
-            value={stats.totalStores}
-            subtitle={t('dashboard.stats.openStores')}
-            isLoading={isLoading}
-          />
+        <StatCard
+          icon={Users}
+          iconBgColor="bg-warning/10"
+          iconColor="text-warning"
+          title={t('dashboard.stats.totalWaiting')}
+          value={stats.totalWaiting}
+          subtitle={t('dashboard.stats.acrossAllStores')}
+          isLoading={isLoading}
+        />
 
-          <StatCard
-            icon={Users}
-            iconBgColor="bg-warning/10"
-            iconColor="text-warning"
-            title={t('dashboard.stats.totalWaiting')}
-            value={stats.totalWaiting}
-            subtitle={t('dashboard.stats.acrossAllStores')}
-            isLoading={isLoading}
-          />
+        <StatCard
+          icon={Clock}
+          iconBgColor="bg-success/10"
+          iconColor="text-success"
+          title={t('dashboard.stats.currentQueue')}
+          value={stats.totalCurrentQueue}
+          subtitle={t('dashboard.stats.activeTickets')}
+          isLoading={isLoading}
+        />
 
-          <StatCard
-            icon={Clock}
-            iconBgColor="bg-success/10"
-            iconColor="text-success"
-            title={t('dashboard.stats.currentQueue')}
-            value={stats.totalCurrentQueue}
-            subtitle={t('dashboard.stats.activeTickets')}
-            isLoading={isLoading}
-          />
-
-          <StatCard
-            icon={Search}
-            iconBgColor="bg-destructive/10"
-            iconColor="text-destructive"
-            title={t('dashboard.stats.filteredResults')}
-            value={filteredStores.length}
-            subtitle={t('dashboard.stats.showing')}
-            isLoading={isLoading}
-          />
-        </div>
-
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-2 bg-card rounded-lg p-3 border border-border">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder={t('dashboard.filters.searchPlaceholder')}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-
-          <div className="flex gap-2 flex-wrap items-center">
-            {/* Region Filters */}
-            <div className="flex gap-2 flex-wrap">
-              <Badge
-                variant={regionFilter === null ? 'primary' : 'outline'}
-                className="cursor-pointer"
-                onClick={() => setRegionFilter(null)}
-              >
-                {t('dashboard.filters.allRegions')}
-              </Badge>
-              {uniqueRegions.map((region) => (
-                <Badge
-                  key={region}
-                  variant={regionFilter === region ? 'default' : 'outline'}
-                  className="cursor-pointer"
-                  onClick={() =>
-                    setRegionFilter(regionFilter === region ? null : region)
-                  }
-                >
-                  {t(`common.regions.${region}`)}
-                </Badge>
-              ))}
-            </div>
-
-            {/* Waiting Status Filters */}
-            <div className="flex gap-2 flex-wrap">
-              <Badge
-                variant={waitingStatusFilter === null ? 'primary' : 'outline'}
-                className="cursor-pointer"
-                onClick={() => setWaitingStatusFilter(null)}
-              >
-                {t('dashboard.filters.allWaitTimes')}
-              </Badge>
-              {waitingStatusOptions.map((status) => (
-                <Badge
-                  key={status}
-                  variant={
-                    waitingStatusFilter === status
-                      ? status === 'LOW'
-                        ? 'default'
-                        : status === 'MEDIUM'
-                          ? 'secondary'
-                          : status === 'HIGH'
-                            ? 'destructive'
-                            : 'destructive'
-                      : 'outline'
-                  }
-                  className="cursor-pointer"
-                  onClick={() =>
-                    setWaitingStatusFilter(
-                      waitingStatusFilter === status ? null : status
-                    )
-                  }
-                >
-                  {t(`dashboard.filters.${status.toLowerCase()}Wait`)}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* View Mode Indicator and Toggle */}
-        {filteredStores.length > 0 && (
-          <div className="flex items-end justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">
-                {t('dashboard.viewMode.showingStores', {
-                  count: filteredStores.length,
-                })}
-              </span>
-              <span className="text-xs text-muted-foreground">
-                {t('dashboard.viewMode.inViewMode', {
-                  mode: t(`ui.${viewMode}`),
-                })}
-              </span>
-            </div>
-            <ViewToggle
-              viewMode={viewMode}
-              onViewChange={handleViewModeChange}
-            />
-          </div>
-        )}
-
-        {/* Store Display */}
-        {filteredStores.length > 0 ? (
-          <>
-            {/* Grid View */}
-            {viewMode === 'grid' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
-                {filteredStores.map((store) => (
-                  <StoreCard key={store.shopId} store={store} />
-                ))}
-              </div>
-            )}
-
-            {/* List View */}
-            {viewMode === 'list' && (
-              <div className="space-y-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
-                {filteredStores.map((store) => (
-                  <StoreListItem key={store.shopId} store={store} />
-                ))}
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="text-center py-8">
-            <Search className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-            <h3 className="text-base font-semibold text-foreground mb-1">
-              {t('dashboard.noResults.title')}
-            </h3>
-            <p className="text-muted-foreground">
-              {t('dashboard.noResults.message')}
-            </p>
-          </div>
-        )}
+        <StatCard
+          icon={Search}
+          iconBgColor="bg-destructive/10"
+          iconColor="text-destructive"
+          title={t('dashboard.stats.filteredResults')}
+          value={filteredStores.length}
+          subtitle={t('dashboard.stats.showing')}
+          isLoading={isLoading}
+        />
       </div>
+
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-2 bg-card rounded-lg p-3 border border-border">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder={t('dashboard.filters.searchPlaceholder')}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+
+        <div className="flex gap-2 flex-wrap items-center">
+          {/* Region Filters */}
+          <div className="flex gap-2 flex-wrap">
+            <Badge
+              variant={regionFilter === null ? 'primary' : 'outline'}
+              className="cursor-pointer"
+              onClick={() => setRegionFilter(null)}
+            >
+              {t('dashboard.filters.allRegions')}
+            </Badge>
+            {uniqueRegions.map((region) => (
+              <Badge
+                key={region}
+                variant={regionFilter === region ? 'default' : 'outline'}
+                className="cursor-pointer"
+                onClick={() =>
+                  setRegionFilter(regionFilter === region ? null : region)
+                }
+              >
+                {t(`common.regions.${region}`)}
+              </Badge>
+            ))}
+          </div>
+
+          {/* Waiting Status Filters */}
+          <div className="flex gap-2 flex-wrap">
+            <Badge
+              variant={waitingStatusFilter === null ? 'primary' : 'outline'}
+              className="cursor-pointer"
+              onClick={() => setWaitingStatusFilter(null)}
+            >
+              {t('dashboard.filters.allWaitTimes')}
+            </Badge>
+            {waitingStatusOptions.map((status) => (
+              <Badge
+                key={status}
+                variant={
+                  waitingStatusFilter === status
+                    ? status === 'LOW'
+                      ? 'default'
+                      : status === 'MEDIUM'
+                        ? 'secondary'
+                        : status === 'HIGH'
+                          ? 'destructive'
+                          : 'destructive'
+                    : 'outline'
+                }
+                className="cursor-pointer"
+                onClick={() =>
+                  setWaitingStatusFilter(
+                    waitingStatusFilter === status ? null : status
+                  )
+                }
+              >
+                {t(`dashboard.filters.${status.toLowerCase()}Wait`)}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* View Mode Indicator and Toggle */}
+      {filteredStores.length > 0 && (
+        <div className="flex items-end justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              {t('dashboard.viewMode.showingStores', {
+                count: filteredStores.length,
+              })}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {t('dashboard.viewMode.inViewMode', {
+                mode: t(`ui.${viewMode}`),
+              })}
+            </span>
+          </div>
+          <ViewToggle viewMode={viewMode} onViewChange={handleViewModeChange} />
+        </div>
+      )}
+
+      {/* Store Display */}
+      {filteredStores.length > 0 ? (
+        <>
+          {/* Grid View */}
+          {viewMode === 'grid' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+              {filteredStores.map((store) => (
+                <StoreCard key={store.shopId} store={store} />
+              ))}
+            </div>
+          )}
+
+          {/* List View */}
+          {viewMode === 'list' && (
+            <div className="space-y-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+              {filteredStores.map((store) => (
+                <StoreListItem key={store.shopId} store={store} />
+              ))}
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="text-center py-8">
+          <Search className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+          <h3 className="text-base font-semibold text-foreground mb-1">
+            {t('dashboard.noResults.title')}
+          </h3>
+          <p className="text-muted-foreground">
+            {t('dashboard.noResults.message')}
+          </p>
+        </div>
+      )}
 
       {/* Floating Refresh Status Bar */}
       <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
