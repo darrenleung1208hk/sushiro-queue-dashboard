@@ -8,21 +8,20 @@ import { Store } from '@/lib/types';
 import { QUEUE_PRIORITY } from '@/lib/constants';
 import { cn, getQueuePriority } from '@/lib/utils';
 
-interface StoreCardProps {
-  store: Store;
-  isLoading?: boolean;
-}
+type StoreCardProps =
+  | { store: Store; isLoading?: false }
+  | { isLoading: true; store?: undefined };
 
 export const StoreCard = ({ store, isLoading }: StoreCardProps) => {
   const t = useTranslations();
   const locale = useLocale();
-  const isOpen = store.storeStatus === 'OPEN';
-  const queueLength = store.storeQueue.length;
-  const waitingGroup = store.waitingGroup;
+  const isOpen = store?.storeStatus === 'OPEN';
+  const queueLength = store?.storeQueue.length;
+  const waitingGroup = store?.waitingGroup;
 
   // Get localized store name based on current locale
-  const storeName = locale === 'zh-HK' ? store.name : store.nameEn;
-  const waitTier = getQueuePriority(waitingGroup);
+  const storeName = locale === 'zh-HK' ? store?.name : store?.nameEn;
+  const waitTier = getQueuePriority(waitingGroup ?? 0);
 
   return (
     <Card className="group hover:shadow-md transition-all duration-200 border border-border shadow-sm bg-card">
