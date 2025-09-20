@@ -19,6 +19,16 @@ export const StoreDisplay: React.FC<StoreDisplayProps> = ({
 }) => {
   const t = useTranslations();
 
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+        {Array.from({ length: 24 }).map((_, index) => (
+          <StoreCard key={index} isLoading={isLoading} />
+        ))}
+      </div>
+    );
+  }
+
   if (stores.length === 0) {
     return (
       <div className="text-center py-8">
@@ -33,25 +43,23 @@ export const StoreDisplay: React.FC<StoreDisplayProps> = ({
     );
   }
 
-  return (
-    <>
-      {/* Grid View */}
-      {viewMode === 'grid' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
-          {stores.map((store) => (
-            <StoreCard key={store.shopId} store={store} isLoading={isLoading} />
-          ))}
-        </div>
-      )}
+  if (viewMode === 'grid') {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+        {stores.map((store) => (
+          <StoreCard key={store.shopId} store={store} isLoading={isLoading} />
+        ))}
+      </div>
+    );
+  }
 
-      {/* List View */}
-      {viewMode === 'list' && (
-        <div className="space-y-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
-          {stores.map((store) => (
-            <StoreListItem key={store.shopId} store={store} />
-          ))}
-        </div>
-      )}
-    </>
-  );
+  if (viewMode === 'list') {
+    return (
+      <div className="space-y-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+        {stores.map((store) => (
+          <StoreListItem key={store.shopId} store={store} />
+        ))}
+      </div>
+    );
+  }
 };
