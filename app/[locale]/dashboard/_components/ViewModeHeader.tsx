@@ -16,10 +16,6 @@ export const ViewModeHeader: React.FC<ViewModeHeaderProps> = ({
 }) => {
   const t = useTranslations();
 
-  if (filteredCount === 0) {
-    return null;
-  }
-
   return (
     <div className="flex items-end justify-between">
       <div className="flex items-center gap-2">
