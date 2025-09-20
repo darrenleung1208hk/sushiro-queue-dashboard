@@ -1,12 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Dashboard } from '@/components/Dashboard';
+import { Dashboard } from '@/app/[locale]/dashboard/_components/Dashboard';
 import { Store } from '@/lib/types';
-import {
-  DashboardLoading,
-  DashboardError,
-} from '@/app/[locale]/dashboard/_components';
 import { useTranslations } from 'next-intl';
 
 // Auto-refresh configuration
@@ -107,14 +103,6 @@ export default function DashboardPage() {
     return () =>
       document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
-
-  if (error && stores.length === 0) {
-    return <DashboardError error={error} />;
-  }
-
-  if (isLoading && stores.length === 0) {
-    return <DashboardLoading />;
-  }
 
   return (
     <Dashboard

@@ -1,11 +1,12 @@
+import { useTranslations, useLocale } from 'next-intl';
+import { Clock, Users, MapPin } from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Clock, Users, MapPin } from 'lucide-react';
-import { cn, getQueuePriority } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Store } from '@/lib/types';
 import { QUEUE_PRIORITY } from '@/lib/constants';
-import { useTranslations, useLocale } from 'next-intl';
-import { Skeleton } from '@/components/ui/skeleton';
+import { cn, getQueuePriority } from '@/lib/utils';
 
 interface StoreCardProps {
   store: Store;

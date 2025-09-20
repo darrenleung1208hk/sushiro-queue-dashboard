@@ -1,9 +1,10 @@
+import { useTranslations, useLocale } from 'next-intl';
+import { Clock, Users } from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Clock, Users } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { Store } from '@/lib/types';
-import { useTranslations, useLocale } from 'next-intl';
+import { cn } from '@/lib/utils';
 
 interface StoreListItemProps {
   store: Store;

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Search,
   StoreIcon,
@@ -10,16 +11,16 @@ import {
   Play,
   RefreshCw,
 } from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { ViewToggle } from '@/components/ui/view-toggle';
+import { Store } from '@/lib/types';
+import { getQueuePriority, cn } from '@/lib/utils';
+
 import { StoreCard } from './StoreCard';
 import { StoreListItem } from './StoreListItem';
 import { StatCard } from './StatCard';
-import { ViewToggle } from './ui/view-toggle';
-import { Store } from '@/lib/types';
-import { getQueuePriority } from '@/lib/utils';
-import { cn } from '@/lib/utils';
-import { useTranslations } from 'next-intl';
 
 interface DashboardProps {
   stores: Store[];
