@@ -29,7 +29,7 @@ export const StoreCard = ({ store, isLoading }: StoreCardProps) => {
         <div className="flex items-start justify-between mb-2">
           <div className="space-y-1">
             {isLoading ? (
-              <Skeleton className="h-4 w-12 my-1" />
+              <Skeleton className="h-4 w-28 my-1" />
             ) : (
               <h3 className="font-semibold text-foreground">{storeName}</h3>
             )}

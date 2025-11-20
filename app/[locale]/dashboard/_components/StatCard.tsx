@@ -34,7 +34,7 @@ export const StatCard: React.FC<StatCardProps> = ({
           <div>
             <p className="text-xs text-muted-foreground">{title}</p>
             {isLoading ? (
-              <Skeleton className="h-5 w-12 my-1" />
+              <Skeleton className="h-5 w-16 my-1" />
             ) : (
               <p className="text-lg font-bold text-foreground">{value}</p>
             )}
