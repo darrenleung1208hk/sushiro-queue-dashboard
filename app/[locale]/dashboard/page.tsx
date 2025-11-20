@@ -1,13 +1,17 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Dashboard } from '@/components/Dashboard';
-import { Store } from '@/lib/types';
-import {
-  DashboardLoading,
-  DashboardError,
-} from '@/app/[locale]/dashboard/_components';
 import { useTranslations } from 'next-intl';
+import { Store } from '@/lib/types';
+import { useDashboardFilters } from '@/lib/hooks/use-dashboard-filters';
+import { useViewMode } from '@/lib/hooks/use-view-mode';
+import { useDashboardStats } from '@/lib/hooks/use-dashboard-stats';
+
+import { DashboardHeader } from './_components/DashboardHeader';
+import { StatsOverview } from './_components/StatsOverview';
+import { FiltersSection } from './_components/FiltersSection';
+import { ViewModeHeader } from './_components/ViewModeHeader';
+import { StoreDisplay } from './_components/StoreDisplay';
 
 // Auto-refresh configuration
 const AUTO_REFRESH_INTERVAL_MS = 60000; // 60 seconds
@@ -17,7 +21,7 @@ export default function DashboardPage() {
   const t = useTranslations();
   const [stores, setStores] = useState<Store[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [, setError] = useState<Error | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [nextRefreshIn, setNextRefreshIn] = useState(
     AUTO_REFRESH_INTERVAL_SECONDS
@@ -108,23 +112,56 @@ export default function DashboardPage() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
-  if (error && stores.length === 0) {
-    return <DashboardError error={error} />;
-  }
-
-  if (isLoading && stores.length === 0) {
-    return <DashboardLoading />;
-  }
+  const stats = useDashboardStats(stores);
+  const {
+    searchTerm,
+    setSearchTerm,
+    regionFilter,
+    setRegionFilter,
+    waitingStatusFilter,
+    setWaitingStatusFilter,
+    filteredStores,
+    uniqueRegions,
+    waitingStatusOptions,
+  } = useDashboardFilters(stores);
+  const { viewMode, handleViewModeChange } = useViewMode();
 
   return (
-    <Dashboard
-      stores={stores}
-      isLoading={isLoading}
-      lastUpdated={lastUpdated}
-      nextRefreshIn={nextRefreshIn}
-      autoRefreshEnabled={autoRefreshEnabled}
-      onAutoRefreshToggle={setAutoRefreshEnabled}
-      onManualRefresh={fetchStores}
-    />
+    <div className="space-y-4">
+      <DashboardHeader
+        isLoading={isLoading}
+        lastUpdated={lastUpdated}
+        onManualRefresh={fetchStores}
+      />
+
+      <StatsOverview
+        stats={stats}
+        filteredCount={filteredStores.length}
+        isLoading={isLoading}
+      />
+
+      <FiltersSection
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        regionFilter={regionFilter}
+        onRegionFilterChange={setRegionFilter}
+        waitingStatusFilter={waitingStatusFilter}
+        onWaitingStatusFilterChange={setWaitingStatusFilter}
+        uniqueRegions={uniqueRegions}
+        waitingStatusOptions={waitingStatusOptions}
+      />
+
+      <ViewModeHeader
+        filteredCount={filteredStores.length}
+        viewMode={viewMode}
+        onViewModeChange={handleViewModeChange}
+      />
+
+      <StoreDisplay
+        stores={filteredStores}
+        viewMode={viewMode}
+        isLoading={isLoading}
+      />
+    </div>
   );
 }

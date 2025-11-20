@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 import { Globe } from 'lucide-react';
 
 export function LanguageSwitcher() {
@@ -73,7 +74,7 @@ export function LanguageSwitcher() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm">
-          <Globe className="h-4 w-4 mr-2" />
+          <Globe className="h-4 w-4 mr-0" />
           {t(`common.languages.${currentLocale}`)}
         </Button>
       </DropdownMenuTrigger>
@@ -82,7 +83,10 @@ export function LanguageSwitcher() {
           <DropdownMenuItem
             key={code}
             onClick={() => handleLanguageChange(code)}
-            className={currentLocale === code ? 'bg-accent' : ''}
+            className={cn(
+              'cursor-pointer',
+              currentLocale === code ? 'bg-accent' : ''
+            )}
           >
             {t(`common.languages.${code}`)}
           </DropdownMenuItem>

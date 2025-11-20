@@ -1,41 +1,49 @@
+import { useTranslations, useLocale } from 'next-intl';
+import { Clock, Users, MapPin } from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Clock, Users, MapPin } from 'lucide-react';
-import { cn, getQueuePriority } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Store } from '@/lib/types';
 import { QUEUE_PRIORITY } from '@/lib/constants';
-import { useTranslations, useLocale } from 'next-intl';
+import { cn, getQueuePriority } from '@/lib/utils';
 
-interface StoreCardProps {
-  store: Store;
-}
+type StoreCardProps =
+  | { store: Store; isLoading?: false }
+  | { isLoading: true; store?: undefined };
 
-export const StoreCard = ({ store }: StoreCardProps) => {
+export const StoreCard = ({ store, isLoading }: StoreCardProps) => {
   const t = useTranslations();
   const locale = useLocale();
-  const isOpen = store.storeStatus === 'OPEN';
-  const queueLength = store.storeQueue.length;
-  const waitingGroup = store.waitingGroup;
+  const isOpen = store?.storeStatus === 'OPEN';
+  const queueLength = store?.storeQueue.length;
+  const waitingGroup = store?.waitingGroup;
 
   // Get localized store name based on current locale
-  const storeName = locale === 'zh-HK' ? store.name : store.nameEn;
-  const waitTier = getQueuePriority(waitingGroup);
+  const storeName = locale === 'zh-HK' ? store?.name : store?.nameEn;
+  const waitTier = getQueuePriority(waitingGroup ?? 0);
 
   return (
     <Card className="group hover:shadow-md transition-all duration-200 border border-border shadow-sm bg-card">
       <CardContent className="p-3">
-        <div className="flex items-start justify-between mb-1">
+        <div className="flex items-start justify-between mb-2">
           <div className="space-y-1">
-            <h3 className="font-semibold leading-tight text-foreground">
-              {storeName}
-            </h3>
+            {isLoading ? (
+              <Skeleton className="h-4 w-28 my-1" />
+            ) : (
+              <h3 className="font-semibold text-foreground">{storeName}</h3>
+            )}
           </div>
-          <Badge
-            variant={isOpen ? 'default' : 'destructive'}
-            className="shrink-0 text-[10px] px-1.5 py-0.5 h-5"
-          >
-            {store.storeStatus}
-          </Badge>
+          {isLoading ? (
+            <Skeleton className="h-5 w-10" />
+          ) : (
+            <Badge
+              variant={isOpen ? 'default' : 'destructive'}
+              className="shrink-0 text-[10px] px-1.5 py-0.5 h-5"
+            >
+              {store.storeStatus}
+            </Badge>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -72,7 +80,7 @@ export const StoreCard = ({ store }: StoreCardProps) => {
                     waitTier === QUEUE_PRIORITY.LOW && 'text-foreground'
                   )}
                 >
-                  {waitingGroup}
+                  {isLoading ? '--' : waitingGroup}
                 </p>
               </div>
             </div>
@@ -83,7 +91,7 @@ export const StoreCard = ({ store }: StoreCardProps) => {
                   {t('store.current')}
                 </p>
                 <p className="font-semibold text-sm text-foreground">
-                  {store.storeQueue.length > 0
+                  {!isLoading && store.storeQueue.length > 0
                     ? `#${store.storeQueue[0]}`
                     : '--'}
                 </p>
@@ -97,26 +105,18 @@ export const StoreCard = ({ store }: StoreCardProps) => {
               {t('store.currentQueue')}
             </p>
             <div className="flex flex-wrap gap-1">
-              {queueLength > 0 ? (
-                <>
-                  {store.storeQueue.slice(0, 3).map((ticket, index) => (
-                    <Badge
-                      key={index}
-                      variant="outline"
-                      className="text-[10px] px-1.5 py-0.5 h-5"
-                    >
-                      #{ticket}
-                    </Badge>
-                  ))}
-                  {queueLength > 3 && (
-                    <Badge
-                      variant="outline"
-                      className="text-[10px] px-1.5 py-0.5 h-5"
-                    >
-                      {t('store.moreTickets', { count: queueLength - 3 })}
-                    </Badge>
-                  )}
-                </>
+              {isLoading ? (
+                <Skeleton className="h-[20px] w-28" />
+              ) : queueLength > 0 ? (
+                store.storeQueue.slice(0, 3).map((ticket, index) => (
+                  <Badge
+                    key={index}
+                    variant="outline"
+                    className="text-[10px] px-1.5 py-0.5 h-5"
+                  >
+                    #{ticket}
+                  </Badge>
+                ))
               ) : (
                 <Badge
                   variant="outline"
@@ -131,12 +131,16 @@ export const StoreCard = ({ store }: StoreCardProps) => {
           {/* Location */}
           <div className="flex items-center gap-2 pt-2 border-t border-border">
             <MapPin className="h-3 w-3 text-muted-foreground shrink-0" />
-            <div>
-              <p className="text-[10px] text-muted-foreground">
-                {t(`common.regions.${store.region}`)} •{' '}
-                {t(`common.areas.${store.area}`)}
-              </p>
-            </div>
+            {isLoading ? (
+              <Skeleton className="h-[15px] w-40" />
+            ) : (
+              <div>
+                <p className="text-[10px] text-muted-foreground">
+                  {t(`common.regions.${store.region}`)} •{' '}
+                  {t(`common.areas.${store.area}`)}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
