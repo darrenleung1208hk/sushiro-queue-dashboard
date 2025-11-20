@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { StoreIcon, Users, Clock, Search } from 'lucide-react';
 
+import { cn } from '@/lib/utils';
 import { StatCard } from './StatCard';
 
 interface StatsOverviewProps {
@@ -20,7 +21,7 @@ export const StatsOverview: React.FC<StatsOverviewProps> = ({
   isLoading = false,
 }) => {
   const t = useTranslations();
-  const [isMounted, setIsMounted] = useState(false);
+  const [delaysReady, setDelaysReady] = useState(false);
 
   const statCards = [
     {
@@ -63,10 +64,14 @@ export const StatsOverview: React.FC<StatsOverviewProps> = ({
   const [statDelays, setStatDelays] = useState<number[]>([]);
 
   useEffect(() => {
-    setIsMounted(true);
     if (isInitialVisit) {
       // Generate delays only on client side
       setStatDelays(Array.from({ length: 4 }).map(() => Math.random() * 400 + 100));
+      // Mark delays as ready so skeletons can appear with animation
+      setDelaysReady(true);
+    } else {
+      // If not initial visit, show immediately without animation
+      setDelaysReady(true);
     }
   }, [isInitialVisit]);
 
@@ -75,9 +80,14 @@ export const StatsOverview: React.FC<StatsOverviewProps> = ({
       {statCards.map((card, index) => (
         <div
           key={index}
-          className={isInitialVisit && isMounted ? 'animate-fade-in-up' : ''}
+          className={cn(
+            isInitialVisit && delaysReady && statDelays[index]
+              ? 'animate-fade-in-up'
+              : '',
+            !delaysReady ? 'opacity-0' : ''
+          )}
           style={
-            isInitialVisit && isMounted && statDelays[index]
+            isInitialVisit && delaysReady && statDelays[index]
               ? {
                   animationDelay: `${statDelays[index]}ms`,
                 }
