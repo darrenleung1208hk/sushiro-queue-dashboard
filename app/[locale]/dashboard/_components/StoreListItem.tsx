@@ -3,22 +3,23 @@ import { Clock, Users } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Store } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
-interface StoreListItemProps {
-  store: Store;
-}
+type StoreListItemProps =
+  | { store: Store; isLoading?: false }
+  | { isLoading: true; store?: undefined };
 
-export const StoreListItem = ({ store }: StoreListItemProps) => {
+export const StoreListItem = ({ store, isLoading }: StoreListItemProps) => {
   const t = useTranslations();
   const locale = useLocale();
-  const isOpen = store.storeStatus === 'OPEN';
-  const queueLength = store.storeQueue.length;
-  const waitingGroup = store.waitingGroup;
+  const isOpen = store?.storeStatus === 'OPEN';
+  const queueLength = store?.storeQueue.length;
+  const waitingGroup = store?.waitingGroup;
 
   // Get localized store name based on current locale
-  const storeName = locale === 'zh-HK' ? store.name : store.nameEn;
+  const storeName = locale === 'zh-HK' ? store?.name : store?.nameEn;
 
   // 3-tier waiting system
   const getWaitTier = (waiting: number) => {
@@ -27,7 +28,7 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
     return 'high';
   };
 
-  const waitTier = getWaitTier(waitingGroup);
+  const waitTier = getWaitTier(waitingGroup ?? 0);
 
   return (
     <Card className="hover:shadow-md transition-all duration-200 border border-border shadow-sm bg-card">
@@ -36,20 +37,32 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
           {/* Store Info */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-semibold text-foreground truncate">
-                {storeName}
-              </h3>
-              <Badge
-                variant={isOpen ? 'default' : 'destructive'}
-                className="shrink-0 text-[10px] px-1.5 py-0.5 h-5"
-              >
-                {store.storeStatus}
-              </Badge>
+              {isLoading ? (
+                <Skeleton className="h-4 w-28" />
+              ) : (
+                <h3 className="font-semibold text-foreground truncate">
+                  {storeName}
+                </h3>
+              )}
+              {isLoading ? (
+                <Skeleton className="h-5 w-10" />
+              ) : (
+                <Badge
+                  variant={isOpen ? 'default' : 'destructive'}
+                  className="shrink-0 text-[10px] px-1.5 py-0.5 h-5"
+                >
+                  {store.storeStatus}
+                </Badge>
+              )}
             </div>
-            <p className="text-xs text-muted-foreground truncate">
-              {t(`common.areas.${store.area}`)},{' '}
-              {t(`common.regions.${store.region}`)}
-            </p>
+            {isLoading ? (
+              <Skeleton className="h-3 w-32 mt-1" />
+            ) : (
+              <p className="text-xs text-muted-foreground truncate">
+                {t(`common.areas.${store.area}`)},{' '}
+                {t(`common.regions.${store.region}`)}
+              </p>
+            )}
           </div>
 
           {/* Metrics */}
@@ -84,7 +97,7 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
                   waitTier === 'low' && 'text-foreground'
                 )}
               >
-                {waitingGroup}
+                {isLoading ? '--' : waitingGroup}
               </p>
             </div>
             <div className="flex flex-col items-center justify-center gap-1 p-1.5 rounded-md bg-accent/30 border border-border text-center">
@@ -95,7 +108,9 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
                 </p>
               </div>
               <p className="font-semibold text-sm text-foreground">
-                {queueLength > 0 ? `#${store.storeQueue[0]}` : '--'}
+                {!isLoading && queueLength > 0
+                  ? `#${store.storeQueue[0]}`
+                  : '--'}
               </p>
             </div>
           </div>
@@ -108,7 +123,9 @@ export const StoreListItem = ({ store }: StoreListItemProps) => {
               {t('store.currentQueue')}
             </p>
             <div className="flex flex-wrap gap-1">
-              {queueLength > 0 ? (
+              {isLoading ? (
+                <Skeleton className="h-[20px] w-28" />
+              ) : queueLength > 0 ? (
                 <>
                   {store.storeQueue.slice(0, 3).map((ticket, index) => (
                     <Badge

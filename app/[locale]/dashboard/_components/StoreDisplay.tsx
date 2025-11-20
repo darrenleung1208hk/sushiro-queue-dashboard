@@ -20,10 +20,21 @@ export const StoreDisplay: React.FC<StoreDisplayProps> = ({
   const t = useTranslations();
 
   if (isLoading) {
+    if (viewMode === 'grid') {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+          {Array.from({ length: 24 }).map((_, index) => (
+            <StoreCard key={index} isLoading={isLoading} />
+          ))}
+        </div>
+      );
+    }
+
+    // List view skeleton
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
-        {Array.from({ length: 24 }).map((_, index) => (
-          <StoreCard key={index} isLoading={isLoading} />
+      <div className="space-y-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+        {Array.from({ length: 12 }).map((_, index) => (
+          <StoreListItem key={index} isLoading={isLoading} />
         ))}
       </div>
     );
