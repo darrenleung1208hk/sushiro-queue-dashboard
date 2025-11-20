@@ -7,11 +7,11 @@ import { useDashboardFilters } from '@/lib/hooks/use-dashboard-filters';
 import { useViewMode } from '@/lib/hooks/use-view-mode';
 import { useDashboardStats } from '@/lib/hooks/use-dashboard-stats';
 
+import { DashboardHeader } from './_components/DashboardHeader';
 import { StatsOverview } from './_components/StatsOverview';
 import { FiltersSection } from './_components/FiltersSection';
 import { ViewModeHeader } from './_components/ViewModeHeader';
 import { StoreDisplay } from './_components/StoreDisplay';
-import { RefreshStatusBar } from './_components/RefreshStatusBar';
 
 // Auto-refresh configuration
 const AUTO_REFRESH_INTERVAL_MS = 60000; // 60 seconds
@@ -128,6 +128,12 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-4">
+      <DashboardHeader
+        isLoading={isLoading}
+        lastUpdated={lastUpdated}
+        onManualRefresh={fetchStores}
+      />
+
       <StatsOverview
         stats={stats}
         filteredCount={filteredStores.length}
@@ -155,15 +161,6 @@ export default function DashboardPage() {
         stores={filteredStores}
         viewMode={viewMode}
         isLoading={isLoading}
-      />
-
-      <RefreshStatusBar
-        isLoading={isLoading}
-        lastUpdated={lastUpdated}
-        nextRefreshIn={nextRefreshIn}
-        autoRefreshEnabled={autoRefreshEnabled}
-        onAutoRefreshToggle={setAutoRefreshEnabled}
-        onManualRefresh={fetchStores}
       />
     </div>
   );

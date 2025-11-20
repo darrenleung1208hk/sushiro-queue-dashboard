@@ -3,7 +3,6 @@ import { getMessages } from 'next-intl/server';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { Providers } from '../providers';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import type { Metadata } from 'next';
 
 interface LocaleLayoutProps {
@@ -42,25 +41,7 @@ export default async function LocaleLayout({
     <NextIntlClientProvider messages={messages} locale={locale}>
       <Providers>
         <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
-          <div className="max-w-7xl mx-auto p-4 pb-24">
-            {/* Header */}
-            <div className="space-y-2 mb-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <h1 className="text-2xl font-bold text-foreground">
-                    {locale === 'zh-HK'
-                      ? '壽司郎排隊儀表板'
-                      : 'Sushiro Queue Dashboard'}
-                  </h1>
-                  <p className="text-muted-foreground">
-                    {locale === 'zh-HK'
-                      ? '實時監控壽司郎餐廳排隊狀況'
-                      : 'Real-time queue monitoring for Sushiro restaurants'}
-                  </p>
-                </div>
-                <LanguageSwitcher />
-              </div>
-            </div>
+          <div className="max-w-7xl mx-auto p-4">
             {children}
           </div>
         </div>
