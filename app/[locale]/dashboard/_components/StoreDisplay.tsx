@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Search } from 'lucide-react';
 
@@ -18,13 +18,47 @@ export const StoreDisplay: React.FC<StoreDisplayProps> = ({
   isLoading = false,
 }) => {
   const t = useTranslations();
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Generate random delays only on client after mount to avoid hydration mismatch
+  // Only on initial visit (when stores are empty), no staggered animation on refresh
+  const isInitialVisit = stores.length === 0;
+  const [gridDelays, setGridDelays] = useState<number[]>([]);
+  const [listDelays, setListDelays] = useState<number[]>([]);
+
+  useEffect(() => {
+    setIsMounted(true);
+    if (isInitialVisit) {
+      // Generate delays only on client side
+      setGridDelays(
+        Array.from({ length: 24 }).map(() => Math.random() * 200 + 100)
+      );
+      setListDelays(
+        Array.from({ length: 12 }).map(() => Math.random() * 200 + 100)
+      );
+    }
+  }, [isInitialVisit]);
 
   if (isLoading) {
     if (viewMode === 'grid') {
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
           {Array.from({ length: 24 }).map((_, index) => (
-            <StoreCard key={index} isLoading={isLoading} />
+            <div
+              key={index}
+              className={
+                isInitialVisit && isMounted ? 'animate-fade-in-up' : ''
+              }
+              style={
+                isInitialVisit && isMounted && gridDelays[index]
+                  ? {
+                      animationDelay: `${gridDelays[index]}ms`,
+                    }
+                  : {}
+              }
+            >
+              <StoreCard isLoading={isLoading} />
+            </div>
           ))}
         </div>
       );
@@ -32,9 +66,21 @@ export const StoreDisplay: React.FC<StoreDisplayProps> = ({
 
     // List view skeleton
     return (
-      <div className="space-y-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+      <div className="space-y-2">
         {Array.from({ length: 12 }).map((_, index) => (
-          <StoreListItem key={index} isLoading={isLoading} />
+          <div
+            key={index}
+            className={isInitialVisit && isMounted ? 'animate-fade-in-up' : ''}
+            style={
+              isInitialVisit && isMounted && listDelays[index]
+                ? {
+                    animationDelay: `${listDelays[index]}ms`,
+                  }
+                : {}
+            }
+          >
+            <StoreListItem isLoading={isLoading} />
+          </div>
         ))}
       </div>
     );
