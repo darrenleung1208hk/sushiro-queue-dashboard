@@ -123,13 +123,12 @@ export const StoreDisplay: React.FC<StoreDisplayProps> = ({
     );
   }
 
-  if (viewMode === 'list') {
-    return (
-      <div className="space-y-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
-        {stores.map((store) => (
-          <StoreListItem key={store.shopId} store={store} />
-        ))}
-      </div>
-    );
-  }
+  // TypeScript type narrowing: viewMode must be 'list' here (already checked 'grid' above)
+  return (
+    <div className="space-y-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+      {stores.map((store) => (
+        <StoreListItem key={store.shopId} store={store} />
+      ))}
+    </div>
+  );
 };
