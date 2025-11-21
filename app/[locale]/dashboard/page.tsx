@@ -15,7 +15,6 @@ import { StoreDisplay } from './_components/StoreDisplay';
 
 // Auto-refresh configuration
 const AUTO_REFRESH_INTERVAL_MS = 60000; // 60 seconds
-const AUTO_REFRESH_INTERVAL_SECONDS = AUTO_REFRESH_INTERVAL_MS / 1000;
 
 export default function DashboardPage() {
   const t = useTranslations();
@@ -23,10 +22,7 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [, setError] = useState<Error | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [nextRefreshIn, setNextRefreshIn] = useState(
-    AUTO_REFRESH_INTERVAL_SECONDS
-  );
-  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
+  const [autoRefreshEnabled] = useState(true);
   const isFetchingRef = useRef(false);
 
   // Data fetching function with deduplication
@@ -82,29 +78,10 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, [fetchStores, autoRefreshEnabled]);
 
-  // Countdown timer
-  useEffect(() => {
-    if (!autoRefreshEnabled) return;
-
-    const countdown = setInterval(() => {
-      setNextRefreshIn((prev) => {
-        if (prev <= 1) {
-          return AUTO_REFRESH_INTERVAL_SECONDS;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(countdown);
-  }, [autoRefreshEnabled]);
-
-  // Tab visibility handling - pause countdown when tab is not visible
+  // Tab visibility handling
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.hidden) {
-        // Pause countdown when tab is not visible
-        setNextRefreshIn(AUTO_REFRESH_INTERVAL_SECONDS);
-      }
+      // Handle visibility changes if needed in the future
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
