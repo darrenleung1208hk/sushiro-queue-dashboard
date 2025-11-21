@@ -6,7 +6,11 @@ A real-time dashboard for monitoring Sushiro restaurant queue status across Hong
 
 - **Real-time Queue Monitoring**: Track waiting groups and current queue numbers for each store
 - **Store Status Tracking**: Monitor which stores are open or closed
-- **Multi-language Support**: Display store names in both Chinese and English
+- **Internationalization**: Full support for English and Traditional Chinese (Hong Kong) with language switcher
+- **Advanced Filtering**: Search stores by name, filter by region, and filter by waiting status (Low/Medium/High/Extreme)
+- **View Modes**: Toggle between grid and list views for optimal viewing experience
+- **Statistics Overview**: Real-time statistics showing total stores, waiting groups, and active tickets
+- **Auto-refresh**: Automatic data refresh every 60 seconds with manual refresh option
 - **Regional Organization**: Stores organized by Hong Kong regions (香港島, 九龍, 新界)
 - **Responsive Design**: Beautiful, modern UI that works on desktop and mobile
 - **Live Updates**: Real-time timestamp tracking for queue data
@@ -15,6 +19,7 @@ A real-time dashboard for monitoring Sushiro restaurant queue status across Hong
 
 - **Framework**: [Next.js 15](https://nextjs.org/) with App Router
 - **Language**: [TypeScript 5.8](https://www.typescriptlang.org/)
+- **Internationalization**: [next-intl](https://next-intl-docs.vercel.app/) for multi-language support
 - **Styling**: [Tailwind CSS 3.4](https://tailwindcss.com/) with [shadcn/ui](https://ui.shadcn.com/)
 - **UI Components**: [Radix UI](https://www.radix-ui.com/) primitives
 - **Icons**: [Lucide React](https://lucide.dev/)
@@ -60,87 +65,66 @@ A real-time dashboard for monitoring Sushiro restaurant queue status across Hong
 ```
 sushiro-queue-dashboard/
 ├── app/                          # Next.js App Router pages
-│   ├── (ui)/                    # UI route group
-│   │   └── dashboard/           # Dashboard page components
-│   │       ├── _components/     # Dashboard-specific components
-│   │       │   ├── DashboardError.tsx
-│   │       │   ├── DashboardLoading.tsx
-│   │       │   └── index.ts
-│   │       └── page.tsx         # Dashboard page
+│   ├── [locale]/                # Internationalized routes
+│   │   ├── dashboard/           # Dashboard page
+│   │   │   ├── _components/     # Dashboard-specific components
+│   │   │   │   ├── DashboardHeader.tsx
+│   │   │   │   ├── FiltersSection.tsx
+│   │   │   │   ├── RefreshStatusBar.tsx
+│   │   │   │   ├── StatCard.tsx
+│   │   │   │   ├── StatsOverview.tsx
+│   │   │   │   ├── StoreCard.tsx
+│   │   │   │   ├── StoreDisplay.tsx
+│   │   │   │   ├── StoreListItem.tsx
+│   │   │   │   └── ViewModeHeader.tsx
+│   │   │   └── page.tsx         # Dashboard page
+│   │   ├── layout.tsx           # Locale-specific layout
+│   │   └── page.tsx             # Locale-specific home page
 │   ├── api/                     # API routes
 │   │   └── stores/              # Store-related API endpoints
 │   │       └── live/            # Live store data endpoint
 │   │           └── route.ts
 │   ├── globals.css              # Global styles
 │   ├── layout.tsx               # Root layout
-│   ├── page.tsx                 # Home page with dashboard
+│   ├── page.tsx                 # Root page (redirects to locale)
 │   └── providers.tsx            # Context providers
 ├── components/                   # React components
-│   ├── Dashboard.tsx            # Main dashboard component
-│   ├── StoreCard.tsx            # Individual store card
+│   ├── LanguageSwitcher.tsx     # Language switcher component
 │   └── ui/                      # shadcn/ui components
-│       ├── accordion.tsx        # Collapsible content
-│       ├── alert-dialog.tsx     # Alert dialogs
-│       ├── alert.tsx            # Alert notifications
-│       ├── aspect-ratio.tsx     # Aspect ratio wrapper
-│       ├── avatar.tsx           # User avatars
 │       ├── badge.tsx            # Status badges
-│       ├── breadcrumb.tsx       # Navigation breadcrumbs
 │       ├── button.tsx           # Button components
-│       ├── calendar.tsx         # Date picker
 │       ├── card.tsx             # Card containers
-│       ├── carousel.tsx         # Image carousel
 │       ├── chart.tsx            # Chart components
-│       ├── checkbox.tsx         # Checkbox inputs
-│       ├── collapsible.tsx      # Collapsible sections
-│       ├── command.tsx          # Command palette
-│       ├── context-menu.tsx     # Right-click menus
-│       ├── dialog.tsx           # Modal dialogs
-│       ├── drawer.tsx           # Slide-out drawers
 │       ├── dropdown-menu.tsx    # Dropdown menus
-│       ├── form.tsx             # Form components
-│       ├── hover-card.tsx       # Hover cards
-│       ├── input-otp.tsx        # OTP input
 │       ├── input.tsx            # Text inputs
-│       ├── label.tsx            # Form labels
-│       ├── menubar.tsx          # Menu bars
-│       ├── navigation-menu.tsx  # Navigation menus
-│       ├── pagination.tsx       # Page navigation
-│       ├── popover.tsx          # Popover content
-│       ├── progress.tsx         # Progress bars
-│       ├── radio-group.tsx      # Radio button groups
-│       ├── resizable.tsx        # Resizable panels
-│       ├── scroll-area.tsx      # Custom scrollbars
-│       ├── select.tsx           # Select dropdowns
-│       ├── separator.tsx        # Visual separators
-│       ├── sheet.tsx            # Slide-out sheets
-│       ├── sidebar.tsx          # Sidebar navigation
 │       ├── skeleton.tsx         # Loading skeletons
-│       ├── slider.tsx           # Range sliders
 │       ├── sonner.tsx           # Toast notifications
-│       ├── switch.tsx           # Toggle switches
-│       ├── table.tsx            # Data tables
-│       ├── tabs.tsx             # Tab navigation
-│       ├── textarea.tsx         # Multi-line inputs
 │       ├── toast.tsx            # Toast components
 │       ├── toaster.tsx          # Toast container
-│       ├── toggle-group.tsx     # Toggle button groups
-│       ├── toggle.tsx           # Toggle buttons
-│       └── tooltip.tsx          # Tooltips
+│       ├── tooltip.tsx          # Tooltips
+│       ├── use-toast.ts         # Toast hook
+│       └── view-toggle.tsx      # View mode toggle
+├── i18n/                        # Internationalization config
+│   └── request.ts               # next-intl request config
 ├── lib/                         # Utility functions and hooks
 │   ├── hooks/                   # Custom React hooks
+│   │   ├── use-dashboard-filters.ts  # Dashboard filtering logic
+│   │   ├── use-dashboard-stats.ts   # Dashboard statistics
 │   │   ├── use-mobile.tsx       # Mobile detection hook
-│   │   └── use-toast.ts         # Toast management hook
+│   │   ├── use-toast.ts         # Toast management hook
+│   │   └── use-view-mode.ts     # View mode state management
+│   ├── constants.ts             # Application constants
 │   ├── types.ts                 # TypeScript type definitions
-│   └── utils.ts                 # Utility functions
+│   └── utils.ts                 # Utility functions (cn, etc.)
+├── locales/                      # Translation files
+│   ├── en.json                  # English translations
+│   └── zh-HK.json               # Traditional Chinese (HK) translations
 ├── public/                      # Static assets
 │   ├── favicon.ico             # Site favicon
 │   ├── placeholder.svg          # Placeholder image
 │   └── robots.txt              # SEO robots file
-├── .vscode/                     # VS Code configuration
+├── middleware.ts                 # Next.js middleware (i18n routing)
 ├── .eslintrc.json              # ESLint configuration
-├── .prettierrc                 # Prettier configuration
-├── .prettierignore             # Prettier ignore patterns
 ├── components.json              # shadcn/ui configuration
 ├── next.config.js              # Next.js configuration
 ├── postcss.config.js           # PostCSS configuration
@@ -168,17 +152,169 @@ interface Store {
 }
 ```
 
+## 🔌 API Endpoints
+
+The dashboard provides a REST API for fetching live store queue data.
+
+### GET `/api/stores/live`
+
+Fetches live store data with queue information for all Sushiro stores in Hong Kong.
+
+#### Query Parameters
+
+All parameters are optional. If not provided, defaults for Hong Kong will be used:
+
+- `latitude` (number, optional): Latitude coordinate for store search
+  - Default: `22.3193` (Hong Kong)
+- `longitude` (number, optional): Longitude coordinate for store search
+  - Default: `114.1694` (Hong Kong)
+- `numresults` (number, optional): Maximum number of stores to return
+  - Default: `25`
+- `region` (string, optional): Region code (e.g., 'HK' for Hong Kong)
+  - Default: `'HK'`
+
+#### Example Request
+
+```bash
+GET /api/stores/live?latitude=22.3193&longitude=114.1694&numresults=25&region=HK
+```
+
+#### Response Format
+
+The API returns a JSON response with the following structure:
+
+```typescript
+{
+  success: boolean;
+  data: Store[];
+  timestamp: Date; // Serialized as ISO 8601 string in JSON (e.g., "2025-08-27T10:13:15.814Z")
+  message?: string;
+  error?: string;
+  warnings?: string[];
+  partialData?: boolean;
+  queueErrors?: Array<{ storeId: number; error: string }>;
+}
+```
+
+**Note**: While the TypeScript interface uses `Date` type, timestamps are serialized as ISO 8601 formatted strings in the JSON response.
+
+#### Response Status Codes
+
+- `200 OK`: Successfully fetched complete data for all stores
+- `206 Partial Content`: Store data available but queue data is unavailable for some stores
+- `404 Not Found`: No stores found for the specified parameters
+- `500 Internal Server Error`: An unexpected error occurred
+- `503 Service Unavailable`: Store data is currently unavailable
+
+#### Success Response Example
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "shopId": 10,
+      "name": "旺角店",
+      "nameEn": "Mong Kok",
+      "storeStatus": "OPEN",
+      "waitingGroup": 83,
+      "storeQueue": ["8312", "8304", "348"],
+      "address": "香港九龍旺角彌敦道628號瓊華中心地庫",
+      "region": "九龍",
+      "area": "油尖旺區",
+      "timestamp": "2025-08-27T10:13:15.814Z",
+      "latitude": 22.3176566401426,
+      "longitude": 114.17000769425294
+    },
+    {
+      "shopId": 4,
+      "name": "黃大仙店",
+      "nameEn": "Wong Tai Sin",
+      "storeStatus": "OPEN",
+      "waitingGroup": 0,
+      "storeQueue": [],
+      "address": "香港九龍黃大仙龍翔道110號豪苑G3/F翔盈里5號舖",
+      "region": "九龍",
+      "area": "黃大仙區",
+      "timestamp": "2025-08-27T10:13:15.814Z",
+      "latitude": 22.342033,
+      "longitude": 114.196866
+    }
+  ],
+  "timestamp": "2025-08-27T10:13:15.814Z",
+  "message": "Successfully fetched complete data for 25 stores"
+}
+```
+
+**Note**: The example shows two stores:
+
+- First store has an active queue with waiting groups and queue numbers
+- Second store has no waiting groups (`waitingGroup: 0`) and an empty queue array
+- Queue numbers are returned as strings and may include alphanumeric values (e.g., "8312", "8304", "8330-1")
+- All timestamps are ISO 8601 formatted strings in the JSON response
+
+#### Error Response Example
+
+```json
+{
+  "success": false,
+  "error": "STORE_DATA_UNAVAILABLE",
+  "message": "Unable to fetch store information. Please try again later.",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "data": []
+}
+```
+
+#### Partial Success Response Example
+
+When queue data is unavailable for some stores:
+
+```json
+{
+  "success": false,
+  "data": [
+    {
+      "shopId": 1,
+      "name": "壽司郎 銅鑼灣店",
+      "storeStatus": "OPEN",
+      "waitingGroup": 0,
+      "storeQueue": [],
+      ...
+    }
+  ],
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "message": "Store data available but queue data is currently unavailable...",
+  "error": "QUEUE_DATA_UNAVAILABLE",
+  "partialData": true,
+  "warnings": ["Queue data unavailable for 5 stores"]
+}
+```
+
+#### Notes
+
+- The API fetches data from Sushiro's external API through a CORS proxy
+- Store list data is cached for 30 seconds (`revalidate: 30`)
+- Queue data is cached for 15 seconds (`revalidate: 15`)
+- Queue data is fetched in parallel with a concurrency limit of 5 stores at a time
+- If queue data is unavailable for a specific store, the store will still be returned with an empty `storeQueue` array
+- The API handles errors gracefully and continues processing other stores even if some fail
+- Queue numbers in `storeQueue` are returned as strings and may include alphanumeric values (e.g., "8312", "8330-1", "348")
+- Stores can have `waitingGroup: 0` and empty `storeQueue` arrays even when `storeStatus: "OPEN"` (indicating no current wait time)
+- All timestamps are serialized as ISO 8601 formatted strings in the JSON response
+
 ## 🎨 UI Components
 
-The dashboard uses a comprehensive set of UI components from shadcn/ui:
+The dashboard uses a curated set of UI components from shadcn/ui:
 
-- **Cards**: Display store information
-- **Badges**: Show store status and queue numbers
-- **Progress bars**: Visual queue indicators
-- **Accordions**: Collapsible store details
-- **Responsive grid**: Adaptive layout for different screen sizes
-- **Toast notifications**: User feedback and alerts
-- **Dark/Light theme**: Theme switching capability
+- **Cards**: Display store information in grid and list views
+- **Badges**: Show store status, queue numbers, and filter tags
+- **Charts**: Visual statistics and data visualization
+- **Input**: Search functionality for filtering stores
+- **Dropdown Menu**: Language switcher and navigation
+- **View Toggle**: Switch between grid and list view modes
+- **Skeleton**: Loading states for better UX
+- **Toast notifications**: User feedback and alerts via Sonner
+- **Tooltips**: Helpful hover information
 
 ## 📱 Responsive Design
 
@@ -211,6 +347,7 @@ The app can be deployed to any platform that supports Next.js:
 - `npm run build` - Build for production
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
+- `npm run type-check` - Run TypeScript type checking without emitting files
 
 ## 📋 Git Workflow & Standards
 
@@ -234,17 +371,15 @@ main                    # Production-ready code
 
 ### Commit Message Standards
 
-We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
+We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification with a simplified format:
 
 #### Commit Message Format
 
 ```
-<type>[optional scope]: <description>
-
-[optional body]
-
-[optional footer(s)]
+<type>: <description>
 ```
+
+**Always use concise format without optional scope or body.**
 
 #### Types
 
@@ -261,7 +396,7 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/) speci
 
 ```
 feat: add store search functionality
-fix(dashboard): resolve queue number display issue
+fix: resolve queue number display issue
 docs: update API documentation
 style: format code with prettier
 refactor: extract store card component
@@ -276,8 +411,8 @@ chore: update dependencies
 2. **Use imperative mood**: "move cursor to..." not "moves cursor to..."
 3. **Don't capitalize the first letter**: "add feature" not "Add feature"
 4. **No period at the end**: "add feature" not "add feature."
-5. **Keep it concise**: Under 50 characters for the subject line
-6. **Use body for detailed explanation**: If more context is needed
+5. **Keep it concise**: Use 1 sentence to conclude the changes
+6. **Never use optional scope or body** - always use simple format: `<type>: <description>`
 
 ### Pull Request Process
 
@@ -350,4 +485,12 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-**Note**: This dashboard currently uses sample data. To integrate with real Sushiro queue data, you would need to connect to their API or implement a data fetching mechanism.
+## 🔑 Environment Variables
+
+The dashboard requires the following environment variables to fetch real Sushiro queue data:
+
+- `CORS_PROXY_URL` - CORS proxy URL for API requests
+- `SUSHIRO_STORE_LIST_API` - Sushiro store list API endpoint
+- `SUSHIRO_QUEUE_API` - Sushiro queue data API endpoint
+
+Create a `.env.local` file in the root directory with these variables to enable live data fetching.
