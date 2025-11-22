@@ -8,31 +8,6 @@
   },
   "plugins": ["@typescript-eslint"],
   "rules": {
-    "@typescript-eslint/strict-boolean-expressions": [
-      "warn",
-      {
-        "allowString": true,
-        "allowNumber": true,
-        "allowNullableObject": true,
-        "allowNullableBoolean": true,
-        "allowNullableString": true,
-        "allowNullableNumber": false,
-        "allowAny": false
-      }
-    ],
-    "@typescript-eslint/no-unnecessary-condition": [
-      "error",
-      {
-        "allowConstantLoopConditions": true
-      }
-    ],
-    "@typescript-eslint/prefer-nullish-coalescing": [
-      "warn",
-      {
-        "ignoreConditionalTests": false,
-        "ignoreMixedLogicalExpressions": false
-      }
-    ],
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
