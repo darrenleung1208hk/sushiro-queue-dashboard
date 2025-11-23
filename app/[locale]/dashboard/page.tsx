@@ -64,7 +64,7 @@ export default function DashboardPage() {
 
   // Initial load
   useEffect(() => {
-    fetchStores();
+    void fetchStores();
   }, [fetchStores]);
 
   // Polling logic - refresh every minute
@@ -72,7 +72,7 @@ export default function DashboardPage() {
     if (!autoRefreshEnabled) return;
 
     const interval = setInterval(() => {
-      fetchStores();
+      void fetchStores();
     }, AUTO_REFRESH_INTERVAL_MS);
 
     return () => clearInterval(interval);
@@ -108,7 +108,9 @@ export default function DashboardPage() {
       <DashboardHeader
         isLoading={isLoading}
         lastUpdated={lastUpdated}
-        onManualRefresh={fetchStores}
+        onManualRefresh={() => {
+          void fetchStores();
+        }}
       />
 
       <StatsOverview
