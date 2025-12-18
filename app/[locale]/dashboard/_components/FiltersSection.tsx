@@ -29,7 +29,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
   const t = useTranslations();
 
   return (
-    <div className="flex flex-col sm:flex-row gap-2 bg-card rounded-lg p-3 border border-border">
+    <div className="sticky top-0 z-10 flex flex-col sm:flex-row gap-2 bg-card rounded-lg p-3 border border-border shadow-sm">
       <div className="relative flex-1">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
