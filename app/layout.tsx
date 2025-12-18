@@ -1,15 +1,12 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { Toaster } from '@/components/ui/toaster';
-import { Toaster as Sonner } from '@/components/ui/sonner';
-import { Providers } from './providers';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Queue Watch Hub',
-  description: 'Monitor store queues and wait times in real-time',
+  title: 'Sushiro Queue Dashboard',
+  description: 'Real-time queue monitoring for Sushiro restaurants',
 };
 
 export default function RootLayout({
@@ -18,14 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <Providers>
-          {children}
-          <Toaster />
-          <Sonner />
-        </Providers>
-      </body>
+    <html>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }

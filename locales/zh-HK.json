@@ -1,0 +1,110 @@
+{
+  "common": {
+    "loading": "載入中...",
+    "error": "錯誤",
+    "retry": "重試",
+    "close": "關閉",
+    "save": "儲存",
+    "cancel": "取消",
+    "refresh": "重新整理",
+    "pause": "暫停",
+    "resume": "繼續",
+    "connected": "已連接",
+    "refreshing": "重新整理中...",
+    "last": "更新",
+    "open": "營業中",
+    "languages": {
+      "en": "English",
+      "zh-HK": "繁體中文"
+    },
+    "regions": {
+      "香港島": "香港島",
+      "九龍": "九龍",
+      "新界": "新界"
+    },
+    "areas": {
+      "中西區": "中西區",
+      "灣仔區": "灣仔區",
+      "東區": "東區",
+      "南區": "南區",
+      "油尖旺區": "油尖旺區",
+      "深水埗區": "深水埗區",
+      "黃大仙區": "黃大仙區",
+      "九龍城區": "九龍城區",
+      "觀塘區": "觀塘區",
+      "葵青區": "葵青區",
+      "荃灣區": "荃灣區",
+      "屯門區": "屯門區",
+      "元朗區": "元朗區",
+      "北區": "北區",
+      "大埔區": "大埔區",
+      "沙田區": "沙田區",
+      "西貢區": "西貢區",
+      "離島區": "離島區"
+    }
+  },
+  "dashboard": {
+    "title": "壽司郎排隊儀表板",
+    "subtitle": "實時監控壽司郎餐廳排隊狀況",
+    "stats": {
+      "totalStores": "總店舖數",
+      "totalWaiting": "總等候人數",
+      "currentQueue": "當前排隊",
+      "filteredResults": "篩選結果",
+      "openStores": "營業中",
+      "acrossAllStores": "所有店舖",
+      "activeTickets": "活躍票號",
+      "showing": "顯示"
+    },
+    "filters": {
+      "searchPlaceholder": "按店舖名稱、地區或區域搜尋...",
+      "allRegions": "所有地區",
+      "allWaitTimes": "所有等候時間",
+      "lowWait": "短等候",
+      "mediumWait": "中等等候",
+      "highWait": "長等候",
+      "extremeWait": "極長等候"
+    },
+    "viewMode": {
+      "grid": "網格",
+      "list": "列表",
+      "showingStores": "顯示 {count} 間店舖",
+      "inViewMode": "以{mode}模式顯示"
+    },
+    "noResults": {
+      "title": "找不到店舖",
+      "message": "請嘗試調整搜尋或篩選條件"
+    }
+  },
+  "store": {
+    "status": {
+      "open": "營業中",
+      "closed": "休息中"
+    },
+    "waiting": "等候",
+    "current": "當前",
+    "queue": "排隊",
+    "currentQueue": "當前排隊",
+    "moreTickets": "+{count} 更多",
+    "noTickets": "無票號"
+  },
+  "navigation": {
+    "home": "首頁",
+    "dashboard": "儀表板"
+  },
+  "errors": {
+    "general": "發生錯誤",
+    "notFound": "找不到頁面",
+    "networkError": "網路錯誤",
+    "failedToLoadData": "載入資料失敗",
+    "unableToFetchStores": "無法從伺服器取得店舖資訊。",
+    "unableToLoadData": "無法載入資料",
+    "apiRequestFailed": "API 請求失敗",
+    "unknownError": "發生未知錯誤"
+  },
+  "ui": {
+    "grid": "網格",
+    "list": "列表",
+    "switchToView": "切換至{view}檢視"
+  }
+}
