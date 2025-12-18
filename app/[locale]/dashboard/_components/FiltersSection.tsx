@@ -101,12 +101,12 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
         {/* Inner wrapper - constrains content to container width */}
         <div
           className={cn(
-            'flex flex-col gap-2 p-3',
+            'flex flex-col sm:flex-row gap-2 p-3',
             isSticky ? 'max-w-7xl mx-auto px-4' : ''
           )}
         >
           {/* Search Input */}
-          <div className="relative w-full">
+          <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder={t('dashboard.filters.searchPlaceholder')}
@@ -117,14 +117,14 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
           </div>
 
           {/* Dropdown Filters */}
-          <div className="flex gap-2 flex-wrap sm:flex-nowrap">
+          <div className="flex gap-2">
             {/* Region Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
-                    'flex-1 sm:flex-initial justify-between min-w-[140px]',
+                    'flex-1 sm:flex-none justify-between min-w-0 sm:min-w-[160px]',
                     regionFilter !== null && 'border-primary'
                   )}
                 >
@@ -172,7 +172,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
                 <Button
                   variant="outline"
                   className={cn(
-                    'flex-1 sm:flex-initial justify-between min-w-[140px]',
+                    'flex-1 sm:flex-none justify-between min-w-0 sm:min-w-[160px]',
                     waitingStatusFilter !== null && 'border-primary'
                   )}
                 >
