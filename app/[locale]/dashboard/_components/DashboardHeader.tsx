@@ -23,7 +23,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const locale = useLocale();
 
   return (
-    <div className="mb-6 pb-4 border-b border-border/50">
+    <div className="mb-6">
       <div className="flex items-start justify-between gap-4 flex-col sm:flex-row">
         {/* Left: Title Section */}
         <div className="space-y-1">

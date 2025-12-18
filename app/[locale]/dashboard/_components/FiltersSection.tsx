@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Search } from 'lucide-react';
 
+import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 
@@ -27,78 +28,121 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
   waitingStatusOptions,
 }) => {
   const t = useTranslations();
+  const stickyRef = useRef<HTMLDivElement>(null);
+  const [isSticky, setIsSticky] = useState(false);
+
+  useEffect(() => {
+    const ref = stickyRef.current;
+    if (!ref) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // When the sentinel is not intersecting, the element is sticky
+        setIsSticky(!entry.isIntersecting);
+      },
+      { threshold: 1, rootMargin: '-1px 0px 0px 0px' }
+    );
+
+    observer.observe(ref);
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div className="flex flex-col sm:flex-row gap-2 bg-card rounded-lg p-3 border border-border">
-      <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder={t('dashboard.filters.searchPlaceholder')}
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10"
-        />
-      </div>
+    <>
+      {/* Sentinel element to detect sticky state */}
+      <div ref={stickyRef} className="h-0 w-full" aria-hidden="true" />
 
-      <div className="flex gap-2 flex-wrap items-center">
-        {/* Region Filters */}
-        <div className="flex gap-2 flex-wrap">
-          <Badge
-            variant={regionFilter === null ? 'primary' : 'outline'}
-            className="cursor-pointer"
-            onClick={() => onRegionFilterChange(null)}
-          >
-            {t('dashboard.filters.allRegions')}
-          </Badge>
-          {uniqueRegions.map((region) => (
-            <Badge
-              key={region}
-              variant={regionFilter === region ? 'default' : 'outline'}
-              className="cursor-pointer"
-              onClick={() =>
-                onRegionFilterChange(regionFilter === region ? null : region)
-              }
-            >
-              {t(`common.regions.${region}`)}
-            </Badge>
-          ))}
-        </div>
+      {/* Outer wrapper - handles full-width when sticky */}
+      <div
+        className={cn(
+          'sticky top-0 z-10 bg-card border-y border-border shadow-sm',
+          'transition-[border-radius,box-shadow] duration-300 ease-in-out',
+          isSticky
+            ? 'w-screen ml-[calc(-50vw+50%)] rounded-none'
+            : 'rounded-lg border-x'
+        )}
+      >
+        {/* Inner wrapper - constrains content to container width */}
+        <div
+          className={cn(
+            'flex flex-col sm:flex-row gap-2 p-3',
+            isSticky ? 'max-w-7xl mx-auto px-4' : ''
+          )}
+        >
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder={t('dashboard.filters.searchPlaceholder')}
+              value={searchTerm}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="pl-10"
+            />
+          </div>
 
-        {/* Waiting Status Filters */}
-        <div className="flex gap-2 flex-wrap">
-          <Badge
-            variant={waitingStatusFilter === null ? 'primary' : 'outline'}
-            className="cursor-pointer"
-            onClick={() => onWaitingStatusFilterChange(null)}
-          >
-            {t('dashboard.filters.allWaitTimes')}
-          </Badge>
-          {waitingStatusOptions.map((status) => (
-            <Badge
-              key={status}
-              variant={
-                waitingStatusFilter === status
-                  ? status === 'LOW'
-                    ? 'default'
-                    : status === 'MEDIUM'
-                      ? 'secondary'
-                      : status === 'HIGH'
-                        ? 'destructive'
-                        : 'destructive'
-                  : 'outline'
-              }
-              className="cursor-pointer"
-              onClick={() =>
-                onWaitingStatusFilterChange(
-                  waitingStatusFilter === status ? null : status
-                )
-              }
-            >
-              {t(`dashboard.filters.${status.toLowerCase()}Wait`)}
-            </Badge>
-          ))}
+          <div className="flex gap-2 flex-wrap items-center">
+            {/* Region Filters */}
+            <div className="flex gap-2 flex-wrap">
+              <Badge
+                variant={regionFilter === null ? 'primary' : 'outline'}
+                className="cursor-pointer"
+                onClick={() => onRegionFilterChange(null)}
+              >
+                {t('dashboard.filters.allRegions')}
+              </Badge>
+              {uniqueRegions.map((region) => (
+                <Badge
+                  key={region}
+                  variant={regionFilter === region ? 'default' : 'outline'}
+                  className="cursor-pointer"
+                  onClick={() =>
+                    onRegionFilterChange(
+                      regionFilter === region ? null : region
+                    )
+                  }
+                >
+                  {t(`common.regions.${region}`)}
+                </Badge>
+              ))}
+            </div>
+
+            {/* Waiting Status Filters */}
+            <div className="flex gap-2 flex-wrap">
+              <Badge
+                variant={waitingStatusFilter === null ? 'primary' : 'outline'}
+                className="cursor-pointer"
+                onClick={() => onWaitingStatusFilterChange(null)}
+              >
+                {t('dashboard.filters.allWaitTimes')}
+              </Badge>
+              {waitingStatusOptions.map((status) => (
+                <Badge
+                  key={status}
+                  variant={
+                    waitingStatusFilter === status
+                      ? status === 'LOW'
+                        ? 'default'
+                        : status === 'MEDIUM'
+                          ? 'secondary'
+                          : status === 'HIGH'
+                            ? 'destructive'
+                            : 'destructive'
+                      : 'outline'
+                  }
+                  className="cursor-pointer"
+                  onClick={() =>
+                    onWaitingStatusFilterChange(
+                      waitingStatusFilter === status ? null : status
+                    )
+                  }
+                >
+                  {t(`dashboard.filters.${status.toLowerCase()}Wait`)}
+                </Badge>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
