@@ -59,7 +59,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
           'sticky top-0 z-10 bg-card border-y border-border shadow-sm',
           'transition-all duration-300 ease-in-out',
           isSticky
-            ? 'w-screen relative left-1/2 right-1/2 -mx-[50vw] rounded-none'
+            ? 'w-screen ml-[calc(-50vw+50%)] rounded-none'
             : 'rounded-lg border-x'
         )}
       >
