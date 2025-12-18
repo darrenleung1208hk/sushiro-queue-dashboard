@@ -57,7 +57,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
       <div
         className={cn(
           'sticky top-0 z-10 bg-card border-y border-border shadow-sm',
-          'transition-all duration-300 ease-in-out',
+          'transition-[border-radius,box-shadow] duration-300 ease-in-out',
           isSticky
             ? 'w-screen ml-[calc(-50vw+50%)] rounded-none'
             : 'rounded-lg border-x'
@@ -66,7 +66,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
         {/* Inner wrapper - constrains content to container width */}
         <div
           className={cn(
-            'flex flex-col sm:flex-row gap-2 p-3 transition-all duration-300 ease-in-out',
+            'flex flex-col sm:flex-row gap-2 p-3',
             isSticky ? 'max-w-7xl mx-auto px-4' : ''
           )}
         >
