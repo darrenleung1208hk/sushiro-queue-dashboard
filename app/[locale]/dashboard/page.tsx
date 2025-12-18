@@ -5,10 +5,8 @@ import { useTranslations } from 'next-intl';
 import { Store } from '@/lib/types';
 import { useDashboardFilters } from '@/lib/hooks/use-dashboard-filters';
 import { useViewMode } from '@/lib/hooks/use-view-mode';
-import { useDashboardStats } from '@/lib/hooks/use-dashboard-stats';
 
 import { DashboardHeader } from './_components/DashboardHeader';
-import { StatsOverview } from './_components/StatsOverview';
 import { FiltersSection } from './_components/FiltersSection';
 import { ViewModeHeader } from './_components/ViewModeHeader';
 import { StoreDisplay } from './_components/StoreDisplay';
@@ -89,7 +87,6 @@ export default function DashboardPage() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
-  const stats = useDashboardStats(stores);
   const {
     searchTerm,
     setSearchTerm,
@@ -111,12 +108,6 @@ export default function DashboardPage() {
         onManualRefresh={() => {
           void fetchStores();
         }}
-      />
-
-      <StatsOverview
-        stats={stats}
-        filteredCount={filteredStores.length}
-        isLoading={isLoading}
       />
 
       <FiltersSection
