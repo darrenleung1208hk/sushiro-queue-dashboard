@@ -119,7 +119,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
           {/* Dropdown Filters */}
           <div className="flex gap-2">
             {/* Region Dropdown */}
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
@@ -167,7 +167,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
             </DropdownMenu>
 
             {/* Wait Time Dropdown */}
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
