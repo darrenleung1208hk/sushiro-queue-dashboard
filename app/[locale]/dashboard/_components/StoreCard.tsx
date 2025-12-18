@@ -16,7 +16,7 @@ export const StoreCard = ({ store, isLoading }: StoreCardProps) => {
   const t = useTranslations();
   const locale = useLocale();
   const isOpen = store?.storeStatus === 'OPEN';
-  const queueLength = store?.storeQueue.length;
+  const queueLength = store?.storeQueue.length ?? 0;
   const waitingGroup = store?.waitingGroup;
 
   // Get localized store name based on current locale

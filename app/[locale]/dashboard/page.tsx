@@ -23,10 +23,8 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [, setError] = useState<Error | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [nextRefreshIn, setNextRefreshIn] = useState(
-    AUTO_REFRESH_INTERVAL_SECONDS
-  );
-  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
+  const [, setNextRefreshIn] = useState(AUTO_REFRESH_INTERVAL_SECONDS);
+  const [autoRefreshEnabled] = useState(true);
   const isFetchingRef = useRef(false);
 
   // Data fetching function with deduplication
