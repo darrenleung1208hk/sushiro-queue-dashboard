@@ -113,6 +113,8 @@
     "store": "店舖",
     "region": "區域",
     "district": "地區",
-    "status": "狀態"
+    "status": "狀態",
+    "columns": "欄位",
+    "toggleColumns": "切換欄位顯示"
   }
 }

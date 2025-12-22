@@ -113,6 +113,8 @@
     "store": "Store",
     "region": "Region",
     "district": "District",
-    "status": "Status"
+    "status": "Status",
+    "columns": "Columns",
+    "toggleColumns": "Toggle columns"
   }
 }
