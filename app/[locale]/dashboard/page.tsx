@@ -119,6 +119,7 @@ export default function DashboardPage() {
         onWaitingStatusFilterChange={setWaitingStatusFilter}
         uniqueRegions={uniqueRegions}
         waitingStatusOptions={waitingStatusOptions}
+        filteredCount={filteredStores.length}
       />
 
       <ViewModeHeader
