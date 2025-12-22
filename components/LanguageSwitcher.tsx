@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { Globe } from 'lucide-react';
+import { trackLanguageChanged } from '@/lib/analytics';
 
 export function LanguageSwitcher() {
   const locale = useLocale();
@@ -35,6 +36,9 @@ export function LanguageSwitcher() {
   }, [locale, pathnameLocale, currentLocale, pathname]);
 
   const handleLanguageChange = (newLocale: string) => {
+    // Track the language change
+    trackLanguageChanged(currentLocale, newLocale);
+
     // Get the current pathname
     const currentPath = pathname;
 

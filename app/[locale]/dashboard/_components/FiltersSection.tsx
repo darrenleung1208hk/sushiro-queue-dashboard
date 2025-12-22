@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Check, ChevronDown, MapPin, Search, Timer } from 'lucide-react';
 
@@ -11,6 +11,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  trackSearchUsed,
+  trackRegionFilterChanged,
+  trackWaitTimeFilterChanged,
+  trackFilterCombinationUsed,
+} from '@/lib/analytics';
 
 interface FiltersSectionProps {
   searchTerm: string;
@@ -21,6 +27,7 @@ interface FiltersSectionProps {
   onWaitingStatusFilterChange: (status: string | null) => void;
   uniqueRegions: string[];
   waitingStatusOptions: string[];
+  filteredCount: number;
 }
 
 export const FiltersSection: React.FC<FiltersSectionProps> = ({
@@ -32,10 +39,14 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
   onWaitingStatusFilterChange,
   uniqueRegions,
   waitingStatusOptions,
+  filteredCount,
 }) => {
   const t = useTranslations();
   const stickyRef = useRef<HTMLDivElement>(null);
   const [isSticky, setIsSticky] = useState(false);
+  const searchDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const previousRegionRef = useRef<string | null>(regionFilter);
+  const previousWaitTimeRef = useRef<string | null>(waitingStatusFilter);
 
   useEffect(() => {
     const ref = stickyRef.current;
@@ -52,6 +63,81 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
     observer.observe(ref);
 
     return () => observer.disconnect();
+  }, []);
+
+  // Debounced search tracking
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      onSearchChange(value);
+
+      // Clear previous debounce
+      if (searchDebounceRef.current) {
+        clearTimeout(searchDebounceRef.current);
+      }
+
+      // Only track non-empty searches after user stops typing
+      if (value.trim()) {
+        searchDebounceRef.current = setTimeout(() => {
+          trackSearchUsed(value, filteredCount);
+          trackFilterCombinationUsed({
+            hasSearch: Boolean(value.trim()),
+            hasRegion: regionFilter !== null,
+            hasWaitTime: waitingStatusFilter !== null,
+            resultsCount: filteredCount,
+          });
+        }, 800);
+      }
+    },
+    [onSearchChange, filteredCount, regionFilter, waitingStatusFilter]
+  );
+
+  // Region filter change with tracking
+  const handleRegionChange = useCallback(
+    (region: string | null) => {
+      trackRegionFilterChanged(
+        region,
+        previousRegionRef.current,
+        filteredCount
+      );
+      trackFilterCombinationUsed({
+        hasSearch: Boolean(searchTerm.trim()),
+        hasRegion: region !== null,
+        hasWaitTime: waitingStatusFilter !== null,
+        resultsCount: filteredCount,
+      });
+      previousRegionRef.current = region;
+      onRegionFilterChange(region);
+    },
+    [onRegionFilterChange, filteredCount, searchTerm, waitingStatusFilter]
+  );
+
+  // Wait time filter change with tracking
+  const handleWaitTimeChange = useCallback(
+    (status: string | null) => {
+      trackWaitTimeFilterChanged(
+        status,
+        previousWaitTimeRef.current,
+        filteredCount
+      );
+      trackFilterCombinationUsed({
+        hasSearch: Boolean(searchTerm.trim()),
+        hasRegion: regionFilter !== null,
+        hasWaitTime: status !== null,
+        resultsCount: filteredCount,
+      });
+      previousWaitTimeRef.current = status;
+      onWaitingStatusFilterChange(status);
+    },
+    [onWaitingStatusFilterChange, filteredCount, searchTerm, regionFilter]
+  );
+
+  // Cleanup debounce on unmount
+  useEffect(() => {
+    return () => {
+      if (searchDebounceRef.current) {
+        clearTimeout(searchDebounceRef.current);
+      }
+    };
   }, []);
 
   const getRegionDisplayLabel = () => {
@@ -111,7 +197,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
             <Input
               placeholder={t('dashboard.filters.searchPlaceholder')}
               value={searchTerm}
-              onChange={(e) => onSearchChange(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="pl-10"
             />
           </div>
@@ -137,7 +223,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-[200px]">
                 <DropdownMenuItem
-                  onClick={() => onRegionFilterChange(null)}
+                  onClick={() => handleRegionChange(null)}
                   className="cursor-pointer"
                 >
                   <Check
@@ -151,7 +237,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
                 {uniqueRegions.map((region) => (
                   <DropdownMenuItem
                     key={region}
-                    onClick={() => onRegionFilterChange(region)}
+                    onClick={() => handleRegionChange(region)}
                     className="cursor-pointer"
                   >
                     <Check
@@ -192,7 +278,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-[200px]">
                 <DropdownMenuItem
-                  onClick={() => onWaitingStatusFilterChange(null)}
+                  onClick={() => handleWaitTimeChange(null)}
                   className="cursor-pointer"
                 >
                   <Check
@@ -206,7 +292,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
                 {waitingStatusOptions.map((status) => (
                   <DropdownMenuItem
                     key={status}
-                    onClick={() => onWaitingStatusFilterChange(status)}
+                    onClick={() => handleWaitTimeChange(status)}
                     className="cursor-pointer"
                   >
                     <Check

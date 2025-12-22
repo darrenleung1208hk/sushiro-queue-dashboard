@@ -1,12 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Clock, RefreshCw } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { trackManualRefresh } from '@/lib/analytics';
 
 interface DashboardHeaderProps {
   isLoading: boolean;
@@ -21,6 +22,16 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 }) => {
   const t = useTranslations();
   const locale = useLocale();
+
+  const handleManualRefresh = useCallback(() => {
+    // Calculate time since last refresh in seconds
+    const timeSinceLastRefresh = lastUpdated
+      ? Math.round((Date.now() - lastUpdated.getTime()) / 1000)
+      : null;
+
+    trackManualRefresh(timeSinceLastRefresh);
+    onManualRefresh?.();
+  }, [lastUpdated, onManualRefresh]);
 
   return (
     <div className="mb-6">
@@ -59,7 +70,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     <div className="h-4 w-px bg-border" aria-hidden="true" />
                   )}
                   <Button
-                    onClick={onManualRefresh}
+                    onClick={handleManualRefresh}
                     disabled={isLoading}
                     size="sm"
                     variant="ghost"

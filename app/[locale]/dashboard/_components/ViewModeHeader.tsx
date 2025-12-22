@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { ViewToggle } from '@/components/ui/view-toggle';
+import { trackViewModeChanged } from '@/lib/analytics';
 
 interface ViewModeHeaderProps {
   filteredCount: number;
@@ -15,6 +16,16 @@ export const ViewModeHeader: React.FC<ViewModeHeaderProps> = ({
   onViewModeChange,
 }) => {
   const t = useTranslations();
+
+  const handleViewModeChange = useCallback(
+    (mode: 'grid' | 'list') => {
+      if (mode !== viewMode) {
+        trackViewModeChanged(mode, filteredCount);
+        onViewModeChange(mode);
+      }
+    },
+    [viewMode, filteredCount, onViewModeChange]
+  );
 
   return (
     <div className="flex items-end justify-between">
@@ -30,7 +41,7 @@ export const ViewModeHeader: React.FC<ViewModeHeaderProps> = ({
           })}
         </span>
       </div>
-      <ViewToggle viewMode={viewMode} onViewChange={onViewModeChange} />
+      <ViewToggle viewMode={viewMode} onViewChange={handleViewModeChange} />
     </div>
   );
 };
