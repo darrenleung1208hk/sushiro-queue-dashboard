@@ -1,10 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Search } from 'lucide-react';
+import { Check, ChevronDown, MapPin, Search, Timer } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface FiltersSectionProps {
   searchTerm: string;
@@ -48,6 +54,35 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
     return () => observer.disconnect();
   }, []);
 
+  const getRegionDisplayLabel = () => {
+    if (regionFilter === null) {
+      return t('dashboard.filters.allRegions');
+    }
+    return t(`common.regions.${regionFilter}`);
+  };
+
+  const getWaitTimeDisplayLabel = () => {
+    if (waitingStatusFilter === null) {
+      return t('dashboard.filters.allWaitTimes');
+    }
+    return t(`dashboard.filters.${waitingStatusFilter.toLowerCase()}Wait`);
+  };
+
+  const getWaitTimeVariantClass = (status: string | null) => {
+    if (status === null) return '';
+    switch (status) {
+      case 'LOW':
+        return 'text-green-600 dark:text-green-400';
+      case 'MEDIUM':
+        return 'text-yellow-600 dark:text-yellow-400';
+      case 'HIGH':
+      case 'EXTREME':
+        return 'text-red-600 dark:text-red-400';
+      default:
+        return '';
+    }
+  };
+
   return (
     <>
       {/* Sentinel element to detect sticky state */}
@@ -70,6 +105,7 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
             isSticky ? 'max-w-7xl mx-auto px-4' : ''
           )}
         >
+          {/* Search Input */}
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -80,66 +116,114 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
             />
           </div>
 
-          <div className="flex gap-2 flex-wrap items-center">
-            {/* Region Filters */}
-            <div className="flex gap-2 flex-wrap">
-              <Badge
-                variant={regionFilter === null ? 'primary' : 'outline'}
-                className="cursor-pointer"
-                onClick={() => onRegionFilterChange(null)}
-              >
-                {t('dashboard.filters.allRegions')}
-              </Badge>
-              {uniqueRegions.map((region) => (
-                <Badge
-                  key={region}
-                  variant={regionFilter === region ? 'default' : 'outline'}
-                  className="cursor-pointer"
-                  onClick={() =>
-                    onRegionFilterChange(
-                      regionFilter === region ? null : region
-                    )
-                  }
+          {/* Dropdown Filters */}
+          <div className="flex gap-2">
+            {/* Region Dropdown */}
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    'flex-1 sm:flex-none justify-between min-w-0 sm:min-w-[160px]',
+                    regionFilter !== null && 'border-primary'
+                  )}
                 >
-                  {t(`common.regions.${region}`)}
-                </Badge>
-              ))}
-            </div>
+                  <span className="flex items-center gap-2 truncate">
+                    <MapPin className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="truncate">{getRegionDisplayLabel()}</span>
+                  </span>
+                  <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-[200px]">
+                <DropdownMenuItem
+                  onClick={() => onRegionFilterChange(null)}
+                  className="cursor-pointer"
+                >
+                  <Check
+                    className={cn(
+                      'mr-2 h-4 w-4',
+                      regionFilter === null ? 'opacity-100' : 'opacity-0'
+                    )}
+                  />
+                  {t('dashboard.filters.allRegions')}
+                </DropdownMenuItem>
+                {uniqueRegions.map((region) => (
+                  <DropdownMenuItem
+                    key={region}
+                    onClick={() => onRegionFilterChange(region)}
+                    className="cursor-pointer"
+                  >
+                    <Check
+                      className={cn(
+                        'mr-2 h-4 w-4',
+                        regionFilter === region ? 'opacity-100' : 'opacity-0'
+                      )}
+                    />
+                    {t(`common.regions.${region}`)}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-            {/* Waiting Status Filters */}
-            <div className="flex gap-2 flex-wrap">
-              <Badge
-                variant={waitingStatusFilter === null ? 'primary' : 'outline'}
-                className="cursor-pointer"
-                onClick={() => onWaitingStatusFilterChange(null)}
-              >
-                {t('dashboard.filters.allWaitTimes')}
-              </Badge>
-              {waitingStatusOptions.map((status) => (
-                <Badge
-                  key={status}
-                  variant={
-                    waitingStatusFilter === status
-                      ? status === 'LOW'
-                        ? 'default'
-                        : status === 'MEDIUM'
-                          ? 'secondary'
-                          : status === 'HIGH'
-                            ? 'destructive'
-                            : 'destructive'
-                      : 'outline'
-                  }
-                  className="cursor-pointer"
-                  onClick={() =>
-                    onWaitingStatusFilterChange(
-                      waitingStatusFilter === status ? null : status
-                    )
-                  }
+            {/* Wait Time Dropdown */}
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    'flex-1 sm:flex-none justify-between min-w-0 sm:min-w-[160px]',
+                    waitingStatusFilter !== null && 'border-primary'
+                  )}
                 >
-                  {t(`dashboard.filters.${status.toLowerCase()}Wait`)}
-                </Badge>
-              ))}
-            </div>
+                  <span className="flex items-center gap-2 truncate">
+                    <Timer className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span
+                      className={cn(
+                        'truncate',
+                        getWaitTimeVariantClass(waitingStatusFilter)
+                      )}
+                    >
+                      {getWaitTimeDisplayLabel()}
+                    </span>
+                  </span>
+                  <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-[200px]">
+                <DropdownMenuItem
+                  onClick={() => onWaitingStatusFilterChange(null)}
+                  className="cursor-pointer"
+                >
+                  <Check
+                    className={cn(
+                      'mr-2 h-4 w-4',
+                      waitingStatusFilter === null ? 'opacity-100' : 'opacity-0'
+                    )}
+                  />
+                  {t('dashboard.filters.allWaitTimes')}
+                </DropdownMenuItem>
+                {waitingStatusOptions.map((status) => (
+                  <DropdownMenuItem
+                    key={status}
+                    onClick={() => onWaitingStatusFilterChange(status)}
+                    className="cursor-pointer"
+                  >
+                    <Check
+                      className={cn(
+                        'mr-2 h-4 w-4',
+                        waitingStatusFilter === status
+                          ? 'opacity-100'
+                          : 'opacity-0'
+                      )}
+                    />
+                    <span className={getWaitTimeVariantClass(status)}>
+                      {t(`dashboard.filters.${status.toLowerCase()}Wait`)}
+                    </span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
