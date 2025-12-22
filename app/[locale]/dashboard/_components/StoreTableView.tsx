@@ -137,7 +137,7 @@ export const StoreTableView = ({
                       variant={isOpen ? 'default' : 'destructive'}
                       className="text-[10px] px-1.5 py-0.5 h-5"
                     >
-                      {store.storeStatus}
+                      {t(`store.status.${store.storeStatus.toLowerCase()}`)}
                     </Badge>
                   </td>
                   <td className="px-4 py-3 text-center">
