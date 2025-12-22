@@ -57,7 +57,7 @@
       "showing": "Showing"
     },
     "filters": {
-      "searchPlaceholder": "Search stores by name, region, or area...",
+      "searchPlaceholder": "Search stores by name, region, or district...",
       "allRegions": "All Regions",
       "allWaitTimes": "All Wait Times",
       "lowWait": "Low Wait",
@@ -112,7 +112,7 @@
   "table": {
     "store": "Store",
     "region": "Region",
-    "area": "Area",
+    "area": "District",
     "status": "Status"
   }
 }
