@@ -103,7 +103,7 @@ export const StoreDisplay: React.FC<StoreDisplayProps> = ({
     return (
       <div className="text-center py-8">
         <Search className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-        <h3 className="text-base font-semibold text-foreground mb-1">
+        <h3 className="text-sm font-semibold text-foreground mb-1">
           {t('dashboard.noResults.title')}
         </h3>
         <p className="text-muted-foreground">
