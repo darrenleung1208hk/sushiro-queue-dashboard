@@ -33,7 +33,7 @@ export const StoreTableView = ({
                   {t('table.region')}
                 </th>
                 <th className="text-left px-4 py-3 font-medium text-muted-foreground">
-                  {t('table.area')}
+                  {t('table.district')}
                 </th>
                 <th className="text-center px-4 py-3 font-medium text-muted-foreground">
                   {t('table.status')}
@@ -95,7 +95,7 @@ export const StoreTableView = ({
                 {t('table.region')}
               </th>
               <th className="text-left px-4 py-3 font-medium text-muted-foreground">
-                {t('table.area')}
+                {t('table.district')}
               </th>
               <th className="text-center px-4 py-3 font-medium text-muted-foreground">
                 {t('table.status')}
@@ -130,7 +130,7 @@ export const StoreTableView = ({
                     {t(`common.regions.${store.region}`)}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
-                    {t(`common.areas.${store.area}`)}
+                    {t(`common.districts.${store.area}`)}
                   </td>
                   <td className="px-4 py-3 text-center">
                     <Badge

@@ -59,7 +59,7 @@ export const StoreListItem = ({ store, isLoading }: StoreListItemProps) => {
               <Skeleton className="h-3 w-32 mt-1" />
             ) : (
               <p className="text-xs text-muted-foreground truncate">
-                {t(`common.areas.${store.area}`)},{' '}
+                {t(`common.districts.${store.area}`)},{' '}
                 {t(`common.regions.${store.region}`)}
               </p>
             )}

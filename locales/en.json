@@ -22,7 +22,7 @@
       "九龍": "Kowloon",
       "新界": "New Territories"
     },
-    "areas": {
+    "districts": {
       "中西區": "Central and Western District",
       "灣仔區": "Wan Chai District",
       "東區": "Eastern District",
@@ -112,7 +112,7 @@
   "table": {
     "store": "Store",
     "region": "Region",
-    "area": "District",
+    "district": "District",
     "status": "Status"
   }
 }

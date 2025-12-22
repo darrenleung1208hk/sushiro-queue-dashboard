@@ -137,7 +137,7 @@ export const StoreCard = ({ store, isLoading }: StoreCardProps) => {
               <div>
                 <p className="text-[10px] text-muted-foreground">
                   {t(`common.regions.${store.region}`)} •{' '}
-                  {t(`common.areas.${store.area}`)}
+                  {t(`common.districts.${store.area}`)}
                 </p>
               </div>
             )}
