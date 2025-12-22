@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { GoogleAnalytics } from '@/components/GoogleAnalytics';
+import { GoogleAnalytics } from '@next/third-parties/google';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -17,10 +17,12 @@ export default function RootLayout({
 }) {
   return (
     <html>
-      <head>
-        <GoogleAnalytics />
-      </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        {children}
+        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
+        )}
+      </body>
     </html>
   );
 }
