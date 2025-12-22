@@ -129,14 +129,14 @@ const SortableHeader = ({
   return (
     <th
       className={cn(
-        'px-4 py-3 font-medium text-muted-foreground cursor-pointer hover:bg-muted/50 transition-colors select-none',
+        'px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground cursor-pointer hover:bg-muted/50 transition-colors select-none whitespace-nowrap',
         className
       )}
       onClick={() => onSort(field)}
     >
       <div
         className={cn(
-          'flex items-center gap-1',
+          'flex items-center gap-0.5 sm:gap-1',
           className?.includes('text-center') && 'justify-center'
         )}
       >
@@ -232,30 +232,24 @@ export const StoreTableView = ({
 
   if (isLoading) {
     return (
-      <div className="border border-border rounded-lg overflow-hidden bg-card">
+      <div className="-mx-4 sm:mx-0 border-y sm:border border-border sm:rounded-lg overflow-hidden bg-card">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-muted/50 border-b border-border">
               <tr>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+                <th className="text-left px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground">
                   {t('table.store')}
                 </th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">
-                  {t('table.region')}
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">
-                  {t('table.district')}
-                </th>
-                <th className="text-center px-4 py-3 font-medium text-muted-foreground">
+                <th className="text-center px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground">
                   {t('table.status')}
                 </th>
-                <th className="text-center px-4 py-3 font-medium text-muted-foreground">
+                <th className="text-center px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground">
                   {t('store.waiting')}
                 </th>
-                <th className="text-center px-4 py-3 font-medium text-muted-foreground">
+                <th className="text-center px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground">
                   {t('store.current')}
                 </th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+                <th className="text-left px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground">
                   {t('store.currentQueue')}
                 </th>
               </tr>
@@ -263,26 +257,20 @@ export const StoreTableView = ({
             <tbody className="divide-y divide-border">
               {Array.from({ length: 10 }).map((_, index) => (
                 <tr key={index} className="hover:bg-muted/30">
-                  <td className="px-4 py-3">
-                    <Skeleton className="h-4 w-28" />
+                  <td className="px-2 sm:px-3 py-2 sm:py-3">
+                    <Skeleton className="h-4 w-20 sm:w-28" />
                   </td>
-                  <td className="px-4 py-3">
-                    <Skeleton className="h-4 w-20" />
+                  <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
+                    <Skeleton className="h-5 w-10 sm:w-12 mx-auto" />
                   </td>
-                  <td className="px-4 py-3">
-                    <Skeleton className="h-4 w-24" />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <Skeleton className="h-5 w-12 mx-auto" />
-                  </td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
                     <Skeleton className="h-4 w-8 mx-auto" />
                   </td>
-                  <td className="px-4 py-3 text-center">
-                    <Skeleton className="h-4 w-12 mx-auto" />
+                  <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
+                    <Skeleton className="h-4 w-10 sm:w-12 mx-auto" />
                   </td>
-                  <td className="px-4 py-3">
-                    <Skeleton className="h-5 w-28" />
+                  <td className="px-2 sm:px-3 py-2 sm:py-3">
+                    <Skeleton className="h-5 w-20 sm:w-28" />
                   </td>
                 </tr>
               ))}
@@ -302,26 +290,28 @@ export const StoreTableView = ({
     switch (columnKey) {
       case 'store':
         return (
-          <td className="px-4 py-3 font-medium text-foreground">{storeName}</td>
+          <td className="px-2 sm:px-3 py-2 sm:py-3 font-medium text-foreground">
+            {storeName}
+          </td>
         );
       case 'region':
         return (
-          <td className="px-4 py-3 text-muted-foreground">
+          <td className="px-2 sm:px-3 py-2 sm:py-3 text-muted-foreground whitespace-nowrap">
             {t(`common.regions.${store.region}`)}
           </td>
         );
       case 'district':
         return (
-          <td className="px-4 py-3 text-muted-foreground">
+          <td className="px-2 sm:px-3 py-2 sm:py-3 text-muted-foreground whitespace-nowrap">
             {t(`common.districts.${store.area}`)}
           </td>
         );
       case 'status':
         return (
-          <td className="px-4 py-3 text-center">
+          <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
             <Badge
               variant={isOpen ? 'default' : 'destructive'}
-              className="text-[10px] px-1.5 py-0.5 h-5"
+              className="text-[10px] px-1 sm:px-1.5 py-0.5 h-5"
             >
               {t(`store.status.${store.storeStatus.toLowerCase()}`)}
             </Badge>
@@ -329,10 +319,10 @@ export const StoreTableView = ({
         );
       case 'waiting':
         return (
-          <td className="px-4 py-3 text-center">
+          <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
             <div
               className={cn(
-                'inline-flex items-center gap-1 px-2 py-0.5 rounded-md',
+                'inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md',
                 waitTier === QUEUE_PRIORITY.HIGH &&
                   'bg-destructive/10 text-destructive',
                 waitTier === QUEUE_PRIORITY.MEDIUM &&
@@ -347,21 +337,21 @@ export const StoreTableView = ({
         );
       case 'current':
         return (
-          <td className="px-4 py-3 text-center font-medium text-foreground">
+          <td className="px-2 sm:px-3 py-2 sm:py-3 text-center font-medium text-foreground">
             {queueLength > 0 ? `#${store.storeQueue[0]}` : '--'}
           </td>
         );
       case 'currentQueue':
         return (
-          <td className="px-4 py-3">
-            <div className="flex flex-wrap gap-1">
+          <td className="px-2 sm:px-3 py-2 sm:py-3">
+            <div className="flex flex-wrap gap-0.5 sm:gap-1">
               {queueLength > 0 ? (
                 <>
                   {store.storeQueue.slice(0, 3).map((ticket, index) => (
                     <Badge
                       key={index}
                       variant="outline"
-                      className="text-[10px] px-1.5 py-0.5 h-5"
+                      className="text-[10px] px-1 sm:px-1.5 py-0.5 h-5"
                     >
                       #{ticket}
                     </Badge>
@@ -369,7 +359,7 @@ export const StoreTableView = ({
                   {queueLength > 3 && (
                     <Badge
                       variant="outline"
-                      className="text-[10px] px-1.5 py-0.5 h-5"
+                      className="text-[10px] px-1 sm:px-1.5 py-0.5 h-5"
                     >
                       {t('store.moreTickets', {
                         count: queueLength - 3,
@@ -380,7 +370,7 @@ export const StoreTableView = ({
               ) : (
                 <Badge
                   variant="outline"
-                  className="text-[10px] px-1.5 py-0.5 h-5 text-muted-foreground"
+                  className="text-[10px] px-1 sm:px-1.5 py-0.5 h-5 text-muted-foreground"
                 >
                   {t('store.noTickets')}
                 </Badge>
@@ -421,7 +411,7 @@ export const StoreTableView = ({
       </div>
 
       {/* Table */}
-      <div className="border border-border rounded-lg overflow-hidden bg-card">
+      <div className="-mx-4 sm:mx-0 border-y sm:border border-border sm:rounded-lg overflow-hidden bg-card">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-muted/50 border-b border-border">
@@ -442,7 +432,7 @@ export const StoreTableView = ({
                     ) : (
                       <th
                         key={column.key}
-                        className={`text-${column.align} px-4 py-3 font-medium text-muted-foreground`}
+                        className={`text-${column.align} px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground`}
                       >
                         {t(column.labelKey)}
                       </th>
