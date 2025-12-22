@@ -23,21 +23,13 @@ import { Store } from '@/lib/types';
 import { QUEUE_PRIORITY } from '@/lib/constants';
 import { cn, getQueuePriority } from '@/lib/utils';
 
-type SortField =
-  | 'store'
-  | 'region'
-  | 'district'
-  | 'status'
-  | 'waiting'
-  | 'current'
-  | null;
+type SortField = 'store' | 'region' | 'district' | 'waiting' | 'current' | null;
 type SortDirection = 'asc' | 'desc';
 
 type ColumnKey =
   | 'store'
   | 'region'
   | 'district'
-  | 'status'
   | 'waiting'
   | 'current'
   | 'currentQueue';
@@ -71,13 +63,6 @@ const COLUMNS: ColumnConfig[] = [
     defaultVisible: false,
     sortable: true,
     align: 'left',
-  },
-  {
-    key: 'status',
-    labelKey: 'table.status',
-    defaultVisible: true,
-    sortable: true,
-    align: 'center',
   },
   {
     key: 'waiting',
@@ -213,11 +198,13 @@ export const StoreTableView = ({
         case 'district':
           comparison = a.area.localeCompare(b.area, locale);
           break;
-        case 'status':
-          comparison = a.storeStatus.localeCompare(b.storeStatus);
-          break;
         case 'waiting':
-          comparison = a.waitingGroup - b.waitingGroup;
+          // Closed stores sort to the end when ascending, beginning when descending
+          const aIsClosed = a.storeStatus === 'CLOSED';
+          const bIsClosed = b.storeStatus === 'CLOSED';
+          if (aIsClosed && !bIsClosed) comparison = 1;
+          else if (!aIsClosed && bIsClosed) comparison = -1;
+          else comparison = a.waitingGroup - b.waitingGroup;
           break;
         case 'current':
           const currentA = a.storeQueue[0] ?? '';
@@ -241,9 +228,6 @@ export const StoreTableView = ({
                   {t('table.store')}
                 </th>
                 <th className="text-center px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground">
-                  {t('table.status')}
-                </th>
-                <th className="text-center px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground">
                   {t('store.waiting')}
                 </th>
                 <th className="text-center px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground">
@@ -261,10 +245,7 @@ export const StoreTableView = ({
                     <Skeleton className="h-4 w-20 sm:w-28" />
                   </td>
                   <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
-                    <Skeleton className="h-5 w-10 sm:w-12 mx-auto" />
-                  </td>
-                  <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
-                    <Skeleton className="h-4 w-8 mx-auto" />
+                    <Skeleton className="h-5 w-12 sm:w-14 mx-auto" />
                   </td>
                   <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
                     <Skeleton className="h-4 w-10 sm:w-12 mx-auto" />
@@ -306,33 +287,32 @@ export const StoreTableView = ({
             {t(`common.districts.${store.area}`)}
           </td>
         );
-      case 'status':
-        return (
-          <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
-            <Badge
-              variant={isOpen ? 'default' : 'destructive'}
-              className="text-[10px] px-1 sm:px-1.5 py-0.5 h-5"
-            >
-              {t(`store.status.${store.storeStatus.toLowerCase()}`)}
-            </Badge>
-          </td>
-        );
       case 'waiting':
         return (
           <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
-            <div
-              className={cn(
-                'inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md',
-                waitTier === QUEUE_PRIORITY.HIGH &&
-                  'bg-destructive/10 text-destructive',
-                waitTier === QUEUE_PRIORITY.MEDIUM &&
-                  'bg-warning/10 text-warning',
-                waitTier === QUEUE_PRIORITY.LOW && 'bg-success/10 text-primary'
-              )}
-            >
-              <Users className="h-3 w-3" />
-              <span className="font-semibold">{store.waitingGroup}</span>
-            </div>
+            {isOpen ? (
+              <div
+                className={cn(
+                  'inline-flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 rounded-md',
+                  waitTier === QUEUE_PRIORITY.HIGH &&
+                    'bg-destructive/10 text-destructive',
+                  waitTier === QUEUE_PRIORITY.MEDIUM &&
+                    'bg-warning/10 text-warning',
+                  waitTier === QUEUE_PRIORITY.LOW &&
+                    'bg-success/10 text-primary'
+                )}
+              >
+                <Users className="h-3 w-3" />
+                <span className="font-semibold">{store.waitingGroup}</span>
+              </div>
+            ) : (
+              <Badge
+                variant="destructive"
+                className="text-[10px] px-1 sm:px-1.5 py-0.5 h-5"
+              >
+                {t('store.status.closed')}
+              </Badge>
+            )}
           </td>
         );
       case 'current':
