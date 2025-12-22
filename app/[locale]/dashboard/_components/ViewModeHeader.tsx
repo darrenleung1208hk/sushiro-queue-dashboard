@@ -19,7 +19,7 @@ export const ViewModeHeader: React.FC<ViewModeHeaderProps> = ({
   const t = useTranslations();
 
   const handleViewModeChange = useCallback(
-    (mode: 'grid' | 'list') => {
+    (mode: ViewMode) => {
       if (mode !== viewMode) {
         trackViewModeChanged(mode, filteredCount);
         onViewModeChange(mode);
