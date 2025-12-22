@@ -1,5 +1,6 @@
+import { useState, useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Users } from 'lucide-react';
+import { Users, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -7,10 +8,68 @@ import { Store } from '@/lib/types';
 import { QUEUE_PRIORITY } from '@/lib/constants';
 import { cn, getQueuePriority } from '@/lib/utils';
 
+type SortField =
+  | 'store'
+  | 'region'
+  | 'district'
+  | 'status'
+  | 'waiting'
+  | 'current'
+  | null;
+type SortDirection = 'asc' | 'desc';
+
 interface StoreTableViewProps {
   stores: Store[];
   isLoading?: boolean;
 }
+
+interface SortableHeaderProps {
+  field: SortField;
+  currentSort: SortField;
+  direction: SortDirection;
+  onSort: (field: SortField) => void;
+  children: React.ReactNode;
+  className?: string;
+}
+
+const SortableHeader = ({
+  field,
+  currentSort,
+  direction,
+  onSort,
+  children,
+  className,
+}: SortableHeaderProps) => {
+  const isActive = currentSort === field;
+
+  return (
+    <th
+      className={cn(
+        'px-4 py-3 font-medium text-muted-foreground cursor-pointer hover:bg-muted/50 transition-colors select-none',
+        className
+      )}
+      onClick={() => onSort(field)}
+    >
+      <div
+        className={cn(
+          'flex items-center gap-1',
+          className?.includes('text-center') && 'justify-center'
+        )}
+      >
+        {children}
+        {isActive ? (
+          direction === 'asc' ? (
+            <ArrowUp className="h-3 w-3" />
+          ) : (
+            <ArrowDown className="h-3 w-3" />
+          )
+        ) : (
+          <ArrowUpDown className="h-3 w-3 opacity-50" />
+        )}
+      </div>
+    </th>
+  );
+};
 
 export const StoreTableView = ({
   stores,
@@ -18,6 +77,52 @@ export const StoreTableView = ({
 }: StoreTableViewProps) => {
   const t = useTranslations();
   const locale = useLocale();
+  const [sortField, setSortField] = useState<SortField>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedStores = useMemo(() => {
+    if (!sortField) return stores;
+
+    return [...stores].sort((a, b) => {
+      let comparison = 0;
+
+      switch (sortField) {
+        case 'store':
+          const nameA = locale === 'zh-HK' ? a.name : a.nameEn;
+          const nameB = locale === 'zh-HK' ? b.name : b.nameEn;
+          comparison = nameA.localeCompare(nameB, locale);
+          break;
+        case 'region':
+          comparison = a.region.localeCompare(b.region, locale);
+          break;
+        case 'district':
+          comparison = a.area.localeCompare(b.area, locale);
+          break;
+        case 'status':
+          comparison = a.storeStatus.localeCompare(b.storeStatus);
+          break;
+        case 'waiting':
+          comparison = a.waitingGroup - b.waitingGroup;
+          break;
+        case 'current':
+          const currentA = a.storeQueue[0] ?? '';
+          const currentB = b.storeQueue[0] ?? '';
+          comparison = currentA.localeCompare(currentB);
+          break;
+      }
+
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+  }, [stores, sortField, sortDirection, locale]);
 
   if (isLoading) {
     return (
@@ -88,31 +193,67 @@ export const StoreTableView = ({
         <table className="w-full text-sm">
           <thead className="bg-muted/50 border-b border-border">
             <tr>
-              <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+              <SortableHeader
+                field="store"
+                currentSort={sortField}
+                direction={sortDirection}
+                onSort={handleSort}
+                className="text-left"
+              >
                 {t('table.store')}
-              </th>
-              <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+              </SortableHeader>
+              <SortableHeader
+                field="region"
+                currentSort={sortField}
+                direction={sortDirection}
+                onSort={handleSort}
+                className="text-left"
+              >
                 {t('table.region')}
-              </th>
-              <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+              </SortableHeader>
+              <SortableHeader
+                field="district"
+                currentSort={sortField}
+                direction={sortDirection}
+                onSort={handleSort}
+                className="text-left"
+              >
                 {t('table.district')}
-              </th>
-              <th className="text-center px-4 py-3 font-medium text-muted-foreground">
+              </SortableHeader>
+              <SortableHeader
+                field="status"
+                currentSort={sortField}
+                direction={sortDirection}
+                onSort={handleSort}
+                className="text-center"
+              >
                 {t('table.status')}
-              </th>
-              <th className="text-center px-4 py-3 font-medium text-muted-foreground">
+              </SortableHeader>
+              <SortableHeader
+                field="waiting"
+                currentSort={sortField}
+                direction={sortDirection}
+                onSort={handleSort}
+                className="text-center"
+              >
                 {t('store.waiting')}
-              </th>
-              <th className="text-center px-4 py-3 font-medium text-muted-foreground">
+              </SortableHeader>
+              <SortableHeader
+                field="current"
+                currentSort={sortField}
+                direction={sortDirection}
+                onSort={handleSort}
+                className="text-center"
+              >
                 {t('store.current')}
-              </th>
+              </SortableHeader>
               <th className="text-left px-4 py-3 font-medium text-muted-foreground">
                 {t('store.currentQueue')}
               </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {stores.map((store) => {
+            {sortedStores.map((store) => {
               const isOpen = store.storeStatus === 'OPEN';
               const storeName = locale === 'zh-HK' ? store.name : store.nameEn;
               const waitTier = getQueuePriority(store.waitingGroup);
