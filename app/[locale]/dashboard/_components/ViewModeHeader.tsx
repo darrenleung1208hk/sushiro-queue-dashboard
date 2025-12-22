@@ -2,11 +2,12 @@ import React from 'react';
 import { useTranslations } from 'next-intl';
 
 import { ViewToggle } from '@/components/ui/view-toggle';
+import { ViewMode } from '@/lib/hooks/use-view-mode';
 
 interface ViewModeHeaderProps {
   filteredCount: number;
-  viewMode: 'grid' | 'list';
-  onViewModeChange: (mode: 'grid' | 'list') => void;
+  viewMode: ViewMode;
+  onViewModeChange: (mode: ViewMode) => void;
 }
 
 export const ViewModeHeader: React.FC<ViewModeHeaderProps> = ({

@@ -105,6 +105,14 @@
   "ui": {
     "grid": "網格",
     "list": "列表",
-    "switchToView": "切換至{view}檢視"
+    "table": "表格",
+    "switchToView": "切換至{view}檢視",
+    "viewModeSelector": "檢視模式選擇器"
+  },
+  "table": {
+    "store": "店舖",
+    "region": "地區",
+    "area": "區域",
+    "status": "狀態"
   }
 }

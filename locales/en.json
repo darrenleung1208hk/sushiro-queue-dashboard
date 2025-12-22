@@ -105,6 +105,14 @@
   "ui": {
     "grid": "Grid",
     "list": "List",
-    "switchToView": "Switch to {view} view"
+    "table": "Table",
+    "switchToView": "Switch to {view} view",
+    "viewModeSelector": "View mode selector"
+  },
+  "table": {
+    "store": "Store",
+    "region": "Region",
+    "area": "Area",
+    "status": "Status"
   }
 }

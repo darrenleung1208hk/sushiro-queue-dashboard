@@ -1,61 +1,51 @@
-import { Grid3X3, List } from 'lucide-react';
+import { Grid3X3, List, Table } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
+import { ViewMode } from '@/lib/hooks/use-view-mode';
 
 interface ViewToggleProps {
-  viewMode: 'grid' | 'list';
-  onViewChange: (mode: 'grid' | 'list') => void;
+  viewMode: ViewMode;
+  onViewChange: (mode: ViewMode) => void;
 }
 
 export const ViewToggle = ({ viewMode, onViewChange }: ViewToggleProps) => {
   const t = useTranslations();
 
-  const handleToggle = () => {
-    const newMode = viewMode === 'grid' ? 'list' : 'grid';
-    onViewChange(newMode);
-  };
-
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      handleToggle();
-    }
-  };
+  const viewModes: {
+    mode: ViewMode;
+    icon: typeof Grid3X3;
+    labelKey: string;
+  }[] = [
+    { mode: 'grid', icon: Grid3X3, labelKey: 'ui.grid' },
+    { mode: 'list', icon: List, labelKey: 'ui.list' },
+    { mode: 'table', icon: Table, labelKey: 'ui.table' },
+  ];
 
   return (
-    <button
-      onClick={handleToggle}
-      onKeyDown={handleKeyDown}
-      className="flex rounded-md border border-border bg-muted p-0.5 cursor-pointer"
-      role="tab"
-      aria-label={t('ui.switchToView', {
-        view: viewMode === 'grid' ? t('ui.grid') : t('ui.list'),
-      })}
-      aria-selected={false}
-      tabIndex={0}
+    <div
+      className="flex rounded-md border border-border bg-muted p-0.5"
+      role="tablist"
+      aria-label={t('ui.viewModeSelector')}
     >
-      <div
-        className={cn(
-          'flex items-center gap-1 px-1.5 py-1 rounded-sm text-xs transition-all duration-200',
-          viewMode === 'grid'
-            ? 'bg-background text-foreground shadow-sm'
-            : 'text-muted-foreground'
-        )}
-      >
-        <Grid3X3 className="h-3 w-3" />
-        <span className="hidden sm:inline">{t('ui.grid')}</span>
-      </div>
-      <div
-        className={cn(
-          'flex items-center gap-1 px-1.5 py-1 rounded-sm text-xs transition-all duration-200',
-          viewMode === 'list'
-            ? 'bg-background text-foreground shadow-sm'
-            : 'text-muted-foreground'
-        )}
-      >
-        <List className="h-3 w-3" />
-        <span className="hidden sm:inline">{t('ui.list')}</span>
-      </div>
-    </button>
+      {viewModes.map(({ mode, icon: Icon, labelKey }) => (
+        <button
+          key={mode}
+          onClick={() => onViewChange(mode)}
+          className={cn(
+            'flex items-center gap-1 px-1.5 py-1 rounded-sm text-xs transition-all duration-200 cursor-pointer',
+            viewMode === mode
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+          role="tab"
+          aria-selected={viewMode === mode}
+          aria-label={t('ui.switchToView', { view: t(labelKey) })}
+          tabIndex={viewMode === mode ? 0 : -1}
+        >
+          <Icon className="h-3 w-3" />
+          <span className="hidden sm:inline">{t(labelKey)}</span>
+        </button>
+      ))}
+    </div>
   );
 };
