@@ -1,0 +1,336 @@
+# Sushiro Queue Dashboard - Cursor Rules
+
+## 🏗️ Project Overview
+
+This is a Next.js 15 + TypeScript project for monitoring Sushiro restaurant queue status across Hong Kong locations. Built with modern UI components using shadcn/ui, Tailwind CSS, and Radix UI primitives.
+
+## 🎯 Development Standards
+
+### Code Quality
+
+- Use TypeScript 5.8+ with strict type checking
+- Follow ESLint and Prettier configurations
+- Write clean, readable, and maintainable code
+- Use meaningful variable and function names
+- Add JSDoc comments for complex functions
+- Keep functions small and focused (single responsibility)
+- **Use the `cn` utility function for all conditional class name logic**
+- **Maintain consistent styling patterns across components**
+
+### React Best Practices
+
+- Use functional components with hooks
+- Prefer `useMemo` and `useCallback` for expensive operations
+- Use proper dependency arrays in useEffect
+- Implement proper error boundaries
+- Follow React 19 patterns and conventions
+- Use TypeScript interfaces for props and state
+
+### UI/UX Guidelines
+
+- Follow shadcn/ui component patterns
+- Use Tailwind CSS utility classes consistently
+- Implement responsive design for all components
+- Maintain accessibility standards (ARIA labels, keyboard navigation)
+- Use consistent spacing, colors, and typography
+- Implement proper loading states and error handling
+
+## 🌿 Git Workflow & Branching Strategy
+
+### Branch Structure
+
+```
+main                    # Production-ready code
+├── develop            # Integration branch for features
+    ├── feature/*      # Feature development branches
+    └── fix/*          # Bug fix branches
+```
+
+### Branch Naming Conventions
+
+- **Feature branches**: `feature/descriptive-name`
+  - Example: `feature/add-store-search`, `feature/improve-ui-styling`
+- **Fix branches**: `fix/issue-description`
+  - Example: `fix/queue-display-issue`, `fix/mobile-layout-bug`
+
+### Creating New Branches
+
+1. Always branch from `develop`:
+
+   ```bash
+   git checkout develop
+   git pull origin develop
+   git checkout -b feature/your-feature-name
+   ```
+
+2. Use descriptive, kebab-case names that clearly indicate the purpose
+
+### Commit Message Standards
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/) specification:
+
+#### Format
+
+```
+<type>: <description>
+```
+
+**Always use concise format without optional scope or body.**
+
+#### Types
+
+- **feat**: A new feature
+- **fix**: A bug fix
+- **docs**: Documentation only changes
+- **style**: Changes that do not affect the meaning of the code
+- **refactor**: A code change that neither fixes a bug nor adds a feature
+- **perf**: A code change that improves performance
+- **test**: Adding missing tests or correcting existing tests
+- **chore**: Changes to the build process or auxiliary tools
+
+#### Examples
+
+```
+feat: add store search functionality
+fix: resolve queue number display issue
+docs: update API documentation
+style: format code with prettier
+refactor: extract store card component
+perf: optimize store data fetching
+test: add unit tests for store utilities
+chore: update dependencies
+```
+
+#### Commit Rules
+
+1. Use present tense: "add feature" not "added feature"
+2. Use imperative mood: "move cursor to..." not "moves cursor to..."
+3. Don't capitalize the first letter: "add feature" not "Add feature"
+4. No period at the end: "add feature" not "add feature."
+5. Keep it concise: Use 1 sentence to conclude the changes
+6. **Never use optional scope or body - always use simple format: `<type>: <description>`**
+
+## 🏪 Store Data Structure
+
+Always use the established Store interface:
+
+```typescript
+interface Store {
+  shopId: number; // Unique store identifier
+  storeStatus: 'OPEN' | 'CLOSED'; // Current store status
+  waitingGroup: number; // Number of people waiting
+  storeQueue: string[]; // Current queue numbers
+  timestamp: string; // Last update timestamp
+  name: string; // Chinese store name
+  nameEn: string; // English store name
+  address: string; // Store address
+  region: string; // Hong Kong region
+  area: string; // District area
+}
+```
+
+## 🎨 UI Component Guidelines
+
+### shadcn/ui Components
+
+- Use existing shadcn/ui components from `components/ui/`
+- Follow the established component patterns
+- Maintain consistency with existing styling
+- Use proper variants and props for each component
+
+### Tailwind CSS Usage
+
+- Use semantic color tokens (primary, secondary, muted, etc.)
+- Follow the established spacing scale
+- Use responsive prefixes (sm:, md:, lg:, xl:)
+- Maintain consistent border radius and shadow patterns
+- **Always use the `cn` utility function for conditional class names**
+- Avoid string concatenation or template literals for dynamic classes
+- Use the `cn` function to merge default classes with conditional variants
+
+### Conditional Styling Best Practices
+
+#### Using the `cn` Function
+
+Always use the `cn` utility function from `@/lib/utils` for conditional class names:
+
+```typescript
+import { cn } from '@/lib/utils';
+
+// ✅ Correct: Using cn function
+const buttonClasses = cn(
+  'px-4 py-2 rounded-md transition-colors',
+  isPrimary && 'bg-primary text-primary-foreground hover:bg-primary/90',
+  isSecondary && 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+  isDisabled && 'opacity-50 cursor-not-allowed'
+);
+
+// ❌ Incorrect: String concatenation
+const buttonClasses =
+  'px-4 py-2 rounded-md ' +
+  (isPrimary ? 'bg-primary text-primary-foreground' : '') +
+  (isSecondary ? 'bg-secondary text-secondary-foreground' : '');
+
+// ❌ Incorrect: Template literals with conditionals
+const buttonClasses = `px-4 py-2 rounded-md ${
+  isPrimary ? 'bg-primary text-primary-foreground' : ''
+}`;
+```
+
+#### Benefits of Using `cn`
+
+- **Type Safety**: Better TypeScript support and IntelliSense
+- **Performance**: Efficient class merging and deduplication
+- **Readability**: Cleaner, more maintainable code
+- **Consistency**: Standardized approach across the project
+- **Debugging**: Easier to inspect and modify classes
+
+#### Common Patterns
+
+```typescript
+// Component variants
+const cardClasses = cn(
+  'border border-border shadow-sm bg-card p-6',
+  variant === 'elevated' && 'shadow-lg',
+  variant === 'outlined' && 'border-2',
+  size === 'sm' && 'p-4',
+  size === 'lg' && 'p-8'
+);
+
+// Responsive classes
+const containerClasses = cn(
+  'w-full',
+  'sm:w-auto sm:max-w-md',
+  'lg:max-w-lg xl:max-w-xl'
+);
+
+// State-based styling
+const inputClasses = cn(
+  'border rounded-md px-3 py-2',
+  'focus:outline-none focus:ring-2 focus:ring-primary',
+  hasError && 'border-destructive focus:ring-destructive',
+  isDisabled && 'opacity-50 cursor-not-allowed'
+);
+```
+
+### Card Styling
+
+- Use `border border-border shadow-sm bg-card` for consistent card appearance
+- Apply `hover:shadow-lg transition-all duration-300` for interactive elements
+- Use proper padding and spacing (`p-6`, `space-y-4`, etc.)
+
+## 📁 File Organization
+
+### Component Structure
+
+- Place reusable components in `components/`
+- Use `components/ui/` for shadcn/ui components
+- Keep page-specific components in `app/(ui)/dashboard/_components/`
+- Use index.ts files for clean exports
+
+### Import Patterns
+
+- Use absolute imports with `@/` prefix
+- Group imports: React, external libraries, internal components, types
+- Use named exports for components
+
+## 🚀 Development Workflow
+
+### Before Starting Work
+
+1. Ensure you're on the latest `develop` branch
+2. Create a feature/fix branch following naming conventions
+3. Review existing code patterns and styling
+
+### During Development
+
+1. Follow established code patterns
+2. Maintain consistent styling with existing components
+3. Test responsive behavior across different screen sizes
+4. Ensure accessibility standards are met
+
+### Before Committing
+
+1. Run linting: `npm run lint`
+2. Check formatting: Ensure Prettier has run
+3. Test the feature/fix works as expected
+4. Write a proper conventional commit message
+
+### Pull Request Process
+
+1. Push your branch to remote
+2. Create PR to `develop` (not `main`)
+3. Use descriptive title and fill out PR template
+4. Request reviews from team members
+5. Address feedback and make necessary changes
+6. Ensure CI checks pass before merging
+
+## 🔧 Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+
+## 📱 Responsive Design Requirements
+
+- Ensure all components work on desktop, tablet, and mobile
+- Use proper breakpoints (sm:, md:, lg:, xl:)
+- Test touch interactions on mobile devices
+- Maintain readability across all screen sizes
+
+## 🎯 Performance Considerations
+
+- Use `useMemo` for expensive calculations
+- Implement proper loading states
+- Optimize re-renders with proper dependency arrays
+- Consider code splitting for large components
+
+## 🧪 Testing Guidelines
+
+- Write tests for new functionality
+- Test responsive behavior
+- Ensure accessibility compliance
+- Test error states and edge cases
+
+## 📚 Documentation
+
+- Update README.md for new features
+- Add JSDoc comments for complex functions
+- Document any new component APIs
+- Keep project structure documentation current
+
+## 🚫 What NOT to Do
+
+- Don't commit directly to `main` or `develop`
+- Don't use non-conventional commit messages
+- Don't ignore linting errors
+- Don't break existing functionality without proper testing
+- Don't create components that don't follow established patterns
+- Don't use hardcoded values instead of design tokens
+- **Don't use string concatenation or template literals for conditional classes**
+- **Don't manually combine Tailwind classes without the `cn` function**
+- **Don't create complex conditional class logic outside of the `cn` utility**
+
+## 🔧 Development Tools & Automation
+
+### Git Hooks & Quality Tools
+
+- **Husky**: Pre-commit hooks for linting and formatting
+- **Commitlint**: Enforces conventional commit message format
+- **Prettier**: Automatic code formatting on save/commit
+- **ESLint**: Code quality and style enforcement
+
+### CI/CD Requirements
+
+- All tests must pass before merging
+- Code coverage should not decrease
+- Build must succeed without errors
+- Linting and formatting checks must pass
+
+### Code Review Standards
+
+- Minimum 1 approval required for PRs
+- Address all review comments before merging
+- Ensure responsive design works across devices
+- Verify accessibility compliance (ARIA, keyboard navigation)
