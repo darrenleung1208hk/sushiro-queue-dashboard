@@ -108,13 +108,17 @@ const SortableHeader = ({
   onSort,
   children,
   className,
-}: SortableHeaderProps) => {
+  isFirst,
+  isLast,
+}: SortableHeaderProps & { isFirst?: boolean; isLast?: boolean }) => {
   const isActive = currentSort === field;
 
   return (
     <th
       className={cn(
         'px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground cursor-pointer hover:bg-muted/50 transition-colors select-none whitespace-nowrap',
+        isFirst && 'pl-4 sm:pl-3',
+        isLast && 'pr-4 sm:pr-3',
         className
       )}
       onClick={() => onSort(field)}
@@ -224,13 +228,13 @@ export const StoreTableView = ({
           <table className="w-full text-sm">
             <thead className="bg-muted/50 border-b border-border">
               <tr>
-                <th className="text-left px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground">
+                <th className="text-left pl-4 sm:pl-3 pr-2 sm:pr-3 py-2 sm:py-3 font-medium text-muted-foreground">
                   {t('table.store')}
                 </th>
                 <th className="text-center px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground">
                   {t('store.waiting')}
                 </th>
-                <th className="text-left px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground">
+                <th className="text-left pl-2 sm:pl-3 pr-4 sm:pr-3 py-2 sm:py-3 font-medium text-muted-foreground">
                   {t('store.currentQueue')}
                 </th>
               </tr>
@@ -238,13 +242,13 @@ export const StoreTableView = ({
             <tbody className="divide-y divide-border">
               {Array.from({ length: 10 }).map((_, index) => (
                 <tr key={index} className="hover:bg-muted/30">
-                  <td className="px-2 sm:px-3 py-2 sm:py-3">
+                  <td className="pl-4 sm:pl-3 pr-2 sm:pr-3 py-2 sm:py-3">
                     <Skeleton className="h-4 w-20 sm:w-28" />
                   </td>
                   <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
                     <Skeleton className="h-5 w-12 sm:w-14 mx-auto" />
                   </td>
-                  <td className="px-2 sm:px-3 py-2 sm:py-3">
+                  <td className="pl-2 sm:pl-3 pr-4 sm:pr-3 py-2 sm:py-3">
                     <Skeleton className="h-5 w-20 sm:w-28" />
                   </td>
                 </tr>
@@ -256,34 +260,55 @@ export const StoreTableView = ({
     );
   }
 
-  const renderCellContent = (store: Store, columnKey: ColumnKey) => {
+  const renderCellContent = (
+    store: Store,
+    columnKey: ColumnKey,
+    isFirst: boolean,
+    isLast: boolean
+  ) => {
     const isOpen = store.storeStatus === 'OPEN';
     const storeName = locale === 'zh-HK' ? store.name : store.nameEn;
     const waitTier = getQueuePriority(store.waitingGroup);
     const queueLength = store.storeQueue.length;
 
+    const cellPadding = cn(
+      'px-2 sm:px-3 py-2 sm:py-3',
+      isFirst && 'pl-4 sm:pl-3',
+      isLast && 'pr-4 sm:pr-3'
+    );
+
     switch (columnKey) {
       case 'store':
         return (
-          <td className="px-2 sm:px-3 py-2 sm:py-3 font-medium text-foreground">
+          <td className={cn(cellPadding, 'font-medium text-foreground')}>
             {storeName}
           </td>
         );
       case 'region':
         return (
-          <td className="px-2 sm:px-3 py-2 sm:py-3 text-muted-foreground whitespace-nowrap">
+          <td
+            className={cn(
+              cellPadding,
+              'text-muted-foreground whitespace-nowrap'
+            )}
+          >
             {t(`common.regions.${store.region}`)}
           </td>
         );
       case 'district':
         return (
-          <td className="px-2 sm:px-3 py-2 sm:py-3 text-muted-foreground whitespace-nowrap">
+          <td
+            className={cn(
+              cellPadding,
+              'text-muted-foreground whitespace-nowrap'
+            )}
+          >
             {t(`common.districts.${store.area}`)}
           </td>
         );
       case 'waiting':
         return (
-          <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
+          <td className={cn(cellPadding, 'text-center')}>
             {isOpen ? (
               <div
                 className={cn(
@@ -311,13 +336,18 @@ export const StoreTableView = ({
         );
       case 'current':
         return (
-          <td className="px-2 sm:px-3 py-2 sm:py-3 text-center font-medium text-foreground">
+          <td
+            className={cn(
+              cellPadding,
+              'text-center font-medium text-foreground'
+            )}
+          >
             {queueLength > 0 ? `#${store.storeQueue[0]}` : '--'}
           </td>
         );
       case 'currentQueue':
         return (
-          <td className="px-2 sm:px-3 py-2 sm:py-3">
+          <td className={cellPadding}>
             <div className="flex flex-wrap gap-0.5 sm:gap-1">
               {queueLength > 0 ? (
                 <>
@@ -391,8 +421,10 @@ export const StoreTableView = ({
             <thead className="bg-muted/50 border-b border-border">
               <tr>
                 {COLUMNS.filter((col) => isColumnVisible(col.key)).map(
-                  (column) =>
-                    column.sortable ? (
+                  (column, index, arr) => {
+                    const isFirst = index === 0;
+                    const isLast = index === arr.length - 1;
+                    return column.sortable ? (
                       <SortableHeader
                         key={column.key}
                         field={column.key as SortField}
@@ -400,17 +432,24 @@ export const StoreTableView = ({
                         direction={sortDirection}
                         onSort={handleSort}
                         className={`text-${column.align}`}
+                        isFirst={isFirst}
+                        isLast={isLast}
                       >
                         {t(column.labelKey)}
                       </SortableHeader>
                     ) : (
                       <th
                         key={column.key}
-                        className={`text-${column.align} px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground`}
+                        className={cn(
+                          `text-${column.align} px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground`,
+                          isFirst && 'pl-4 sm:pl-3',
+                          isLast && 'pr-4 sm:pr-3'
+                        )}
                       >
                         {t(column.labelKey)}
                       </th>
-                    )
+                    );
+                  }
                 )}
               </tr>
             </thead>
@@ -421,9 +460,14 @@ export const StoreTableView = ({
                   className="hover:bg-muted/30 transition-colors"
                 >
                   {COLUMNS.filter((col) => isColumnVisible(col.key)).map(
-                    (column) => (
+                    (column, index, arr) => (
                       <React.Fragment key={column.key}>
-                        {renderCellContent(store, column.key)}
+                        {renderCellContent(
+                          store,
+                          column.key,
+                          index === 0,
+                          index === arr.length - 1
+                        )}
                       </React.Fragment>
                     )
                   )}
