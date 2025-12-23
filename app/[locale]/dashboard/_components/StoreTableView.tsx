@@ -74,7 +74,7 @@ const COLUMNS: ColumnConfig[] = [
   {
     key: 'current',
     labelKey: 'store.current',
-    defaultVisible: true,
+    defaultVisible: false,
     sortable: true,
     align: 'center',
   },
@@ -230,9 +230,6 @@ export const StoreTableView = ({
                 <th className="text-center px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground">
                   {t('store.waiting')}
                 </th>
-                <th className="text-center px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground">
-                  {t('store.current')}
-                </th>
                 <th className="text-left px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground">
                   {t('store.currentQueue')}
                 </th>
@@ -246,9 +243,6 @@ export const StoreTableView = ({
                   </td>
                   <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
                     <Skeleton className="h-5 w-12 sm:w-14 mx-auto" />
-                  </td>
-                  <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
-                    <Skeleton className="h-4 w-10 sm:w-12 mx-auto" />
                   </td>
                   <td className="px-2 sm:px-3 py-2 sm:py-3">
                     <Skeleton className="h-5 w-20 sm:w-28" />
