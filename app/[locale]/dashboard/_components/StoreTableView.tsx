@@ -1,23 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import {
-  Users,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
-  Settings2,
-} from 'lucide-react';
+import { Users, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Store } from '@/lib/types';
 import { QUEUE_PRIORITY } from '@/lib/constants';
@@ -144,6 +129,9 @@ const SortableHeader = ({
   );
 };
 
+// Filter to only show default visible columns
+const VISIBLE_COLUMNS = COLUMNS.filter((col) => col.defaultVisible);
+
 export const StoreTableView = ({
   stores,
   isLoading = false,
@@ -152,11 +140,6 @@ export const StoreTableView = ({
   const locale = useLocale();
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
-  const [visibleColumns, setVisibleColumns] = useState<Set<ColumnKey>>(() => {
-    return new Set(
-      COLUMNS.filter((col) => col.defaultVisible).map((col) => col.key)
-    );
-  });
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -166,23 +149,6 @@ export const StoreTableView = ({
       setSortDirection('asc');
     }
   };
-
-  const toggleColumn = (columnKey: ColumnKey) => {
-    setVisibleColumns((prev) => {
-      const next = new Set(prev);
-      if (next.has(columnKey)) {
-        // Don't allow hiding all columns - keep at least store column
-        if (next.size > 1 || columnKey === 'store') {
-          next.delete(columnKey);
-        }
-      } else {
-        next.add(columnKey);
-      }
-      return next;
-    });
-  };
-
-  const isColumnVisible = (key: ColumnKey) => visibleColumns.has(key);
 
   const sortedStores = useMemo(() => {
     if (!sortField) return stores;
@@ -388,94 +354,62 @@ export const StoreTableView = ({
   };
 
   return (
-    <div className="space-y-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
-      {/* Column Selector */}
-      <div className="flex justify-end">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8 gap-1">
-              <Settings2 className="h-3.5 w-3.5" />
-              <span className="text-xs">{t('table.columns')}</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuLabel>{t('table.toggleColumns')}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {COLUMNS.map((column) => (
-              <DropdownMenuCheckboxItem
-                key={column.key}
-                checked={isColumnVisible(column.key)}
-                onCheckedChange={() => toggleColumn(column.key)}
+    <div className="-mx-4 sm:mx-0 border-y sm:border border-border sm:rounded-lg overflow-hidden bg-card animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/50 border-b border-border">
+            <tr>
+              {VISIBLE_COLUMNS.map((column, index, arr) => {
+                const isFirst = index === 0;
+                const isLast = index === arr.length - 1;
+                return column.sortable ? (
+                  <SortableHeader
+                    key={column.key}
+                    field={column.key as SortField}
+                    currentSort={sortField}
+                    direction={sortDirection}
+                    onSort={handleSort}
+                    className={`text-${column.align}`}
+                    isFirst={isFirst}
+                    isLast={isLast}
+                  >
+                    {t(column.labelKey)}
+                  </SortableHeader>
+                ) : (
+                  <th
+                    key={column.key}
+                    className={cn(
+                      `text-${column.align} px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground`,
+                      isFirst && 'pl-4 sm:pl-3',
+                      isLast && 'pr-4 sm:pr-3'
+                    )}
+                  >
+                    {t(column.labelKey)}
+                  </th>
+                );
+              })}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {sortedStores.map((store) => (
+              <tr
+                key={store.shopId}
+                className="hover:bg-muted/30 transition-colors"
               >
-                {t(column.labelKey)}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      {/* Table */}
-      <div className="-mx-4 sm:mx-0 border-y sm:border border-border sm:rounded-lg overflow-hidden bg-card">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50 border-b border-border">
-              <tr>
-                {COLUMNS.filter((col) => isColumnVisible(col.key)).map(
-                  (column, index, arr) => {
-                    const isFirst = index === 0;
-                    const isLast = index === arr.length - 1;
-                    return column.sortable ? (
-                      <SortableHeader
-                        key={column.key}
-                        field={column.key as SortField}
-                        currentSort={sortField}
-                        direction={sortDirection}
-                        onSort={handleSort}
-                        className={`text-${column.align}`}
-                        isFirst={isFirst}
-                        isLast={isLast}
-                      >
-                        {t(column.labelKey)}
-                      </SortableHeader>
-                    ) : (
-                      <th
-                        key={column.key}
-                        className={cn(
-                          `text-${column.align} px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground`,
-                          isFirst && 'pl-4 sm:pl-3',
-                          isLast && 'pr-4 sm:pr-3'
-                        )}
-                      >
-                        {t(column.labelKey)}
-                      </th>
-                    );
-                  }
-                )}
+                {VISIBLE_COLUMNS.map((column, index, arr) => (
+                  <React.Fragment key={column.key}>
+                    {renderCellContent(
+                      store,
+                      column.key,
+                      index === 0,
+                      index === arr.length - 1
+                    )}
+                  </React.Fragment>
+                ))}
               </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {sortedStores.map((store) => (
-                <tr
-                  key={store.shopId}
-                  className="hover:bg-muted/30 transition-colors"
-                >
-                  {COLUMNS.filter((col) => isColumnVisible(col.key)).map(
-                    (column, index, arr) => (
-                      <React.Fragment key={column.key}>
-                        {renderCellContent(
-                          store,
-                          column.key,
-                          index === 0,
-                          index === arr.length - 1
-                        )}
-                      </React.Fragment>
-                    )
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
