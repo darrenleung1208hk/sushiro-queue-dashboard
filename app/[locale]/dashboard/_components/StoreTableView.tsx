@@ -398,11 +398,12 @@ export const StoreTableView = ({
                   key={store.shopId}
                   layout
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
                   transition={{
                     layout: { type: 'spring', stiffness: 300, damping: 30 },
                     opacity: { duration: 0.2 },
+                    x: { duration: 0.2 },
                   }}
                   className="hover:bg-muted/30 transition-colors"
                 >
