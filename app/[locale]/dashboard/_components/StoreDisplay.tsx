@@ -133,7 +133,7 @@ export const StoreDisplay: React.FC<StoreDisplayProps> = ({
   }
 
   if (viewMode === 'table') {
-    return <StoreTableView stores={stores} isLoading={isLoading} />;
+    return <StoreTableView stores={stores} />;
   }
 
   // TypeScript type narrowing: viewMode must be 'list' here (already checked 'grid' and 'table' above)
