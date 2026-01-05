@@ -24,13 +24,13 @@ export const StoreDisplay: React.FC<StoreDisplayProps> = ({
   const [delaysReady, setDelaysReady] = useState(false);
 
   // Generate random delays only on client after mount to avoid hydration mismatch
-  // Only on initial visit (when stores are empty), no staggered animation on refresh
-  const isInitialVisit = stores.length === 0;
+  // Only on initial load (when stores are empty), no staggered animation on refresh
+  const isInitialLoad = stores.length === 0;
   const [gridDelays, setGridDelays] = useState<number[]>([]);
   const [listDelays, setListDelays] = useState<number[]>([]);
 
   useEffect(() => {
-    if (isInitialVisit) {
+    if (isInitialLoad) {
       // Generate delays only on client side
       setGridDelays(
         Array.from({ length: 24 }).map(() => Math.random() * 200 + 100)
@@ -41,12 +41,15 @@ export const StoreDisplay: React.FC<StoreDisplayProps> = ({
       // Mark delays as ready so skeletons can appear with animation
       setDelaysReady(true);
     } else {
-      // If not initial visit, show immediately without animation
+      // If not initial load, show immediately without animation
       setDelaysReady(true);
     }
-  }, [isInitialVisit]);
+  }, [isInitialLoad]);
 
-  if (isLoading) {
+  // Only show skeletons on initial load, not during refresh when we have existing data
+  const showSkeletons = isLoading && isInitialLoad;
+
+  if (showSkeletons) {
     if (viewMode === 'grid') {
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
@@ -54,13 +57,13 @@ export const StoreDisplay: React.FC<StoreDisplayProps> = ({
             <div
               key={index}
               className={cn(
-                isInitialVisit && delaysReady && gridDelays[index]
+                isInitialLoad && delaysReady && gridDelays[index]
                   ? 'animate-fade-in-up'
                   : '',
                 !delaysReady ? 'opacity-0' : ''
               )}
               style={
-                isInitialVisit && delaysReady && gridDelays[index]
+                isInitialLoad && delaysReady && gridDelays[index]
                   ? {
                       animationDelay: `${gridDelays[index]}ms`,
                     }
@@ -85,13 +88,13 @@ export const StoreDisplay: React.FC<StoreDisplayProps> = ({
           <div
             key={index}
             className={cn(
-              isInitialVisit && delaysReady && listDelays[index]
+              isInitialLoad && delaysReady && listDelays[index]
                 ? 'animate-fade-in-up'
                 : '',
               !delaysReady ? 'opacity-0' : ''
             )}
             style={
-              isInitialVisit && delaysReady && listDelays[index]
+              isInitialLoad && delaysReady && listDelays[index]
                 ? {
                     animationDelay: `${listDelays[index]}ms`,
                   }
