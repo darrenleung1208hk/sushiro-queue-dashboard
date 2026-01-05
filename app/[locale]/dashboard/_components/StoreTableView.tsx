@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Users, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
@@ -134,14 +134,28 @@ const SortableHeader = ({
 const VISIBLE_COLUMNS = COLUMNS.filter((col) => col.defaultVisible);
 
 // Mario Kart style animated table row
-const TableRow = ({ children }: { children: React.ReactNode }) => {
+const TableRow = ({
+  children,
+  onAnimationStart,
+  onAnimationEnd,
+}: {
+  children: React.ReactNode;
+  onAnimationStart: () => void;
+  onAnimationEnd: () => void;
+}) => {
   const [isAnimating, setIsAnimating] = useState(false);
 
   return (
     <motion.tr
       layout
-      onLayoutAnimationStart={() => setIsAnimating(true)}
-      onLayoutAnimationComplete={() => setIsAnimating(false)}
+      onLayoutAnimationStart={() => {
+        setIsAnimating(true);
+        onAnimationStart();
+      }}
+      onLayoutAnimationComplete={() => {
+        setIsAnimating(false);
+        onAnimationEnd();
+      }}
       transition={{
         layout: {
           type: 'spring',
@@ -170,6 +184,15 @@ export const StoreTableView = ({
   const locale = useLocale();
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [animatingCount, setAnimatingCount] = useState(0);
+
+  const handleAnimationStart = useCallback(() => {
+    setAnimatingCount((prev) => prev + 1);
+  }, []);
+
+  const handleAnimationEnd = useCallback(() => {
+    setAnimatingCount((prev) => Math.max(0, prev - 1));
+  }, []);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -385,7 +408,12 @@ export const StoreTableView = ({
 
   return (
     <div className="-mx-4 sm:mx-0 border-y sm:border border-border sm:rounded-lg overflow-hidden bg-card animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
-      <div className="overflow-x-auto">
+      <div
+        className={cn(
+          'overflow-x-auto',
+          animatingCount > 0 && 'overflow-hidden'
+        )}
+      >
         <table className="w-full text-sm">
           <thead className="bg-muted/50 border-b border-border">
             <tr>
@@ -422,7 +450,11 @@ export const StoreTableView = ({
           </thead>
           <tbody className="divide-y divide-border">
             {sortedStores.map((store) => (
-              <TableRow key={store.shopId}>
+              <TableRow
+                key={store.shopId}
+                onAnimationStart={handleAnimationStart}
+                onAnimationEnd={handleAnimationEnd}
+              >
                 {VISIBLE_COLUMNS.map((column, index, arr) => (
                   <React.Fragment key={column.key}>
                     {renderCellContent(
