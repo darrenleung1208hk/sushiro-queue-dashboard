@@ -143,11 +143,19 @@ const TableRow = ({
   onAnimationStart: () => void;
   onAnimationEnd: () => void;
 }) => {
+  const [isAnimating, setIsAnimating] = useState(false);
+
   return (
     <motion.tr
       layout
-      onLayoutAnimationStart={onAnimationStart}
-      onLayoutAnimationComplete={onAnimationEnd}
+      onLayoutAnimationStart={() => {
+        setIsAnimating(true);
+        onAnimationStart();
+      }}
+      onLayoutAnimationComplete={() => {
+        setIsAnimating(false);
+        onAnimationEnd();
+      }}
       transition={{
         layout: {
           type: 'spring',
@@ -156,7 +164,7 @@ const TableRow = ({
           mass: 0.8,
         },
       }}
-      className="hover:bg-muted/30 transition-colors"
+      className={cn('transition-colors', !isAnimating && 'hover:bg-muted/30')}
     >
       {children}
     </motion.tr>
