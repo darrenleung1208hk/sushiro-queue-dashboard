@@ -126,7 +126,7 @@ export const StoreDisplay: React.FC<StoreDisplayProps> = ({
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
         {stores.map((store) => (
-          <StoreCard key={store.shopId} store={store} isLoading={isLoading} />
+          <StoreCard key={store.shopId} store={store} />
         ))}
       </div>
     );
