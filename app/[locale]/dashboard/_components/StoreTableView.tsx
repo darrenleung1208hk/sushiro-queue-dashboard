@@ -133,7 +133,7 @@ const SortableHeader = ({
 // Filter to only show default visible columns
 const VISIBLE_COLUMNS = COLUMNS.filter((col) => col.defaultVisible);
 
-// Mario Kart style animated table row
+// Animated table row with snappy spring animation
 const TableRow = ({
   children,
   onAnimationStart,
@@ -143,19 +143,11 @@ const TableRow = ({
   onAnimationStart: () => void;
   onAnimationEnd: () => void;
 }) => {
-  const [isAnimating, setIsAnimating] = useState(false);
-
   return (
     <motion.tr
       layout
-      onLayoutAnimationStart={() => {
-        setIsAnimating(true);
-        onAnimationStart();
-      }}
-      onLayoutAnimationComplete={() => {
-        setIsAnimating(false);
-        onAnimationEnd();
-      }}
+      onLayoutAnimationStart={onAnimationStart}
+      onLayoutAnimationComplete={onAnimationEnd}
       transition={{
         layout: {
           type: 'spring',
@@ -164,12 +156,7 @@ const TableRow = ({
           mass: 0.8,
         },
       }}
-      className={cn(
-        'transition-colors duration-300',
-        isAnimating
-          ? 'bg-primary/20 dark:bg-primary/30'
-          : 'hover:bg-muted/30 bg-transparent'
-      )}
+      className="hover:bg-muted/30 transition-colors"
     >
       {children}
     </motion.tr>
