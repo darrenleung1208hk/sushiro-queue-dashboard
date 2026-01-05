@@ -81,7 +81,8 @@
   "store": {
     "status": {
       "open": "OPEN",
-      "closed": "CLOSED"
+      "closed": "CLOSED",
+      "disconnected": "DISCONNECTED"
     },
     "waiting": "Waiting",
     "current": "Current",

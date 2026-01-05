@@ -81,7 +81,8 @@
   "store": {
     "status": {
       "open": "營業中",
-      "closed": "休息中"
+      "closed": "休息中",
+      "disconnected": "已斷線"
     },
     "waiting": "等候",
     "current": "當前",
