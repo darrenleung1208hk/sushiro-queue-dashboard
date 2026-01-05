@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Users, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -391,23 +392,33 @@ export const StoreTableView = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {sortedStores.map((store) => (
-              <tr
-                key={store.shopId}
-                className="hover:bg-muted/30 transition-colors"
-              >
-                {VISIBLE_COLUMNS.map((column, index, arr) => (
-                  <React.Fragment key={column.key}>
-                    {renderCellContent(
-                      store,
-                      column.key,
-                      index === 0,
-                      index === arr.length - 1
-                    )}
-                  </React.Fragment>
-                ))}
-              </tr>
-            ))}
+            <AnimatePresence mode="popLayout">
+              {sortedStores.map((store) => (
+                <motion.tr
+                  key={store.shopId}
+                  layout
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{
+                    layout: { type: 'spring', stiffness: 300, damping: 30 },
+                    opacity: { duration: 0.2 },
+                  }}
+                  className="hover:bg-muted/30 transition-colors"
+                >
+                  {VISIBLE_COLUMNS.map((column, index, arr) => (
+                    <React.Fragment key={column.key}>
+                      {renderCellContent(
+                        store,
+                        column.key,
+                        index === 0,
+                        index === arr.length - 1
+                      )}
+                    </React.Fragment>
+                  ))}
+                </motion.tr>
+              ))}
+            </AnimatePresence>
           </tbody>
         </table>
       </div>
