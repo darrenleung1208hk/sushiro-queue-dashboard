@@ -133,48 +133,6 @@ const SortableHeader = ({
 // Filter to only show default visible columns
 const VISIBLE_COLUMNS = COLUMNS.filter((col) => col.defaultVisible);
 
-// Animated table row component with drag-and-drop style animation
-const TableRow = ({
-  store,
-  children,
-}: {
-  store: Store;
-  children: React.ReactNode;
-}) => {
-  const [isAnimating, setIsAnimating] = useState(false);
-
-  return (
-    <motion.tr
-      key={store.shopId}
-      layout
-      onLayoutAnimationStart={() => setIsAnimating(true)}
-      onLayoutAnimationComplete={() => setIsAnimating(false)}
-      initial={false}
-      animate={{
-        scale: isAnimating ? 1.01 : 1,
-        boxShadow: isAnimating
-          ? '0 8px 16px -4px rgba(0,0,0,0.12)'
-          : '0 0 0 0 rgba(0,0,0,0)',
-      }}
-      transition={{
-        layout: {
-          type: 'spring',
-          stiffness: 350,
-          damping: 30,
-        },
-        scale: { duration: 0.15 },
-        boxShadow: { duration: 0.15 },
-      }}
-      className={cn(
-        'transition-colors bg-card',
-        isAnimating ? 'z-10 relative' : 'hover:bg-muted/30'
-      )}
-    >
-      {children}
-    </motion.tr>
-  );
-};
-
 export const StoreTableView = ({
   stores,
   isLoading = false,
@@ -435,7 +393,14 @@ export const StoreTableView = ({
           </thead>
           <tbody className="divide-y divide-border">
             {sortedStores.map((store) => (
-              <TableRow key={store.shopId} store={store}>
+              <motion.tr
+                key={store.shopId}
+                layout
+                transition={{
+                  layout: { type: 'spring', stiffness: 300, damping: 30 },
+                }}
+                className="hover:bg-muted/30 transition-colors"
+              >
                 {VISIBLE_COLUMNS.map((column, index, arr) => (
                   <React.Fragment key={column.key}>
                     {renderCellContent(
@@ -446,7 +411,7 @@ export const StoreTableView = ({
                     )}
                   </React.Fragment>
                 ))}
-              </TableRow>
+              </motion.tr>
             ))}
           </tbody>
         </table>
