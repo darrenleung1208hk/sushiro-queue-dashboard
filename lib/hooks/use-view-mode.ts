@@ -1,15 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 
+export type ViewMode = 'grid' | 'list' | 'table';
+
 export const useViewMode = () => {
   const t = useTranslations();
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
 
   // Load view mode preference from localStorage
   useEffect(() => {
     try {
       const savedView = localStorage.getItem('dashboard-view-mode');
-      if (savedView === 'grid' || savedView === 'list') {
+      if (
+        savedView === 'grid' ||
+        savedView === 'list' ||
+        savedView === 'table'
+      ) {
         setViewMode(savedView);
       }
     } catch (error) {
@@ -29,7 +35,7 @@ export const useViewMode = () => {
   }, [viewMode, t]);
 
   // Handle view mode change
-  const handleViewModeChange = (mode: 'grid' | 'list') => {
+  const handleViewModeChange = (mode: ViewMode) => {
     if (mode !== viewMode) {
       setViewMode(mode);
     }

@@ -78,10 +78,10 @@ export function trackManualRefresh(timeSinceLastRefresh: number | null) {
 }
 
 /**
- * Track when user changes view mode (grid/list)
+ * Track when user changes view mode (grid/list/table)
  */
 export function trackViewModeChanged(
-  viewMode: 'grid' | 'list',
+  viewMode: 'grid' | 'list' | 'table',
   storesDisplayed: number
 ) {
   trackEvent('view_mode_changed', {

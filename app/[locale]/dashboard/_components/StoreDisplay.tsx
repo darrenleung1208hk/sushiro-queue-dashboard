@@ -4,12 +4,14 @@ import { Search } from 'lucide-react';
 
 import { Store } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { ViewMode } from '@/lib/hooks/use-view-mode';
 import { StoreCard } from './StoreCard';
 import { StoreListItem } from './StoreListItem';
+import { StoreTableView } from './StoreTableView';
 
 interface StoreDisplayProps {
   stores: Store[];
-  viewMode: 'grid' | 'list';
+  viewMode: ViewMode;
   isLoading?: boolean;
 }
 
@@ -72,6 +74,10 @@ export const StoreDisplay: React.FC<StoreDisplayProps> = ({
       );
     }
 
+    if (viewMode === 'table') {
+      return <StoreTableView stores={[]} isLoading={true} />;
+    }
+
     // List view skeleton
     return (
       <div className="space-y-2">
@@ -123,7 +129,11 @@ export const StoreDisplay: React.FC<StoreDisplayProps> = ({
     );
   }
 
-  // TypeScript type narrowing: viewMode must be 'list' here (already checked 'grid' above)
+  if (viewMode === 'table') {
+    return <StoreTableView stores={stores} isLoading={isLoading} />;
+  }
+
+  // TypeScript type narrowing: viewMode must be 'list' here (already checked 'grid' and 'table' above)
   return (
     <div className="space-y-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
       {stores.map((store) => (

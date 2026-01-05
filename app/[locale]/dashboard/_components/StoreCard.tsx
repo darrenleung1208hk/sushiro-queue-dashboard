@@ -41,7 +41,7 @@ export const StoreCard = ({ store, isLoading }: StoreCardProps) => {
               variant={isOpen ? 'default' : 'destructive'}
               className="shrink-0 text-[10px] px-1.5 py-0.5 h-5"
             >
-              {store.storeStatus}
+              {t(`store.status.${store.storeStatus.toLowerCase()}`)}
             </Badge>
           )}
         </div>
@@ -137,7 +137,7 @@ export const StoreCard = ({ store, isLoading }: StoreCardProps) => {
               <div>
                 <p className="text-[10px] text-muted-foreground">
                   {t(`common.regions.${store.region}`)} •{' '}
-                  {t(`common.areas.${store.area}`)}
+                  {t(`common.districts.${store.area}`)}
                 </p>
               </div>
             )}

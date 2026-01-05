@@ -22,7 +22,7 @@
       "九龍": "Kowloon",
       "新界": "New Territories"
     },
-    "areas": {
+    "districts": {
       "中西區": "Central and Western District",
       "灣仔區": "Wan Chai District",
       "東區": "Eastern District",
@@ -57,7 +57,7 @@
       "showing": "Showing"
     },
     "filters": {
-      "searchPlaceholder": "Search stores by name, region, or area...",
+      "searchPlaceholder": "Search stores by name, region, or district...",
       "allRegions": "All Regions",
       "allWaitTimes": "All Wait Times",
       "lowWait": "Low Wait",
@@ -105,6 +105,16 @@
   "ui": {
     "grid": "Grid",
     "list": "List",
-    "switchToView": "Switch to {view} view"
+    "table": "Table",
+    "switchToView": "Switch to {view} view",
+    "viewModeSelector": "View mode selector"
+  },
+  "table": {
+    "store": "Store",
+    "region": "Region",
+    "district": "District",
+    "status": "Status",
+    "columns": "Columns",
+    "toggleColumns": "Toggle columns"
   }
 }

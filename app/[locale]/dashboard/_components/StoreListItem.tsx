@@ -51,7 +51,7 @@ export const StoreListItem = ({ store, isLoading }: StoreListItemProps) => {
                   variant={isOpen ? 'default' : 'destructive'}
                   className="shrink-0 text-[10px] px-1.5 py-0.5 h-5"
                 >
-                  {store.storeStatus}
+                  {t(`store.status.${store.storeStatus.toLowerCase()}`)}
                 </Badge>
               )}
             </div>
@@ -59,7 +59,7 @@ export const StoreListItem = ({ store, isLoading }: StoreListItemProps) => {
               <Skeleton className="h-3 w-32 mt-1" />
             ) : (
               <p className="text-xs text-muted-foreground truncate">
-                {t(`common.areas.${store.area}`)},{' '}
+                {t(`common.districts.${store.area}`)},{' '}
                 {t(`common.regions.${store.region}`)}
               </p>
             )}
