@@ -11,6 +11,8 @@
     "resume": "Resume",
     "connected": "Connected",
     "refreshing": "Refreshing...",
+    "refreshStarted": "Refreshing data...",
+    "refreshComplete": "Data updated successfully",
     "last": "Last updated at",
     "open": "Open",
     "languages": {
