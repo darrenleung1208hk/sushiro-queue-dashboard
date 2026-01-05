@@ -22,7 +22,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
             'group-[.toast]:bg-primary group-[.toast]:text-primary-foreground',
           cancelButton:
             'group-[.toast]:bg-muted group-[.toast]:text-muted-foreground',
-          icon: 'group-[.toast]:flex group-[.toast]:items-center group-[.toast]:justify-center',
+          icon: 'group-[.toast]:flex group-[.toast]:items-center group-[.toast]:justify-center group-[.toast]:m-0',
           success: 'group-[.toaster]:text-green-500 [&>svg]:text-green-500',
           error: 'group-[.toaster]:text-destructive [&>svg]:text-destructive',
           loading: '[&>svg]:text-muted-foreground',
