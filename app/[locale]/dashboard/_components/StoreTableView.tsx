@@ -133,6 +133,35 @@ const SortableHeader = ({
 // Filter to only show default visible columns
 const VISIBLE_COLUMNS = COLUMNS.filter((col) => col.defaultVisible);
 
+// Mario Kart style animated table row
+const TableRow = ({ children }: { children: React.ReactNode }) => {
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  return (
+    <motion.tr
+      layout
+      onLayoutAnimationStart={() => setIsAnimating(true)}
+      onLayoutAnimationComplete={() => setIsAnimating(false)}
+      transition={{
+        layout: {
+          type: 'spring',
+          stiffness: 500,
+          damping: 35,
+          mass: 0.8,
+        },
+      }}
+      className={cn(
+        'transition-colors duration-300',
+        isAnimating
+          ? 'bg-primary/20 dark:bg-primary/30'
+          : 'hover:bg-muted/30 bg-transparent'
+      )}
+    >
+      {children}
+    </motion.tr>
+  );
+};
+
 export const StoreTableView = ({
   stores,
   isLoading = false,
@@ -393,14 +422,7 @@ export const StoreTableView = ({
           </thead>
           <tbody className="divide-y divide-border">
             {sortedStores.map((store) => (
-              <motion.tr
-                key={store.shopId}
-                layout
-                transition={{
-                  layout: { type: 'spring', stiffness: 300, damping: 30 },
-                }}
-                className="hover:bg-muted/30 transition-colors"
-              >
+              <TableRow key={store.shopId}>
                 {VISIBLE_COLUMNS.map((column, index, arr) => (
                   <React.Fragment key={column.key}>
                     {renderCellContent(
@@ -411,7 +433,7 @@ export const StoreTableView = ({
                     )}
                   </React.Fragment>
                 ))}
-              </motion.tr>
+              </TableRow>
             ))}
           </tbody>
         </table>
