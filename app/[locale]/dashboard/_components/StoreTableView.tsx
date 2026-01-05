@@ -391,18 +391,15 @@ export const StoreTableView = ({
               })}
             </tr>
           </thead>
-          <tbody>
-            {sortedStores.map((store, index) => (
+          <tbody className="divide-y divide-border">
+            {sortedStores.map((store) => (
               <motion.tr
                 key={store.shopId}
                 layout
                 transition={{
                   layout: { type: 'spring', stiffness: 300, damping: 30 },
                 }}
-                className={cn(
-                  'hover:bg-muted/30 transition-colors',
-                  index < sortedStores.length - 1 && 'border-b border-border'
-                )}
+                className="hover:bg-muted/30 transition-colors"
               >
                 {VISIBLE_COLUMNS.map((column, index, arr) => (
                   <React.Fragment key={column.key}>
