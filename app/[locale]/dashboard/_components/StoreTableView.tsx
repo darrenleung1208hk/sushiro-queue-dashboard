@@ -73,6 +73,9 @@ const COLUMNS: ColumnConfig[] = [
   },
 ];
 
+// Grid template for consistent column alignment
+const GRID_TEMPLATE = 'minmax(120px, 1fr) 100px minmax(140px, 1fr)';
+
 interface StoreTableViewProps {
   stores: Store[];
   isLoading?: boolean;
@@ -100,7 +103,12 @@ const SortableHeader = ({
   const isActive = currentSort === field;
 
   return (
-    <th
+    <div
+      role="columnheader"
+      aria-sort={
+        isActive ? (direction === 'asc' ? 'ascending' : 'descending') : 'none'
+      }
+      tabIndex={0}
       className={cn(
         'px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground cursor-pointer hover:bg-muted/50 transition-colors select-none whitespace-nowrap',
         isFirst && 'pl-4 sm:pl-3',
@@ -108,6 +116,12 @@ const SortableHeader = ({
         className
       )}
       onClick={() => onSort(field)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSort(field);
+        }
+      }}
     >
       <div
         className={cn(
@@ -126,7 +140,7 @@ const SortableHeader = ({
           <ArrowUpDown className="h-3 w-3 opacity-50" />
         )}
       </div>
-    </th>
+    </div>
   );
 };
 
@@ -146,7 +160,8 @@ const TableRow = ({
   const [isAnimating, setIsAnimating] = useState(false);
 
   return (
-    <motion.tr
+    <motion.div
+      role="row"
       layout
       onLayoutAnimationStart={() => {
         setIsAnimating(true);
@@ -164,10 +179,14 @@ const TableRow = ({
           mass: 0.8,
         },
       }}
-      className={cn('transition-colors', !isAnimating && 'hover:bg-muted/30')}
+      className={cn(
+        'grid border-b border-border last:border-b-0 transition-colors',
+        !isAnimating && 'hover:bg-muted/30'
+      )}
+      style={{ gridTemplateColumns: GRID_TEMPLATE }}
     >
       {children}
-    </motion.tr>
+    </motion.div>
   );
 };
 
@@ -237,38 +256,71 @@ export const StoreTableView = ({
 
   if (isLoading) {
     return (
-      <div className="-mx-4 sm:mx-0 border-y sm:border border-border sm:rounded-lg overflow-hidden bg-card">
+      <div
+        role="table"
+        aria-label={t('table.store')}
+        className="-mx-4 sm:mx-0 border-y sm:border border-border sm:rounded-lg overflow-hidden bg-card"
+      >
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50 border-b border-border">
-              <tr>
-                <th className="text-left pl-4 sm:pl-3 pr-2 sm:pr-3 py-2 sm:py-3 font-medium text-muted-foreground">
+          <div className="min-w-full text-sm">
+            {/* Header */}
+            <div role="rowgroup" className="bg-muted/50 border-b border-border">
+              <div
+                role="row"
+                className="grid"
+                style={{ gridTemplateColumns: GRID_TEMPLATE }}
+              >
+                <div
+                  role="columnheader"
+                  className="text-left pl-4 sm:pl-3 pr-2 sm:pr-3 py-2 sm:py-3 font-medium text-muted-foreground"
+                >
                   {t('table.store')}
-                </th>
-                <th className="text-center px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground">
+                </div>
+                <div
+                  role="columnheader"
+                  className="text-center px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground"
+                >
                   {t('store.waiting')}
-                </th>
-                <th className="text-left pl-2 sm:pl-3 pr-4 sm:pr-3 py-2 sm:py-3 font-medium text-muted-foreground">
+                </div>
+                <div
+                  role="columnheader"
+                  className="text-left pl-2 sm:pl-3 pr-4 sm:pr-3 py-2 sm:py-3 font-medium text-muted-foreground"
+                >
                   {t('store.currentQueue')}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
+                </div>
+              </div>
+            </div>
+            {/* Body */}
+            <div role="rowgroup">
               {Array.from({ length: 10 }).map((_, index) => (
-                <tr key={index} className="hover:bg-muted/30">
-                  <td className="pl-4 sm:pl-3 pr-2 sm:pr-3 py-2 sm:py-3">
+                <div
+                  key={index}
+                  role="row"
+                  className="grid border-b border-border last:border-b-0 hover:bg-muted/30"
+                  style={{ gridTemplateColumns: GRID_TEMPLATE }}
+                >
+                  <div
+                    role="cell"
+                    className="pl-4 sm:pl-3 pr-2 sm:pr-3 py-2 sm:py-3"
+                  >
                     <Skeleton className="h-4 w-20 sm:w-28" />
-                  </td>
-                  <td className="px-2 sm:px-3 py-2 sm:py-3 text-center">
+                  </div>
+                  <div
+                    role="cell"
+                    className="px-2 sm:px-3 py-2 sm:py-3 text-center"
+                  >
                     <Skeleton className="h-5 w-12 sm:w-14 mx-auto" />
-                  </td>
-                  <td className="pl-2 sm:pl-3 pr-4 sm:pr-3 py-2 sm:py-3">
+                  </div>
+                  <div
+                    role="cell"
+                    className="pl-2 sm:pl-3 pr-4 sm:pr-3 py-2 sm:py-3"
+                  >
                     <Skeleton className="h-5 w-20 sm:w-28" />
-                  </td>
-                </tr>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -294,35 +346,40 @@ export const StoreTableView = ({
     switch (columnKey) {
       case 'store':
         return (
-          <td className={cn(cellPadding, 'font-medium text-foreground')}>
+          <div
+            role="cell"
+            className={cn(cellPadding, 'font-medium text-foreground')}
+          >
             {storeName}
-          </td>
+          </div>
         );
       case 'region':
         return (
-          <td
+          <div
+            role="cell"
             className={cn(
               cellPadding,
               'text-muted-foreground whitespace-nowrap'
             )}
           >
             {t(`common.regions.${store.region}`)}
-          </td>
+          </div>
         );
       case 'district':
         return (
-          <td
+          <div
+            role="cell"
             className={cn(
               cellPadding,
               'text-muted-foreground whitespace-nowrap'
             )}
           >
             {t(`common.districts.${store.area}`)}
-          </td>
+          </div>
         );
       case 'waiting':
         return (
-          <td className={cn(cellPadding, 'text-center')}>
+          <div role="cell" className={cn(cellPadding, 'text-center')}>
             {isOpen ? (
               <div
                 className={cn(
@@ -346,22 +403,23 @@ export const StoreTableView = ({
                 {t('store.status.closed')}
               </Badge>
             )}
-          </td>
+          </div>
         );
       case 'current':
         return (
-          <td
+          <div
+            role="cell"
             className={cn(
               cellPadding,
               'text-center font-medium text-foreground'
             )}
           >
             {queueLength > 0 ? `#${store.storeQueue[0]}` : '--'}
-          </td>
+          </div>
         );
       case 'currentQueue':
         return (
-          <td className={cellPadding}>
+          <div role="cell" className={cellPadding}>
             <div className="flex flex-wrap gap-0.5 sm:gap-1">
               {queueLength > 0 ? (
                 <>
@@ -394,7 +452,7 @@ export const StoreTableView = ({
                 </Badge>
               )}
             </div>
-          </td>
+          </div>
         );
       default:
         return null;
@@ -402,16 +460,25 @@ export const StoreTableView = ({
   };
 
   return (
-    <div className="-mx-4 sm:mx-0 border-y sm:border border-border sm:rounded-lg overflow-hidden bg-card animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+    <div
+      role="table"
+      aria-label={t('table.store')}
+      className="-mx-4 sm:mx-0 border-y sm:border border-border sm:rounded-lg overflow-hidden bg-card animate-in fade-in-0 slide-in-from-bottom-2 duration-300"
+    >
       <div
         className={cn(
           'overflow-x-auto',
           animatingCount > 0 && 'overflow-hidden'
         )}
       >
-        <table className="w-full text-sm">
-          <thead className="bg-muted/50 border-b border-border">
-            <tr>
+        <div className="min-w-full text-sm">
+          {/* Header */}
+          <div role="rowgroup" className="bg-muted/50 border-b border-border">
+            <div
+              role="row"
+              className="grid"
+              style={{ gridTemplateColumns: GRID_TEMPLATE }}
+            >
               {VISIBLE_COLUMNS.map((column, index, arr) => {
                 const isFirst = index === 0;
                 const isLast = index === arr.length - 1;
@@ -429,8 +496,9 @@ export const StoreTableView = ({
                     {t(column.labelKey)}
                   </SortableHeader>
                 ) : (
-                  <th
+                  <div
                     key={column.key}
+                    role="columnheader"
                     className={cn(
                       `text-${column.align} px-2 sm:px-3 py-2 sm:py-3 font-medium text-muted-foreground`,
                       isFirst && 'pl-4 sm:pl-3',
@@ -438,12 +506,13 @@ export const StoreTableView = ({
                     )}
                   >
                     {t(column.labelKey)}
-                  </th>
+                  </div>
                 );
               })}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
+            </div>
+          </div>
+          {/* Body */}
+          <div role="rowgroup">
             {sortedStores.map((store) => (
               <TableRow
                 key={store.shopId}
@@ -462,8 +531,8 @@ export const StoreTableView = ({
                 ))}
               </TableRow>
             ))}
-          </tbody>
-        </table>
+          </div>
+        </div>
       </div>
     </div>
   );
