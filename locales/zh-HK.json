@@ -11,6 +11,8 @@
     "resume": "繼續",
     "connected": "已連接",
     "refreshing": "重新整理中...",
+    "refreshStarted": "正在更新資料...",
+    "refreshComplete": "資料更新成功",
     "last": "更新",
     "open": "營業中",
     "languages": {
@@ -79,7 +81,8 @@
   "store": {
     "status": {
       "open": "營業中",
-      "closed": "休息中"
+      "closed": "休息中",
+      "disconnected": "已斷線"
     },
     "waiting": "等候",
     "current": "當前",

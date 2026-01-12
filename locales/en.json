@@ -11,6 +11,8 @@
     "resume": "Resume",
     "connected": "Connected",
     "refreshing": "Refreshing...",
+    "refreshStarted": "Refreshing data...",
+    "refreshComplete": "Data updated successfully",
     "last": "Last updated at",
     "open": "Open",
     "languages": {
@@ -79,7 +81,8 @@
   "store": {
     "status": {
       "open": "OPEN",
-      "closed": "CLOSED"
+      "closed": "CLOSED",
+      "disconnected": "DISCONNECTED"
     },
     "waiting": "Waiting",
     "current": "Current",

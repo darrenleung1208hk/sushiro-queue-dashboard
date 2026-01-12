@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 import { Store } from '@/lib/types';
 import { useDashboardFilters } from '@/lib/hooks/use-dashboard-filters';
 import { useViewMode } from '@/lib/hooks/use-view-mode';
@@ -22,16 +23,24 @@ export default function DashboardPage() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [autoRefreshEnabled] = useState(true);
   const isFetchingRef = useRef(false);
+  const isInitialLoadRef = useRef(true);
 
   // Data fetching function with deduplication
   const fetchStores = useCallback(async () => {
     // Prevent multiple simultaneous requests
     if (isFetchingRef.current) return;
 
+    const isRefresh = !isInitialLoadRef.current;
+
     try {
       isFetchingRef.current = true;
       setIsLoading(true);
       setError(null);
+
+      // Show toast only for auto-refresh, not initial load
+      if (isRefresh) {
+        toast.loading(t('common.refreshStarted'), { id: 'refresh-toast' });
+      }
 
       const response = await fetch('/api/stores/live');
 
@@ -49,14 +58,25 @@ export default function DashboardPage() {
 
       setStores(apiResponse.data);
       setLastUpdated(new Date());
+
+      // Show success toast only for refresh
+      if (isRefresh) {
+        toast.success(t('common.refreshComplete'), { id: 'refresh-toast' });
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err : new Error(t('errors.unknownError'))
       );
       console.error('Error fetching stores:', err);
+
+      // Dismiss loading toast on error
+      if (isRefresh) {
+        toast.error(t('errors.failedToLoadData'), { id: 'refresh-toast' });
+      }
     } finally {
       setIsLoading(false);
       isFetchingRef.current = false;
+      isInitialLoadRef.current = false;
     }
   }, [t]);
 
