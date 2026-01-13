@@ -1,4 +1,4 @@
-import { Grid3X3, List, Table } from 'lucide-react';
+import { Grid3X3, Table } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import { ViewMode } from '@/lib/hooks/use-view-mode';
@@ -17,7 +17,6 @@ export const ViewToggle = ({ viewMode, onViewChange }: ViewToggleProps) => {
     labelKey: string;
   }[] = [
     { mode: 'grid', icon: Grid3X3, labelKey: 'ui.grid' },
-    { mode: 'list', icon: List, labelKey: 'ui.list' },
     { mode: 'table', icon: Table, labelKey: 'ui.table' },
   ];
 

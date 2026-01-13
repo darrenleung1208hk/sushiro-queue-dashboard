@@ -6,7 +6,6 @@ import { Store } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { ViewMode } from '@/lib/hooks/use-view-mode';
 import { StoreCard } from './StoreCard';
-import { StoreListItem } from './StoreListItem';
 import { StoreTableView } from './StoreTableView';
 
 interface StoreDisplayProps {
@@ -27,16 +26,12 @@ export const StoreDisplay: React.FC<StoreDisplayProps> = ({
   // Only on initial load (when stores are empty), no staggered animation on refresh
   const isInitialLoad = stores.length === 0;
   const [gridDelays, setGridDelays] = useState<number[]>([]);
-  const [listDelays, setListDelays] = useState<number[]>([]);
 
   useEffect(() => {
     if (isInitialLoad) {
       // Generate delays only on client side
       setGridDelays(
         Array.from({ length: 24 }).map(() => Math.random() * 200 + 100)
-      );
-      setListDelays(
-        Array.from({ length: 12 }).map(() => Math.random() * 200 + 100)
       );
       // Mark delays as ready so skeletons can appear with animation
       setDelaysReady(true);
@@ -77,35 +72,8 @@ export const StoreDisplay: React.FC<StoreDisplayProps> = ({
       );
     }
 
-    if (viewMode === 'table') {
-      return <StoreTableView stores={[]} isLoading={true} />;
-    }
-
-    // List view skeleton
-    return (
-      <div className="space-y-2">
-        {Array.from({ length: 12 }).map((_, index) => (
-          <div
-            key={index}
-            className={cn(
-              isInitialLoad && delaysReady && listDelays[index]
-                ? 'animate-fade-in-up'
-                : '',
-              !delaysReady ? 'opacity-0' : ''
-            )}
-            style={
-              isInitialLoad && delaysReady && listDelays[index]
-                ? {
-                    animationDelay: `${listDelays[index]}ms`,
-                  }
-                : {}
-            }
-          >
-            <StoreListItem isLoading={isLoading} />
-          </div>
-        ))}
-      </div>
-    );
+    // Table view skeleton (viewMode === 'table')
+    return <StoreTableView stores={[]} isLoading={true} />;
   }
 
   if (stores.length === 0) {
@@ -132,16 +100,6 @@ export const StoreDisplay: React.FC<StoreDisplayProps> = ({
     );
   }
 
-  if (viewMode === 'table') {
-    return <StoreTableView stores={stores} />;
-  }
-
-  // TypeScript type narrowing: viewMode must be 'list' here (already checked 'grid' and 'table' above)
-  return (
-    <div className="space-y-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
-      {stores.map((store) => (
-        <StoreListItem key={store.shopId} store={store} />
-      ))}
-    </div>
-  );
+  // Table view (viewMode === 'table')
+  return <StoreTableView stores={stores} />;
 };
