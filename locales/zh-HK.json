@@ -69,7 +69,6 @@
     },
     "viewMode": {
       "grid": "網格",
-      "list": "列表",
       "showingStores": "顯示 {count} 間分店",
       "inViewMode": "以{mode}模式顯示"
     },
@@ -107,7 +106,6 @@
   },
   "ui": {
     "grid": "網格",
-    "list": "列表",
     "table": "表格",
     "switchToView": "切換至{view}檢視",
     "viewModeSelector": "檢視模式選擇器"

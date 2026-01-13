@@ -69,7 +69,6 @@
     },
     "viewMode": {
       "grid": "grid",
-      "list": "list",
       "showingStores": "Showing {count} stores",
       "inViewMode": "in {mode} view"
     },
@@ -107,7 +106,6 @@
   },
   "ui": {
     "grid": "Grid",
-    "list": "List",
     "table": "Table",
     "switchToView": "Switch to {view} view",
     "viewModeSelector": "View mode selector"
