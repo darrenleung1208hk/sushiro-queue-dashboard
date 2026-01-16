@@ -3,7 +3,7 @@
 import { useMemo, useRef } from 'react';
 import Marquee from 'react-fast-marquee';
 import { useLocale } from 'next-intl';
-import { ArrowBigUp, ArrowBigDown } from 'lucide-react';
+import { ArrowBigUp, ArrowBigDown, Users } from 'lucide-react';
 
 import { Store } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -101,8 +101,9 @@ export const TickerTape = ({
               </span>
 
               {/* Waiting count - like stock price */}
-              <span className="ml-2 tabular-nums font-medium text-muted-foreground">
-                {store.waitingGroup}
+              <span className="ml-2 flex items-center gap-1 text-muted-foreground">
+                <Users className="h-3.5 w-3.5" />
+                <span className="tabular-nums font-medium">{store.waitingGroup}</span>
               </span>
 
               {/* Delta indicator - like price change */}
