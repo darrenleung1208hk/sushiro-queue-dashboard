@@ -81,14 +81,7 @@ export const TickerTape = ({
             >
               <span className="font-medium text-foreground">{storeName}</span>
               <span className="text-muted-foreground">:</span>
-              <span
-                className={cn(
-                  'font-semibold',
-                  store.deltaDirection === 'up' && 'text-destructive',
-                  store.deltaDirection === 'down' && 'text-green-600',
-                  store.deltaDirection === 'unchanged' && 'text-foreground'
-                )}
-              >
+              <span className="font-semibold text-foreground">
                 {store.waitingGroup} {t('store.waiting')}
               </span>
 
@@ -96,20 +89,20 @@ export const TickerTape = ({
               {showDelta && (
                 <span
                   className={cn(
-                    'flex items-center gap-0.5 text-xs font-medium',
-                    store.deltaDirection === 'up' && 'text-destructive',
-                    store.deltaDirection === 'down' && 'text-green-600'
+                    'flex items-center gap-0.5 text-sm font-semibold text-white px-1.5 py-0.5 rounded',
+                    store.deltaDirection === 'up' && 'bg-destructive',
+                    store.deltaDirection === 'down' && 'bg-green-600'
                   )}
                 >
                   {store.deltaDirection === 'up' && (
                     <>
-                      <TrendingUp className="h-3 w-3" />
+                      <TrendingUp className="h-3.5 w-3.5" />
                       <span>+{store.waitingGroupDelta}</span>
                     </>
                   )}
                   {store.deltaDirection === 'down' && (
                     <>
-                      <TrendingDown className="h-3 w-3" />
+                      <TrendingDown className="h-3.5 w-3.5" />
                       <span>{store.waitingGroupDelta}</span>
                     </>
                   )}
