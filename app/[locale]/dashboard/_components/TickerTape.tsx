@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import Marquee from 'react-fast-marquee';
 import { useTranslations, useLocale } from 'next-intl';
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 
 import { Store } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -41,13 +41,22 @@ export const TickerTape = ({
     });
   }, [stores, previousStores]);
 
-  // Filter to only show stores that are open
-  const openStores = useMemo(() => {
-    return storesWithDeltas.filter((store) => store.storeStatus === 'OPEN');
-  }, [storesWithDeltas]);
+  // Filter to only show open stores with changes (after initial load)
+  const storesToDisplay = useMemo(() => {
+    const openStores = storesWithDeltas.filter(
+      (store) => store.storeStatus === 'OPEN'
+    );
 
-  // Don't show ticker if no stores or still loading initial data
-  if (openStores.length === 0) {
+    // After initial load, only show stores with changes
+    if (!isInitialLoad) {
+      return openStores.filter((store) => store.waitingGroupDelta !== 0);
+    }
+
+    return openStores;
+  }, [storesWithDeltas, isInitialLoad]);
+
+  // Don't show ticker if no stores to display
+  if (storesToDisplay.length === 0) {
     return null;
   }
 
@@ -61,7 +70,7 @@ export const TickerTape = ({
         gradientWidth={50}
         className="py-2"
       >
-        {openStores.map((store) => {
+        {storesToDisplay.map((store) => {
           const storeName = locale === 'zh-HK' ? store.name : store.nameEn;
           const showDelta = !isInitialLoad && store.waitingGroupDelta !== 0;
 
@@ -105,11 +114,6 @@ export const TickerTape = ({
                     </>
                   )}
                 </span>
-              )}
-
-              {/* Show unchanged indicator only after initial load */}
-              {!isInitialLoad && store.waitingGroupDelta === 0 && (
-                <Minus className="h-3 w-3 text-muted-foreground" />
               )}
 
               <span className="text-muted-foreground/50 ml-2">•</span>
