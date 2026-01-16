@@ -2,7 +2,6 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, usePathname } from 'next/navigation';
-import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -13,6 +12,18 @@ import {
 import { cn } from '@/lib/utils';
 import { Globe } from 'lucide-react';
 import { trackLanguageChanged } from '@/lib/analytics';
+
+// Cookie configuration for locale preference
+const LOCALE_COOKIE_NAME = 'NEXT_LOCALE';
+const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year in seconds
+
+/**
+ * Sets the locale preference cookie
+ * This cookie is read by next-intl middleware to determine user's preferred locale
+ */
+function setLocaleCookie(locale: string) {
+  document.cookie = `${LOCALE_COOKIE_NAME}=${locale}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}; SameSite=Lax`;
+}
 
 export function LanguageSwitcher() {
   const locale = useLocale();
@@ -27,17 +38,13 @@ export function LanguageSwitcher() {
   // Use the more reliable locale source
   const currentLocale = isPathnameLocaleValid ? pathnameLocale : locale;
 
-  // Debug logging
-  useEffect(() => {
-    console.log('LanguageSwitcher - useLocale():', locale);
-    console.log('LanguageSwitcher - pathnameLocale:', pathnameLocale);
-    console.log('LanguageSwitcher - currentLocale (used):', currentLocale);
-    console.log('LanguageSwitcher - Current pathname:', pathname);
-  }, [locale, pathnameLocale, currentLocale, pathname]);
-
   const handleLanguageChange = (newLocale: string) => {
     // Track the language change
     trackLanguageChanged(currentLocale, newLocale);
+
+    // Store the user's locale preference in a cookie
+    // This will be read by the middleware on subsequent visits
+    setLocaleCookie(newLocale);
 
     // Get the current pathname
     const currentPath = pathname;
@@ -65,13 +72,10 @@ export function LanguageSwitcher() {
     // Construct the new path
     const newPath = `/${newLocale}${pathWithoutLocale ? `/${pathWithoutLocale}` : ''}`;
 
-    // Use router.push for navigation
+    // Navigate to the new locale path
+    // The cookie ensures the preference is remembered for future visits
     router.push(newPath);
-
-    // Force a page refresh to ensure translations update properly
-    setTimeout(() => {
-      window.location.href = newPath;
-    }, 100);
+    router.refresh();
   };
 
   return (
