@@ -133,7 +133,7 @@ export default function DashboardPage() {
   const { viewMode, handleViewModeChange } = useViewMode();
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-14">
       <DashboardHeader
         isLoading={isLoading}
         lastUpdated={lastUpdated}

@@ -52,7 +52,7 @@ export const TickerTape = ({
   }
 
   return (
-    <div className="w-full overflow-hidden rounded-md border border-border bg-muted/30">
+    <div className="fixed bottom-0 left-0 right-0 z-50 w-screen overflow-hidden border-t border-border bg-background/95 backdrop-blur-sm">
       <Marquee
         speed={40}
         pauseOnHover
