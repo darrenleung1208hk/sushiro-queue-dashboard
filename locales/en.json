@@ -11,6 +11,8 @@
     "resume": "Resume",
     "connected": "Connected",
     "refreshing": "Refreshing...",
+    "refreshStarted": "Refreshing data...",
+    "refreshComplete": "Data updated successfully",
     "last": "Last updated at",
     "open": "Open",
     "languages": {
@@ -22,7 +24,7 @@
       "九龍": "Kowloon",
       "新界": "New Territories"
     },
-    "areas": {
+    "districts": {
       "中西區": "Central and Western District",
       "灣仔區": "Wan Chai District",
       "東區": "Eastern District",
@@ -57,7 +59,7 @@
       "showing": "Showing"
     },
     "filters": {
-      "searchPlaceholder": "Search stores by name, region, or area...",
+      "searchPlaceholder": "Search stores by name, region, or district...",
       "allRegions": "All Regions",
       "allWaitTimes": "All Wait Times",
       "lowWait": "Low Wait",
@@ -67,7 +69,6 @@
     },
     "viewMode": {
       "grid": "grid",
-      "list": "list",
       "showingStores": "Showing {count} stores",
       "inViewMode": "in {mode} view"
     },
@@ -79,7 +80,8 @@
   "store": {
     "status": {
       "open": "OPEN",
-      "closed": "CLOSED"
+      "closed": "CLOSED",
+      "disconnected": "DISCONNECTED"
     },
     "waiting": "Waiting",
     "current": "Current",
@@ -104,7 +106,16 @@
   },
   "ui": {
     "grid": "Grid",
-    "list": "List",
-    "switchToView": "Switch to {view} view"
+    "table": "Table",
+    "switchToView": "Switch to {view} view",
+    "viewModeSelector": "View mode selector"
+  },
+  "table": {
+    "store": "Store",
+    "region": "Region",
+    "district": "District",
+    "status": "Status",
+    "columns": "Columns",
+    "toggleColumns": "Toggle columns"
   }
 }
