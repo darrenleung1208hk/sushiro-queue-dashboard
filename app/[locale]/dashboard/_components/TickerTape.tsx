@@ -114,13 +114,13 @@ export const TickerTape = ({
                   {store.deltaDirection === 'up' && (
                     <>
                       <ArrowBigUp className="h-4 w-4" />
-                      <span>+{store.waitingGroupDelta}</span>
+                      <span>{store.waitingGroupDelta}</span>
                     </>
                   )}
                   {store.deltaDirection === 'down' && (
                     <>
                       <ArrowBigDown className="h-4 w-4" />
-                      <span>{store.waitingGroupDelta}</span>
+                      <span>{Math.abs(store.waitingGroupDelta)}</span>
                     </>
                   )}
                 </span>
