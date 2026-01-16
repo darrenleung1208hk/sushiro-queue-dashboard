@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import Marquee from 'react-fast-marquee';
 import { useTranslations, useLocale } from 'next-intl';
 import { TrendingUp, TrendingDown } from 'lucide-react';
@@ -27,6 +27,9 @@ export const TickerTape = ({
   const t = useTranslations();
   const locale = useLocale();
 
+  // Keep track of last displayed stores with changes
+  const lastDisplayedStoresRef = useRef<StoreWithDelta[]>([]);
+
   // Compute deltas by comparing current stores with previous stores
   const storesWithDeltas = useMemo((): StoreWithDelta[] => {
     return stores.map((store) => {
@@ -42,17 +45,31 @@ export const TickerTape = ({
   }, [stores, previousStores]);
 
   // Filter to only show open stores with changes (after initial load)
+  // If no changes, keep showing the last displayed stores
   const storesToDisplay = useMemo(() => {
     const openStores = storesWithDeltas.filter(
       (store) => store.storeStatus === 'OPEN'
     );
 
-    // After initial load, only show stores with changes
-    if (!isInitialLoad) {
-      return openStores.filter((store) => store.waitingGroupDelta !== 0);
+    // On initial load, show all open stores
+    if (isInitialLoad) {
+      lastDisplayedStoresRef.current = openStores;
+      return openStores;
     }
 
-    return openStores;
+    // After initial load, only show stores with changes
+    const storesWithChanges = openStores.filter(
+      (store) => store.waitingGroupDelta !== 0
+    );
+
+    // If there are changes, update the ref and return the new list
+    if (storesWithChanges.length > 0) {
+      lastDisplayedStoresRef.current = storesWithChanges;
+      return storesWithChanges;
+    }
+
+    // No changes - keep showing the last displayed stores
+    return lastDisplayedStoresRef.current;
   }, [storesWithDeltas, isInitialLoad]);
 
   // Don't show ticker if no stores to display
