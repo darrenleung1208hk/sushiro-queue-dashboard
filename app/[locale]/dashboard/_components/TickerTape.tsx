@@ -2,7 +2,7 @@
 
 import { useMemo, useRef } from 'react';
 import Marquee from 'react-fast-marquee';
-import { useTranslations, useLocale } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { ArrowBigUp, ArrowBigDown } from 'lucide-react';
 
 import { Store } from '@/lib/types';
@@ -24,7 +24,6 @@ export const TickerTape = ({
   previousStores,
   isInitialLoad,
 }: TickerTapeProps) => {
-  const t = useTranslations();
   const locale = useLocale();
 
   // Keep track of last displayed stores with changes
@@ -85,7 +84,7 @@ export const TickerTape = ({
         gradient
         gradientColor="hsl(var(--background))"
         gradientWidth={50}
-        className="py-2"
+        className="py-1.5"
       >
         {storesToDisplay.map((store) => {
           const storeName = locale === 'zh-HK' ? store.name : store.nameEn;
@@ -94,19 +93,23 @@ export const TickerTape = ({
           return (
             <div
               key={store.shopId}
-              className="flex items-center gap-1.5 mx-4 text-sm"
+              className="flex items-center mx-6 text-sm"
             >
-              <span className="font-medium text-foreground">{storeName}</span>
-              <span className="text-muted-foreground">:</span>
-              <span className="font-semibold text-foreground">
-                {store.waitingGroup} {t('store.waiting')}
+              {/* Store name - like stock symbol */}
+              <span className="font-semibold text-foreground tracking-tight">
+                {storeName}
               </span>
 
-              {/* Delta indicator */}
+              {/* Waiting count - like stock price */}
+              <span className="ml-2 tabular-nums font-medium text-muted-foreground">
+                {store.waitingGroup}
+              </span>
+
+              {/* Delta indicator - like price change */}
               {showDelta && (
                 <span
                   className={cn(
-                    'flex items-center gap-0.5 text-sm font-semibold text-white px-1.5 py-0.5 rounded',
+                    'ml-1.5 flex items-center gap-0.5 text-sm font-bold text-white px-1 py-0.5 rounded-sm tabular-nums',
                     store.deltaDirection === 'up' && 'bg-destructive',
                     store.deltaDirection === 'down' && 'bg-green-600'
                   )}
@@ -126,7 +129,8 @@ export const TickerTape = ({
                 </span>
               )}
 
-              <span className="text-muted-foreground/50 ml-2">•</span>
+              {/* Vertical divider - stock ticker style */}
+              <span className="ml-6 h-4 w-px bg-border" />
             </div>
           );
         })}
