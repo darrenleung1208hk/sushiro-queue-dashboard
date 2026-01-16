@@ -1,0 +1,122 @@
+'use client';
+
+import { useMemo } from 'react';
+import Marquee from 'react-fast-marquee';
+import { useTranslations, useLocale } from 'next-intl';
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+
+import { Store } from '@/lib/types';
+import { cn } from '@/lib/utils';
+
+interface StoreWithDelta extends Store {
+  waitingGroupDelta: number;
+  deltaDirection: 'up' | 'down' | 'unchanged';
+}
+
+interface TickerTapeProps {
+  stores: Store[];
+  previousStores: Store[];
+  isInitialLoad: boolean;
+}
+
+export const TickerTape = ({
+  stores,
+  previousStores,
+  isInitialLoad,
+}: TickerTapeProps) => {
+  const t = useTranslations();
+  const locale = useLocale();
+
+  // Compute deltas by comparing current stores with previous stores
+  const storesWithDeltas = useMemo((): StoreWithDelta[] => {
+    return stores.map((store) => {
+      const previous = previousStores.find((p) => p.shopId === store.shopId);
+      const delta = previous ? store.waitingGroup - previous.waitingGroup : 0;
+
+      return {
+        ...store,
+        waitingGroupDelta: delta,
+        deltaDirection: delta > 0 ? 'up' : delta < 0 ? 'down' : 'unchanged',
+      };
+    });
+  }, [stores, previousStores]);
+
+  // Filter to only show stores that are open
+  const openStores = useMemo(() => {
+    return storesWithDeltas.filter((store) => store.storeStatus === 'OPEN');
+  }, [storesWithDeltas]);
+
+  // Don't show ticker if no stores or still loading initial data
+  if (openStores.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="w-full overflow-hidden rounded-md border border-border bg-muted/30">
+      <Marquee
+        speed={40}
+        pauseOnHover
+        gradient
+        gradientColor="hsl(var(--background))"
+        gradientWidth={50}
+        className="py-2"
+      >
+        {openStores.map((store) => {
+          const storeName = locale === 'zh-HK' ? store.name : store.nameEn;
+          const showDelta = !isInitialLoad && store.waitingGroupDelta !== 0;
+
+          return (
+            <div
+              key={store.shopId}
+              className="flex items-center gap-1.5 mx-4 text-sm"
+            >
+              <span className="font-medium text-foreground">{storeName}</span>
+              <span className="text-muted-foreground">:</span>
+              <span
+                className={cn(
+                  'font-semibold',
+                  store.deltaDirection === 'up' && 'text-destructive',
+                  store.deltaDirection === 'down' && 'text-green-600',
+                  store.deltaDirection === 'unchanged' && 'text-foreground'
+                )}
+              >
+                {store.waitingGroup} {t('store.waiting')}
+              </span>
+
+              {/* Delta indicator */}
+              {showDelta && (
+                <span
+                  className={cn(
+                    'flex items-center gap-0.5 text-xs font-medium',
+                    store.deltaDirection === 'up' && 'text-destructive',
+                    store.deltaDirection === 'down' && 'text-green-600'
+                  )}
+                >
+                  {store.deltaDirection === 'up' && (
+                    <>
+                      <TrendingUp className="h-3 w-3" />
+                      <span>+{store.waitingGroupDelta}</span>
+                    </>
+                  )}
+                  {store.deltaDirection === 'down' && (
+                    <>
+                      <TrendingDown className="h-3 w-3" />
+                      <span>{store.waitingGroupDelta}</span>
+                    </>
+                  )}
+                </span>
+              )}
+
+              {/* Show unchanged indicator only after initial load */}
+              {!isInitialLoad && store.waitingGroupDelta === 0 && (
+                <Minus className="h-3 w-3 text-muted-foreground" />
+              )}
+
+              <span className="text-muted-foreground/50 ml-2">•</span>
+            </div>
+          );
+        })}
+      </Marquee>
+    </div>
+  );
+};

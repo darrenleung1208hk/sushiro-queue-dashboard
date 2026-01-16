@@ -11,6 +11,7 @@ import { DashboardHeader } from './_components/DashboardHeader';
 import { FiltersSection } from './_components/FiltersSection';
 import { ViewModeHeader } from './_components/ViewModeHeader';
 import { StoreDisplay } from './_components/StoreDisplay';
+import { TickerTape } from './_components/TickerTape';
 
 // Auto-refresh configuration
 const AUTO_REFRESH_INTERVAL_MS = 60000; // 60 seconds
@@ -18,12 +19,15 @@ const AUTO_REFRESH_INTERVAL_MS = 60000; // 60 seconds
 export default function DashboardPage() {
   const t = useTranslations();
   const [stores, setStores] = useState<Store[]>([]);
+  const [previousStores, setPreviousStores] = useState<Store[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [, setError] = useState<Error | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [autoRefreshEnabled] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const isFetchingRef = useRef(false);
   const isInitialLoadRef = useRef(true);
+  const storesRef = useRef<Store[]>([]);
 
   // Data fetching function with deduplication
   const fetchStores = useCallback(async () => {
@@ -56,8 +60,16 @@ export default function DashboardPage() {
         throw new Error(apiResponse.message || t('errors.failedToLoadData'));
       }
 
+      // Save current stores as previous before updating (for delta calculation)
+      setPreviousStores(storesRef.current);
       setStores(apiResponse.data);
+      storesRef.current = apiResponse.data;
       setLastUpdated(new Date());
+
+      // Mark initial load as complete after first successful fetch
+      if (isInitialLoadRef.current) {
+        setIsInitialLoad(false);
+      }
 
       // Show success toast only for refresh
       if (isRefresh) {
@@ -128,6 +140,12 @@ export default function DashboardPage() {
         onManualRefresh={() => {
           void fetchStores();
         }}
+      />
+
+      <TickerTape
+        stores={stores}
+        previousStores={previousStores}
+        isInitialLoad={isInitialLoad}
       />
 
       <FiltersSection
