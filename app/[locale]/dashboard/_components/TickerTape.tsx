@@ -3,7 +3,7 @@
 import { useMemo, useRef } from 'react';
 import Marquee from 'react-fast-marquee';
 import { useTranslations, useLocale } from 'next-intl';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { ArrowBigUp, ArrowBigDown } from 'lucide-react';
 
 import { Store } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -113,13 +113,13 @@ export const TickerTape = ({
                 >
                   {store.deltaDirection === 'up' && (
                     <>
-                      <TrendingUp className="h-3.5 w-3.5" />
+                      <ArrowBigUp className="h-4 w-4" />
                       <span>+{store.waitingGroupDelta}</span>
                     </>
                   )}
                   {store.deltaDirection === 'down' && (
                     <>
-                      <TrendingDown className="h-3.5 w-3.5" />
+                      <ArrowBigDown className="h-4 w-4" />
                       <span>{store.waitingGroupDelta}</span>
                     </>
                   )}
