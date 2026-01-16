@@ -130,8 +130,6 @@ export const TickerTape = ({
                 </span>
               )}
 
-              {/* Vertical divider - stock ticker style */}
-              <span className="ml-6 h-4 w-px bg-border" />
             </div>
           );
         })}
