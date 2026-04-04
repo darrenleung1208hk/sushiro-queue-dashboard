@@ -1,176 +1,405 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useTranslations } from 'next-intl';
-import { toast } from 'sonner';
-import { Store } from '@/lib/types';
-import { useDashboardFilters } from '@/lib/hooks/use-dashboard-filters';
-import { useViewMode } from '@/lib/hooks/use-view-mode';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  AlertCircle,
+  ArrowUpRight,
+  Clock,
+  RefreshCw,
+  Store,
+  Timer,
+} from 'lucide-react';
 
-import { DashboardHeader } from './_components/DashboardHeader';
-import { FiltersSection } from './_components/FiltersSection';
-import { ViewModeHeader } from './_components/ViewModeHeader';
-import { StoreDisplay } from './_components/StoreDisplay';
-import { TickerTape } from './_components/TickerTape';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { QueueApiResponse, QueueItem } from '@/lib/types';
+import { cn } from '@/lib/utils';
 
-// Auto-refresh configuration
-const AUTO_REFRESH_INTERVAL_MS = 60000; // 60 seconds
+const AUTO_REFRESH_INTERVAL_MS = 30000;
+
+interface QueueRowProps {
+  index: number;
+  item: QueueItem;
+  highlighted?: boolean;
+}
+
+function getQueueLevelBadgeVariant(level: QueueItem['level']) {
+  switch (level) {
+    case 'LOW':
+      return 'default';
+    case 'MEDIUM':
+      return 'secondary';
+    case 'HIGH':
+      return 'destructive';
+    default:
+      return 'outline';
+  }
+}
+
+function QueueRow({ index, item, highlighted = false }: QueueRowProps) {
+  const hasValidQueueCount = item.queueCount !== null;
+
+  return (
+    <div
+      className={cn(
+        'group grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-2xl border border-border/70 bg-background/80 p-4 transition-all duration-300',
+        highlighted &&
+          'border-primary/30 bg-primary/5 shadow-[0_8px_30px_hsl(var(--primary)/0.08)]',
+        !hasValidQueueCount && 'opacity-75'
+      )}
+    >
+      <div
+        className={cn(
+          'flex h-9 w-9 items-center justify-center rounded-full border text-sm font-semibold',
+          highlighted
+            ? 'border-primary/30 bg-primary/10 text-primary'
+            : 'border-border text-muted-foreground'
+        )}
+      >
+        {index + 1}
+      </div>
+
+      <div className="min-w-0">
+        <p className="truncate text-sm font-semibold text-foreground sm:text-base">
+          {item.name}
+        </p>
+        <div className="mt-1 flex items-center gap-2">
+          <p className="text-xs text-muted-foreground sm:text-sm">Queue level</p>
+          <Badge
+            variant={
+              hasValidQueueCount ? getQueueLevelBadgeVariant(item.level) : 'outline'
+            }
+            className="rounded-md px-2 py-0 text-[10px] font-medium uppercase tracking-wide"
+          >
+            {hasValidQueueCount ? item.level : 'Invalid'}
+          </Badge>
+        </div>
+      </div>
+
+      <div className="text-right">
+        <p className="text-xs text-muted-foreground">Groups</p>
+        <div className="text-lg font-semibold text-foreground sm:text-xl">
+          {hasValidQueueCount ? item.queueCount : '--'}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function QueueListSkeleton() {
+  return (
+    <div className="space-y-2.5">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <div
+          key={index}
+          className="grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-2xl border border-border/70 bg-background/80 p-4"
+        >
+          <Skeleton className="h-9 w-9 rounded-full" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+          <div className="space-y-1 text-right">
+            <Skeleton className="ml-auto h-3 w-12" />
+            <Skeleton className="ml-auto h-6 w-10" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function DashboardPage() {
-  const t = useTranslations();
-  const [stores, setStores] = useState<Store[]>([]);
-  const [previousStores, setPreviousStores] = useState<Store[]>([]);
+  const [queues, setQueues] = useState<QueueItem[]>([]);
+  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [, setError] = useState<Error | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [autoRefreshEnabled] = useState(true);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const isFetchingRef = useRef(false);
-  const isInitialLoadRef = useRef(true);
-  const storesRef = useRef<Store[]>([]);
+  const hasDataRef = useRef(false);
 
-  // Data fetching function with deduplication
-  const fetchStores = useCallback(async () => {
-    // Prevent multiple simultaneous requests
-    if (isFetchingRef.current) return;
+  const copy = useMemo(
+    () => ({
+      title: 'Sushiro Queue Dashboard',
+      subtitle: 'Scan all branches and spot the shortest queue first.',
+      topThree: 'Top 3 branches',
+      fullList: 'All branches',
+      updatedAtLabel: 'Updated',
+      refresh: 'Refresh',
+      retry: 'Retry',
+      loading: 'Loading...',
+      empty: 'No queue data is available right now.',
+      error: 'Unable to load queue data.',
+      refreshing: 'Refreshing',
+      retryHint: 'Try refreshing to load the latest queue view.',
+    }),
+    []
+  );
 
-    const isRefresh = !isInitialLoadRef.current;
+  const fetchQueues = useCallback(async () => {
+    if (isFetchingRef.current) {
+      return;
+    }
+
+    const hasExistingData = hasDataRef.current;
 
     try {
       isFetchingRef.current = true;
-      setIsLoading(true);
-      setError(null);
+      setErrorMessage(null);
 
-      // Show toast only for auto-refresh, not initial load
-      if (isRefresh) {
-        toast.loading(t('common.refreshStarted'), { id: 'refresh-toast' });
+      if (hasExistingData) {
+        setIsRefreshing(true);
+      } else {
+        setIsLoading(true);
       }
 
-      const response = await fetch('/api/stores/live');
+      const response = await fetch('/api/queues', { cache: 'no-store' });
 
       if (!response.ok) {
-        throw new Error(
-          `${t('errors.apiRequestFailed')}: ${response.status} ${response.statusText}`
-        );
+        throw new Error(`Queue API error: ${response.status}`);
       }
 
-      const apiResponse = await response.json();
+      const payload = (await response.json()) as QueueApiResponse;
 
-      if (!apiResponse.success) {
-        throw new Error(apiResponse.message || t('errors.failedToLoadData'));
-      }
-
-      // Save current stores as previous before updating (for delta calculation)
-      setPreviousStores(storesRef.current);
-      setStores(apiResponse.data);
-      storesRef.current = apiResponse.data;
-      setLastUpdated(new Date());
-
-      // Mark initial load as complete after first successful fetch
-      if (isInitialLoadRef.current) {
-        setIsInitialLoad(false);
-      }
-
-      // Show success toast only for refresh
-      if (isRefresh) {
-        toast.success(t('common.refreshComplete'), { id: 'refresh-toast' });
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error ? err : new Error(t('errors.unknownError'))
-      );
-      console.error('Error fetching stores:', err);
-
-      // Dismiss loading toast on error
-      if (isRefresh) {
-        toast.error(t('errors.failedToLoadData'), { id: 'refresh-toast' });
-      }
+      setQueues(payload.data);
+      hasDataRef.current = payload.data.length > 0;
+      setUpdatedAt(payload.updatedAt ? new Date(payload.updatedAt) : null);
+    } catch (error) {
+      console.error('Error fetching queues:', error);
+      setErrorMessage(copy.error);
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
       isFetchingRef.current = false;
-      isInitialLoadRef.current = false;
     }
-  }, [t]);
+  }, [copy.error]);
 
-  // Initial load
   useEffect(() => {
-    void fetchStores();
-  }, [fetchStores]);
+    void fetchQueues();
+  }, [fetchQueues]);
 
-  // Polling logic - refresh every minute
   useEffect(() => {
-    if (!autoRefreshEnabled) return;
-
     const interval = setInterval(() => {
-      void fetchStores();
+      void fetchQueues();
     }, AUTO_REFRESH_INTERVAL_MS);
 
     return () => clearInterval(interval);
-  }, [fetchStores, autoRefreshEnabled]);
+  }, [fetchQueues]);
 
-  // Tab visibility handling
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      // Handle visibility changes if needed in the future
-    };
+  const validQueues = useMemo(
+    () => queues.filter((queue) => queue.queueCount !== null),
+    [queues]
+  );
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () =>
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
+  const topQueues = useMemo(() => {
+    if (queues.length < 3) {
+      return queues.slice(0, 3);
+    }
 
-  const {
-    searchTerm,
-    setSearchTerm,
-    regionFilter,
-    setRegionFilter,
-    waitingStatusFilter,
-    setWaitingStatusFilter,
-    filteredStores,
-    uniqueRegions,
-    waitingStatusOptions,
-  } = useDashboardFilters(stores);
-  const { viewMode, handleViewModeChange } = useViewMode();
+    return validQueues.slice(0, 3);
+  }, [queues, validQueues]);
+
+  const totalWaitingGroups = useMemo(
+    () => validQueues.reduce((sum, queue) => sum + (queue.queueCount ?? 0), 0),
+    [validQueues]
+  );
+
+  const lowestQueue = useMemo(() => {
+    if (validQueues.length === 0) {
+      return null;
+    }
+
+    return validQueues[0];
+  }, [validQueues]);
+
+  const showBlockingError =
+    errorMessage !== null && queues.length === 0 && !isLoading;
+  const showInlineError = errorMessage !== null && queues.length > 0;
 
   return (
-    <div className="space-y-4 pb-14">
-      <DashboardHeader
-        isLoading={isLoading}
-        lastUpdated={lastUpdated}
-        onManualRefresh={() => {
-          void fetchStores();
-        }}
-      />
+    <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-5 pb-10 pt-2 sm:gap-6 sm:pt-4">
+      <div className="pointer-events-none absolute inset-x-6 top-0 -z-10 h-48 rounded-full bg-gradient-to-r from-primary/10 via-primary/5 to-transparent blur-3xl" />
 
-      <TickerTape
-        stores={stores}
-        previousStores={previousStores}
-        isInitialLoad={isInitialLoad}
-      />
+      <Card className="overflow-hidden rounded-3xl border-border/60 bg-card/90 shadow-[0_12px_40px_hsl(var(--foreground)/0.08)] backdrop-blur">
+        <CardContent className="space-y-5 p-4 sm:p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="space-y-1">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                Live Queue Monitor
+              </p>
+              <h1 className="text-xl font-semibold leading-tight text-foreground sm:text-3xl">
+                {copy.title}
+              </h1>
+              <p className="max-w-2xl text-sm text-muted-foreground">
+                {copy.subtitle}
+              </p>
+            </div>
 
-      <FiltersSection
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        regionFilter={regionFilter}
-        onRegionFilterChange={setRegionFilter}
-        waitingStatusFilter={waitingStatusFilter}
-        onWaitingStatusFilterChange={setWaitingStatusFilter}
-        uniqueRegions={uniqueRegions}
-        waitingStatusOptions={waitingStatusOptions}
-        filteredCount={filteredStores.length}
-      />
+            <div className="flex items-center gap-2 self-start sm:gap-3">
+              <div className="rounded-xl border border-border/60 bg-background/70 px-3 py-2 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5" />
+                  <span>
+                    {copy.updatedAtLabel}:{' '}
+                    {updatedAt ? updatedAt.toLocaleTimeString() : copy.loading}
+                  </span>
+                </div>
+              </div>
 
-      <ViewModeHeader
-        filteredCount={filteredStores.length}
-        viewMode={viewMode}
-        onViewModeChange={handleViewModeChange}
-      />
+              <Button
+                onClick={() => {
+                  void fetchQueues();
+                }}
+                disabled={isLoading || isRefreshing}
+                variant="outline"
+                size="sm"
+                className="gap-2 rounded-xl border-border/70 bg-background/70"
+              >
+                <RefreshCw
+                  className={cn(
+                    'h-3.5 w-3.5',
+                    (isLoading || isRefreshing) && 'animate-spin'
+                  )}
+                />
+                <span className="hidden sm:inline">
+                  {isRefreshing ? copy.refreshing : copy.refresh}
+                </span>
+              </Button>
 
-      <StoreDisplay
-        stores={filteredStores}
-        viewMode={viewMode}
-        isLoading={isLoading}
-      />
+              <LanguageSwitcher />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
+            <div className="rounded-2xl border border-border/60 bg-background/70 p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Branches
+                </p>
+                <Store className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <p className="mt-2 text-2xl font-semibold leading-none text-foreground">
+                {queues.length}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-border/60 bg-background/70 p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Waiting groups
+                </p>
+                <Timer className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <p className="mt-2 text-2xl font-semibold leading-none text-foreground">
+                {totalWaitingGroups}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-border/60 bg-background/70 p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Best option now
+                </p>
+                <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <p className="mt-2 truncate text-sm font-semibold text-foreground">
+                {lowestQueue?.name ?? '--'}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {lowestQueue?.queueCount ?? '--'} groups waiting
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {showBlockingError ? (
+        <Card className="rounded-2xl border border-border/60 bg-card/90">
+          <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
+            <AlertCircle className="h-10 w-10 text-destructive" />
+            <div className="space-y-1">
+              <p className="font-medium text-foreground">{copy.error}</p>
+              <p className="text-sm text-muted-foreground">
+                {copy.retryHint}
+              </p>
+            </div>
+            <Button
+              onClick={() => {
+                void fetchQueues();
+              }}
+            >
+              {copy.retry}
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          {showInlineError && (
+            <div className="flex items-center gap-2 rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              <span>{copy.error}</span>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
+            <section className="space-y-2 lg:col-span-2">
+              <div className="flex items-center justify-between px-1">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                  {copy.topThree}
+                </h2>
+                <p className="text-xs text-muted-foreground">Fast pick</p>
+              </div>
+
+              {isLoading ? (
+                <QueueListSkeleton />
+              ) : topQueues.length > 0 ? (
+                <div className="space-y-2.5">
+                  {topQueues.map((item, index) => (
+                    <QueueRow
+                      key={`top-${item.name}-${index}`}
+                      index={index}
+                      item={item}
+                      highlighted
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-border/70 bg-background/70 px-4 py-6 text-sm text-muted-foreground">
+                  {copy.empty}
+                </div>
+              )}
+            </section>
+
+            <section className="space-y-2 lg:col-span-3">
+              <div className="flex items-center justify-between px-1">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                  {copy.fullList}
+                </h2>
+                <p className="text-xs text-muted-foreground">
+                  {queues.length} branches
+                </p>
+              </div>
+
+              {isLoading ? (
+                <QueueListSkeleton />
+              ) : queues.length > 0 ? (
+                <div className="space-y-2.5">
+                  {queues.map((item, index) => (
+                    <QueueRow key={`${item.name}-${index}`} index={index} item={item} />
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-border/70 bg-background/70 px-4 py-6 text-sm text-muted-foreground">
+                  {copy.empty}
+                </div>
+              )}
+            </section>
+          </div>
+        </>
+      )}
     </div>
   );
 }
