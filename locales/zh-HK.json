@@ -121,7 +121,7 @@
   "dashboardQueue": {
     "title": "壽司郎排隊儀表板",
     "subtitle": "快速查看所有分店，優先選擇最短隊列。",
-    "availableNow": "即刻入座",
+    "availableNow": "最快入座",
     "availableNowHint": "先看即刻有位的分店，再比較最短等候時間。",
     "moreAvailableHint": "下面還有 {count} 間即刻有位",
     "updatedAtLabel": "更新時間",

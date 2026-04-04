@@ -121,7 +121,7 @@
   "dashboardQueue": {
     "title": "Sushiro Queue Dashboard",
     "subtitle": "Scan all branches and spot the shortest queue first.",
-    "availableNow": "Immediate Seating",
+    "availableNow": "Fastest Seating",
     "availableNowHint": "Start with branches that can seat you immediately, then compare the shortest waits.",
     "moreAvailableHint": "+{count} more available below",
     "updatedAtLabel": "Updated",
