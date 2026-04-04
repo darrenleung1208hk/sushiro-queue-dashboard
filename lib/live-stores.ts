@@ -7,7 +7,7 @@ const QUEUE_API = process.env.SUSHIRO_QUEUE_API as string;
 const DEFAULT_PARAMS = {
   latitude: 22.3193,
   longitude: 114.1694,
-  numresults: 25,
+  numresults: 100,
   region: 'HK',
 } as const;
 
