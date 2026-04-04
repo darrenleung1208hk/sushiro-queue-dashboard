@@ -147,6 +147,7 @@ export interface ErrorResponse {
 
 export interface QueueItem {
   name: string;
+  storeStatus: string;
   queueCount: number | null;
   level: QueueLevel;
 }

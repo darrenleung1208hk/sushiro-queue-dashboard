@@ -138,6 +138,7 @@
     "busyGroup": "繁忙",
     "otherGroup": "其他",
     "availableNowStatus": "即刻有位",
+    "closedStatus": "已休息",
     "lowStatus": "較少人",
     "busyStatus": "繁忙",
     "invalid": "暫未提供",

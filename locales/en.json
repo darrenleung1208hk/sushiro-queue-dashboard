@@ -138,6 +138,7 @@
     "busyGroup": "Busy",
     "otherGroup": "Other",
     "availableNowStatus": "Available now",
+    "closedStatus": "Closed",
     "lowStatus": "Low wait",
     "busyStatus": "Busy",
     "invalid": "Unavailable",

@@ -29,11 +29,17 @@ function compareQueueItems(left: QueueItem, right: QueueItem): number {
   return left.name.localeCompare(right.name, 'zh-HK');
 }
 
-function buildQueueItem(name: string, rawQueueCount: unknown): QueueItem {
-  const queueCount = normalizeQueueCount(rawQueueCount);
+function buildQueueItem(
+  name: string,
+  storeStatus: string,
+  rawQueueCount: unknown
+): QueueItem {
+  const normalizedQueueCount = normalizeQueueCount(rawQueueCount);
+  const queueCount = storeStatus === 'OPEN' ? normalizedQueueCount : null;
 
   return {
     name,
+    storeStatus,
     queueCount,
     level: getQueuePriority(queueCount ?? 0),
   };
@@ -45,7 +51,9 @@ export async function GET(): Promise<NextResponse<QueueApiResponse>> {
     const updatedAt = liveStores.timestamp ?? new Date();
 
     const data = liveStores.stores
-      .map((store) => buildQueueItem(store.name, store.waitingGroup))
+      .map((store) =>
+        buildQueueItem(store.name, store.storeStatus, store.waitingGroup)
+      )
       .sort(compareQueueItems);
 
     return NextResponse.json({

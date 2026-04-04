@@ -296,6 +296,10 @@ export default function DashboardPage() {
 
   const getStatusText = useCallback(
     (item: QueueItem) => {
+      if (item.storeStatus === 'CLOSED') {
+        return t('closedStatus');
+      }
+
       if (item.queueCount === null) {
         return t('invalid');
       }
