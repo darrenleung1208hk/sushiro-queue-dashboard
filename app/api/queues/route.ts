@@ -5,7 +5,9 @@ import { QueueApiResponse, QueueItem } from '@/lib/types';
 import { getQueuePriority } from '@/lib/utils';
 
 function normalizeQueueCount(value: unknown): number | null {
-  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0
+    ? value
+    : null;
 }
 
 function getSortableQueueCount(queueCount: number | null): number {
