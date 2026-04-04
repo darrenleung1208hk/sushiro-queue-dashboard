@@ -47,48 +47,48 @@
   },
   "dashboard": {
     "title": "壽司郎排隊儀表板",
-    "subtitle": "實時監控壽司郎餐廳排隊狀況",
+    "subtitle": "即時監察分店排隊與等候情況",
     "stats": {
-      "totalStores": "總分店數",
-      "totalWaiting": "總等候人數",
-      "currentQueue": "當前排隊",
+      "totalStores": "分店總數",
+      "totalWaiting": "總等候組數",
+      "currentQueue": "目前叫號",
       "filteredResults": "篩選結果",
       "openStores": "營業中",
       "acrossAllStores": "所有分店",
-      "activeTickets": "活躍票號",
+      "activeTickets": "目前進行號碼",
       "showing": "顯示"
     },
     "filters": {
-      "searchPlaceholder": "按分店名稱、地區或區域搜尋...",
+      "searchPlaceholder": "按分店、地區或區域搜尋...",
       "allRegions": "所有地區",
-      "allWaitTimes": "所有等候時間",
-      "lowWait": "短等候",
-      "mediumWait": "中等等候",
-      "highWait": "長等候",
-      "extremeWait": "極長等候"
+      "allWaitTimes": "所有等候時段",
+      "lowWait": "低等候",
+      "mediumWait": "中等候",
+      "highWait": "高等候",
+      "extremeWait": "極高等候"
     },
     "viewMode": {
       "grid": "網格",
       "showingStores": "顯示 {count} 間分店",
-      "inViewMode": "以{mode}模式顯示"
+      "inViewMode": "目前為 {mode} 檢視"
     },
     "noResults": {
       "title": "找不到分店",
-      "message": "請嘗試調整搜尋或篩選條件"
+      "message": "請調整搜尋或篩選條件"
     }
   },
   "store": {
     "status": {
       "open": "營業中",
-      "closed": "休息中",
-      "disconnected": "已斷線"
+      "closed": "已休息",
+      "disconnected": "連線中斷"
     },
     "waiting": "等候",
-    "current": "當前",
-    "queue": "排隊",
-    "currentQueue": "當前排隊",
-    "moreTickets": "+{count} 更多",
-    "noTickets": "無票號"
+    "current": "目前",
+    "queue": "隊列",
+    "currentQueue": "目前隊列",
+    "moreTickets": "另有 {count} 個",
+    "noTickets": "暫無號碼"
   },
   "navigation": {
     "home": "首頁",
@@ -97,9 +97,9 @@
   "errors": {
     "general": "發生錯誤",
     "notFound": "找不到頁面",
-    "networkError": "網路錯誤",
-    "failedToLoadData": "載入資料失敗",
-    "unableToFetchStores": "無法從伺服器取得分店資訊。",
+    "networkError": "網絡錯誤",
+    "failedToLoadData": "資料載入失敗",
+    "unableToFetchStores": "暫時無法從伺服器取得分店資料。",
     "unableToLoadData": "無法載入資料",
     "apiRequestFailed": "API 請求失敗",
     "unknownError": "發生未知錯誤"
@@ -107,15 +107,38 @@
   "ui": {
     "grid": "網格",
     "table": "表格",
-    "switchToView": "切換至{view}檢視",
+    "switchToView": "切換至 {view} 檢視",
     "viewModeSelector": "檢視模式選擇器"
   },
   "table": {
     "store": "分店",
-    "region": "區域",
-    "district": "地區",
+    "region": "地區",
+    "district": "區域",
     "status": "狀態",
     "columns": "欄位",
-    "toggleColumns": "切換欄位顯示"
+    "toggleColumns": "切換欄位"
+  },
+  "dashboardQueue": {
+    "title": "壽司郎排隊儀表板",
+    "subtitle": "快速查看所有分店，優先選擇最短隊列。",
+    "topThree": "最佳 3 間分店",
+    "fullList": "所有分店",
+    "updatedAtLabel": "更新時間",
+    "refresh": "重新整理",
+    "retry": "再試一次",
+    "loading": "載入中...",
+    "empty": "目前沒有可用排隊資料。",
+    "error": "無法載入排隊資料。",
+    "refreshing": "更新中",
+    "retryHint": "請重新整理以取得最新排隊狀況。",
+    "liveMonitor": "即時排隊監察",
+    "queueLevel": "等候級別",
+    "groups": "組數",
+    "branches": "分店",
+    "waitingGroups": "等候組數",
+    "bestOptionNow": "目前最佳選擇",
+    "groupsWaiting": "組等候",
+    "fastPick": "快速選擇",
+    "invalid": "無效"
   }
 }

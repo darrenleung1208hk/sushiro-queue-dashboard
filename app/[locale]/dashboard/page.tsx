@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   AlertCircle,
   ArrowUpRight,
@@ -23,6 +24,9 @@ const AUTO_REFRESH_INTERVAL_MS = 30000;
 interface QueueRowProps {
   index: number;
   item: QueueItem;
+  queueLevelLabel: string;
+  groupsLabel: string;
+  invalidLabel: string;
   highlighted?: boolean;
 }
 
@@ -39,7 +43,14 @@ function getQueueLevelBadgeVariant(level: QueueItem['level']) {
   }
 }
 
-function QueueRow({ index, item, highlighted = false }: QueueRowProps) {
+function QueueRow({
+  index,
+  item,
+  queueLevelLabel,
+  groupsLabel,
+  invalidLabel,
+  highlighted = false,
+}: QueueRowProps) {
   const hasValidQueueCount = item.queueCount !== null;
 
   return (
@@ -67,20 +78,20 @@ function QueueRow({ index, item, highlighted = false }: QueueRowProps) {
           {item.name}
         </p>
         <div className="mt-1 flex items-center gap-2">
-          <p className="text-xs text-muted-foreground sm:text-sm">Queue level</p>
+          <p className="text-xs text-muted-foreground sm:text-sm">{queueLevelLabel}</p>
           <Badge
             variant={
               hasValidQueueCount ? getQueueLevelBadgeVariant(item.level) : 'outline'
             }
             className="rounded-md px-2 py-0 text-[10px] font-medium uppercase tracking-wide"
           >
-            {hasValidQueueCount ? item.level : 'Invalid'}
+            {hasValidQueueCount ? item.level : invalidLabel}
           </Badge>
         </div>
       </div>
 
       <div className="text-right">
-        <p className="text-xs text-muted-foreground">Groups</p>
+        <p className="text-xs text-muted-foreground">{groupsLabel}</p>
         <div className="text-lg font-semibold text-foreground sm:text-xl">
           {hasValidQueueCount ? item.queueCount : '--'}
         </div>
@@ -113,6 +124,7 @@ function QueueListSkeleton() {
 }
 
 export default function DashboardPage() {
+  const t = useTranslations('dashboardQueue');
   const [queues, setQueues] = useState<QueueItem[]>([]);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -120,24 +132,6 @@ export default function DashboardPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const isFetchingRef = useRef(false);
   const hasDataRef = useRef(false);
-
-  const copy = useMemo(
-    () => ({
-      title: 'Sushiro Queue Dashboard',
-      subtitle: 'Scan all branches and spot the shortest queue first.',
-      topThree: 'Top 3 branches',
-      fullList: 'All branches',
-      updatedAtLabel: 'Updated',
-      refresh: 'Refresh',
-      retry: 'Retry',
-      loading: 'Loading...',
-      empty: 'No queue data is available right now.',
-      error: 'Unable to load queue data.',
-      refreshing: 'Refreshing',
-      retryHint: 'Try refreshing to load the latest queue view.',
-    }),
-    []
-  );
 
   const fetchQueues = useCallback(async () => {
     if (isFetchingRef.current) {
@@ -169,13 +163,13 @@ export default function DashboardPage() {
       setUpdatedAt(payload.updatedAt ? new Date(payload.updatedAt) : null);
     } catch (error) {
       console.error('Error fetching queues:', error);
-      setErrorMessage(copy.error);
+      setErrorMessage(t('error'));
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
       isFetchingRef.current = false;
     }
-  }, [copy.error]);
+  }, [t]);
 
   useEffect(() => {
     void fetchQueues();
@@ -228,13 +222,13 @@ export default function DashboardPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-1">
               <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                Live Queue Monitor
+                {t('liveMonitor')}
               </p>
               <h1 className="text-xl font-semibold leading-tight text-foreground sm:text-3xl">
-                {copy.title}
+                {t('title')}
               </h1>
               <p className="max-w-2xl text-sm text-muted-foreground">
-                {copy.subtitle}
+                {t('subtitle')}
               </p>
             </div>
 
@@ -243,8 +237,7 @@ export default function DashboardPage() {
                 <div className="flex items-center gap-1.5">
                   <Clock className="h-3.5 w-3.5" />
                   <span>
-                    {copy.updatedAtLabel}:{' '}
-                    {updatedAt ? updatedAt.toLocaleTimeString() : copy.loading}
+                    {t('updatedAtLabel')}: {updatedAt ? updatedAt.toLocaleTimeString() : t('loading')}
                   </span>
                 </div>
               </div>
@@ -264,8 +257,8 @@ export default function DashboardPage() {
                     (isLoading || isRefreshing) && 'animate-spin'
                   )}
                 />
-                <span className="hidden sm:inline">
-                  {isRefreshing ? copy.refreshing : copy.refresh}
+                  <span className="hidden sm:inline">
+                  {isRefreshing ? t('refreshing') : t('refresh')}
                 </span>
               </Button>
 
@@ -277,7 +270,7 @@ export default function DashboardPage() {
             <div className="rounded-2xl border border-border/60 bg-background/70 p-4">
               <div className="flex items-center justify-between">
                 <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                  Branches
+                  {t('branches')}
                 </p>
                 <Store className="h-4 w-4 text-muted-foreground" />
               </div>
@@ -289,7 +282,7 @@ export default function DashboardPage() {
             <div className="rounded-2xl border border-border/60 bg-background/70 p-4">
               <div className="flex items-center justify-between">
                 <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                  Waiting groups
+                  {t('waitingGroups')}
                 </p>
                 <Timer className="h-4 w-4 text-muted-foreground" />
               </div>
@@ -301,7 +294,7 @@ export default function DashboardPage() {
             <div className="rounded-2xl border border-border/60 bg-background/70 p-4">
               <div className="flex items-center justify-between">
                 <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                  Best option now
+                  {t('bestOptionNow')}
                 </p>
                 <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
               </div>
@@ -309,7 +302,7 @@ export default function DashboardPage() {
                 {lowestQueue?.name ?? '--'}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                {lowestQueue?.queueCount ?? '--'} groups waiting
+                {lowestQueue?.queueCount ?? '--'} {t('groupsWaiting')}
               </p>
             </div>
           </div>
@@ -321,9 +314,9 @@ export default function DashboardPage() {
           <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
             <AlertCircle className="h-10 w-10 text-destructive" />
             <div className="space-y-1">
-              <p className="font-medium text-foreground">{copy.error}</p>
+              <p className="font-medium text-foreground">{t('error')}</p>
               <p className="text-sm text-muted-foreground">
-                {copy.retryHint}
+                {t('retryHint')}
               </p>
             </div>
             <Button
@@ -331,7 +324,7 @@ export default function DashboardPage() {
                 void fetchQueues();
               }}
             >
-              {copy.retry}
+              {t('retry')}
             </Button>
           </CardContent>
         </Card>
@@ -340,7 +333,7 @@ export default function DashboardPage() {
           {showInlineError && (
             <div className="flex items-center gap-2 rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               <AlertCircle className="h-4 w-4 shrink-0" />
-              <span>{copy.error}</span>
+              <span>{t('error')}</span>
             </div>
           )}
 
@@ -348,9 +341,9 @@ export default function DashboardPage() {
             <section className="space-y-2 lg:col-span-2">
               <div className="flex items-center justify-between px-1">
                 <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                  {copy.topThree}
+                  {t('topThree')}
                 </h2>
-                <p className="text-xs text-muted-foreground">Fast pick</p>
+                <p className="text-xs text-muted-foreground">{t('fastPick')}</p>
               </div>
 
               {isLoading ? (
@@ -362,13 +355,16 @@ export default function DashboardPage() {
                       key={`top-${item.name}-${index}`}
                       index={index}
                       item={item}
+                      queueLevelLabel={t('queueLevel')}
+                      groupsLabel={t('groups')}
+                      invalidLabel={t('invalid')}
                       highlighted
                     />
                   ))}
                 </div>
               ) : (
                 <div className="rounded-2xl border border-border/70 bg-background/70 px-4 py-6 text-sm text-muted-foreground">
-                  {copy.empty}
+                  {t('empty')}
                 </div>
               )}
             </section>
@@ -376,10 +372,10 @@ export default function DashboardPage() {
             <section className="space-y-2 lg:col-span-3">
               <div className="flex items-center justify-between px-1">
                 <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                  {copy.fullList}
+                  {t('fullList')}
                 </h2>
                 <p className="text-xs text-muted-foreground">
-                  {queues.length} branches
+                  {queues.length} {t('branches')}
                 </p>
               </div>
 
@@ -388,12 +384,19 @@ export default function DashboardPage() {
               ) : queues.length > 0 ? (
                 <div className="space-y-2.5">
                   {queues.map((item, index) => (
-                    <QueueRow key={`${item.name}-${index}`} index={index} item={item} />
+                    <QueueRow
+                      key={`${item.name}-${index}`}
+                      index={index}
+                      item={item}
+                      queueLevelLabel={t('queueLevel')}
+                      groupsLabel={t('groups')}
+                      invalidLabel={t('invalid')}
+                    />
                   ))}
                 </div>
               ) : (
                 <div className="rounded-2xl border border-border/70 bg-background/70 px-4 py-6 text-sm text-muted-foreground">
-                  {copy.empty}
+                  {t('empty')}
                 </div>
               )}
             </section>

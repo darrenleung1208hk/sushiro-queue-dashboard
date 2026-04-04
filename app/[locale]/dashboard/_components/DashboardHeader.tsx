@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Clock, RefreshCw } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { Button } from '@/components/ui/button';
 import { trackManualRefresh } from '@/lib/analytics';
+import { cn } from '@/lib/utils';
 
 interface DashboardHeaderProps {
   isLoading: boolean;
@@ -21,10 +21,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   onManualRefresh,
 }) => {
   const t = useTranslations();
-  const locale = useLocale();
 
   const handleManualRefresh = useCallback(() => {
-    // Calculate time since last refresh in seconds
     const timeSinceLastRefresh = lastUpdated
       ? Math.round((Date.now() - lastUpdated.getTime()) / 1000)
       : null;
@@ -35,28 +33,21 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
   return (
     <div className="mb-6">
-      <div className="flex items-start justify-between gap-4 flex-col sm:flex-row">
-        {/* Left: Title Section */}
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-foreground">
-            {locale === 'zh-HK'
-              ? '壽司郎排隊儀表板'
-              : 'Sushiro Queue Dashboard'}
+            {t('dashboardQueue.title')}
           </h1>
           <p className="text-sm text-muted-foreground">
-            {locale === 'zh-HK'
-              ? '實時監控壽司郎餐廳排隊狀況'
-              : 'Real-time queue monitoring for Sushiro restaurants'}
+            {t('dashboardQueue.subtitle')}
           </p>
         </div>
 
-        {/* Right: Controls Section */}
-        <div className="flex items-center gap-3 flex-wrap">
-          {/* Refresh Controls Group */}
+        <div className="flex flex-wrap items-center gap-3">
           {(lastUpdated || onManualRefresh) && (
-            <div className="flex items-center h-9 rounded-md bg-muted/50 border border-border/50">
+            <div className="flex h-9 items-center rounded-md border border-border/50 bg-muted/50">
               {lastUpdated && (
-                <div className="flex items-center gap-1.5 mx-2 text-xs text-muted-foreground">
+                <div className="mx-2 flex items-center gap-1.5 text-xs text-muted-foreground">
                   <Clock className="h-3 w-3" />
                   <span className="whitespace-nowrap">
                     {t('common.last')}: {lastUpdated.toLocaleTimeString()}
@@ -80,7 +71,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     <RefreshCw
                       className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')}
                     />
-                    <span className="hidden sm:inline text-xs">
+                    <span className="hidden text-xs sm:inline">
                       {t('common.refresh')}
                     </span>
                   </Button>
@@ -89,8 +80,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             </div>
           )}
 
-          {/* Language Switcher - Separate from refresh controls */}
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <LanguageSwitcher />
           </div>
         </div>

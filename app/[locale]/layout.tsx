@@ -1,9 +1,11 @@
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import { Toaster } from '@/components/ui/toaster';
-import { Toaster as Sonner } from '@/components/ui/sonner';
-import { Providers } from '../providers';
 import type { Metadata } from 'next';
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages, getTranslations } from 'next-intl/server';
+
+import { Toaster as Sonner } from '@/components/ui/sonner';
+import { Toaster } from '@/components/ui/toaster';
+
+import { Providers } from '../providers';
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
@@ -16,17 +18,11 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-
-  if (locale === 'zh-HK') {
-    return {
-      title: '壽司郎排隊儀表板',
-      description: '實時監控壽司郎餐廳排隊狀況',
-    };
-  }
+  const t = await getTranslations({ locale, namespace: 'dashboardQueue' });
 
   return {
-    title: 'Sushiro Queue Dashboard',
-    description: 'Real-time queue monitoring for Sushiro restaurants',
+    title: t('title'),
+    description: t('subtitle'),
   };
 }
 
@@ -41,7 +37,7 @@ export default async function LocaleLayout({
     <NextIntlClientProvider messages={messages} locale={locale}>
       <Providers>
         <div className="min-h-screen bg-gradient-to-br from-background to-muted/30">
-          <div className="max-w-7xl mx-auto p-4">{children}</div>
+          <div className="mx-auto max-w-7xl p-4">{children}</div>
         </div>
         <Toaster />
         <Sonner />
