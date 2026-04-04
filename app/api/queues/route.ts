@@ -4,6 +4,10 @@ import { fetchLiveStores } from '@/lib/live-stores';
 import { QueueApiResponse, QueueItem } from '@/lib/types';
 import { getQueuePriority } from '@/lib/utils';
 
+function isRecommendableStatus(storeStatus: string): boolean {
+  return storeStatus === 'OPEN' || storeStatus === 'BUSY';
+}
+
 function normalizeQueueCount(value: unknown): number | null {
   return typeof value === 'number' && Number.isFinite(value) && value >= 0
     ? value
@@ -29,13 +33,29 @@ function compareQueueItems(left: QueueItem, right: QueueItem): number {
   return left.name.localeCompare(right.name, 'zh-HK');
 }
 
-function buildQueueItem(name: string, rawQueueCount: unknown): QueueItem {
-  const queueCount = normalizeQueueCount(rawQueueCount);
+function buildQueueItem(
+  name: string,
+  storeStatus: string,
+  rawQueueCount: unknown
+): QueueItem {
+  const normalizedQueueCount = normalizeQueueCount(rawQueueCount);
+  const queueCount = isRecommendableStatus(storeStatus)
+    ? normalizedQueueCount
+    : null;
+  const recommendationState = !isRecommendableStatus(storeStatus)
+    ? 'INELIGIBLE'
+    : queueCount === null
+      ? 'UNAVAILABLE'
+      : queueCount === 0
+        ? 'IMMEDIATE'
+        : 'WAITING';
 
   return {
     name,
+    storeStatus,
     queueCount,
     level: getQueuePriority(queueCount ?? 0),
+    recommendationState,
   };
 }
 
@@ -45,7 +65,9 @@ export async function GET(): Promise<NextResponse<QueueApiResponse>> {
     const updatedAt = liveStores.timestamp ?? new Date();
 
     const data = liveStores.stores
-      .map((store) => buildQueueItem(store.name, store.waitingGroup))
+      .map((store) =>
+        buildQueueItem(store.name, store.storeStatus, store.waitingGroup)
+      )
       .sort(compareQueueItems);
 
     return NextResponse.json({
