@@ -121,8 +121,9 @@
   "dashboardQueue": {
     "title": "Sushiro Queue Dashboard",
     "subtitle": "Scan all branches and spot the shortest queue first.",
-    "topThree": "Top 3 branches",
-    "fullList": "All branches",
+    "availableNow": "Immediate Seating",
+    "availableNowHint": "Start with branches that can seat you immediately, then compare the shortest waits.",
+    "moreAvailableHint": "+{count} more available below",
     "updatedAtLabel": "Updated",
     "refresh": "Refresh",
     "retry": "Retry",
@@ -132,13 +133,14 @@
     "refreshing": "Refreshing",
     "retryHint": "Try refreshing to load the latest queue view.",
     "liveMonitor": "Live Queue Monitor",
-    "queueLevel": "Queue level",
-    "groups": "Groups",
-    "branches": "Branches",
-    "waitingGroups": "Waiting groups",
-    "bestOptionNow": "Best option now",
-    "groupsWaiting": "groups waiting",
-    "fastPick": "Fast pick",
-    "invalid": "Invalid"
+    "availableGroup": "Available",
+    "lowGroup": "Low",
+    "busyGroup": "Busy",
+    "otherGroup": "Other",
+    "availableNowStatus": "Available now",
+    "lowStatus": "Low wait",
+    "busyStatus": "Busy",
+    "invalid": "Unavailable",
+    "emptyGroup": "No branches in this group."
   }
 }

@@ -121,8 +121,9 @@
   "dashboardQueue": {
     "title": "壽司郎排隊儀表板",
     "subtitle": "快速查看所有分店，優先選擇最短隊列。",
-    "topThree": "最佳 3 間分店",
-    "fullList": "所有分店",
+    "availableNow": "即刻入座",
+    "availableNowHint": "先看即刻有位的分店，再比較最短等候時間。",
+    "moreAvailableHint": "下面還有 {count} 間即刻有位",
     "updatedAtLabel": "更新時間",
     "refresh": "重新整理",
     "retry": "再試一次",
@@ -132,13 +133,14 @@
     "refreshing": "更新中",
     "retryHint": "請重新整理以取得最新排隊狀況。",
     "liveMonitor": "即時排隊監察",
-    "queueLevel": "等候級別",
-    "groups": "組數",
-    "branches": "分店",
-    "waitingGroups": "等候組數",
-    "bestOptionNow": "目前最佳選擇",
-    "groupsWaiting": "組等候",
-    "fastPick": "快速選擇",
-    "invalid": "無效"
+    "availableGroup": "即刻有位",
+    "lowGroup": "較少人",
+    "busyGroup": "繁忙",
+    "otherGroup": "其他",
+    "availableNowStatus": "即刻有位",
+    "lowStatus": "較少人",
+    "busyStatus": "繁忙",
+    "invalid": "暫未提供",
+    "emptyGroup": "暫時沒有分店。"
   }
 }

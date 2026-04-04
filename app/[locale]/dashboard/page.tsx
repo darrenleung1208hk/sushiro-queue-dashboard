@@ -2,17 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import {
-  AlertCircle,
-  ArrowUpRight,
-  Clock,
-  RefreshCw,
-  Store,
-  Timer,
-} from 'lucide-react';
+import { AlertCircle, Clock, RefreshCw } from 'lucide-react';
 
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -22,100 +14,161 @@ import { cn } from '@/lib/utils';
 const AUTO_REFRESH_INTERVAL_MS = 30000;
 
 interface QueueRowProps {
-  index: number;
   item: QueueItem;
-  queueLevelLabel: string;
-  groupsLabel: string;
-  invalidLabel: string;
-  highlighted?: boolean;
+  statusText: string;
+  tone: 'available' | 'low' | 'busy' | 'invalid';
+  emphasized?: boolean;
 }
 
-function getQueueLevelBadgeVariant(level: QueueItem['level']) {
-  switch (level) {
-    case 'LOW':
-      return 'default';
-    case 'MEDIUM':
-      return 'secondary';
-    case 'HIGH':
-      return 'destructive';
-    default:
-      return 'outline';
+interface QueueGroupProps {
+  title: string;
+  count: number;
+  items: QueueItem[];
+  emptyText: string;
+  getStatusText: (item: QueueItem) => string;
+}
+
+function getRowTone(item: QueueItem): QueueRowProps['tone'] {
+  if (item.queueCount === null) {
+    return 'invalid';
   }
+
+  if (item.queueCount === 0) {
+    return 'available';
+  }
+
+  if (item.queueCount <= 15) {
+    return 'low';
+  }
+
+  return 'busy';
+}
+
+function getRowClasses(tone: QueueRowProps['tone'], emphasized: boolean) {
+  if (tone === 'available') {
+    return cn(
+      'border-success/25 bg-success/10',
+      emphasized && 'border-success/35 bg-success/12'
+    );
+  }
+
+  if (tone === 'invalid') {
+    return 'border-border bg-background/60 opacity-70';
+  }
+
+  return cn(
+    'border-border bg-background',
+    emphasized && 'border-border/80 bg-background/90'
+  );
+}
+
+function getValueText(item: QueueItem): string | null {
+  if (item.queueCount === null) {
+    return '--';
+  }
+
+  return item.queueCount.toString();
 }
 
 function QueueRow({
-  index,
   item,
-  queueLevelLabel,
-  groupsLabel,
-  invalidLabel,
-  highlighted = false,
+  statusText,
+  tone,
+  emphasized = false,
 }: QueueRowProps) {
-  const hasValidQueueCount = item.queueCount !== null;
+  const valueText = getValueText(item);
 
   return (
     <div
       className={cn(
-        'group grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-2xl border border-border/70 bg-background/80 p-4 transition-all duration-300',
-        highlighted &&
-          'border-primary/30 bg-primary/5 shadow-[0_8px_30px_hsl(var(--primary)/0.08)]',
-        !hasValidQueueCount && 'opacity-75'
+        'flex items-center justify-between gap-3 rounded-xl border px-4 py-3',
+        getRowClasses(tone, emphasized)
       )}
     >
-      <div
-        className={cn(
-          'flex h-9 w-9 items-center justify-center rounded-full border text-sm font-semibold',
-          highlighted
-            ? 'border-primary/30 bg-primary/10 text-primary'
-            : 'border-border text-muted-foreground'
-        )}
-      >
-        {index + 1}
-      </div>
-
-      <div className="min-w-0">
-        <p className="truncate text-sm font-semibold text-foreground sm:text-base">
+      <div className="min-w-0 flex-1">
+        <p
+          className={cn(
+            'truncate text-sm font-medium',
+            tone === 'available' ? 'text-success' : 'text-foreground'
+          )}
+        >
           {item.name}
         </p>
-        <div className="mt-1 flex items-center gap-2">
-          <p className="text-xs text-muted-foreground sm:text-sm">{queueLevelLabel}</p>
-          <Badge
-            variant={
-              hasValidQueueCount ? getQueueLevelBadgeVariant(item.level) : 'outline'
-            }
-            className="rounded-md px-2 py-0 text-[10px] font-medium uppercase tracking-wide"
-          >
-            {hasValidQueueCount ? item.level : invalidLabel}
-          </Badge>
-        </div>
+        <p
+          className={cn(
+            'mt-1 text-sm',
+            tone === 'available' ? 'text-success/90' : 'text-muted-foreground'
+          )}
+        >
+          {statusText}
+        </p>
       </div>
 
-      <div className="text-right">
-        <p className="text-xs text-muted-foreground">{groupsLabel}</p>
-        <div className="text-lg font-semibold text-foreground sm:text-xl">
-          {hasValidQueueCount ? item.queueCount : '--'}
+      {valueText !== null && (
+        <div
+          className={cn(
+            'shrink-0 text-right text-lg font-semibold tabular-nums',
+            tone === 'available' ? 'text-success' : 'text-muted-foreground'
+          )}
+        >
+          {valueText}
         </div>
-      </div>
+      )}
     </div>
   );
 }
 
-function QueueListSkeleton() {
+function QueueGroup({
+  title,
+  count,
+  items,
+  emptyText,
+  getStatusText,
+}: QueueGroupProps) {
   return (
-    <div className="space-y-2.5">
-      {Array.from({ length: 6 }).map((_, index) => (
+    <section className="space-y-2">
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+        <span className="text-xs text-muted-foreground">{count}</span>
+      </div>
+
+      {items.length > 0 ? (
+        <div className="space-y-2">
+          {items.map((item, index) => (
+            <QueueRow
+              key={`${title}-${item.name}-${index}`}
+              item={item}
+              statusText={getStatusText(item)}
+              tone={getRowTone(item)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-xl border border-dashed border-border px-4 py-5 text-sm text-muted-foreground">
+          {emptyText}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function QueueListSkeleton({ emphasized = false }: { emphasized?: boolean }) {
+  return (
+    <div className="space-y-2">
+      {Array.from({ length: 3 }).map((_, index) => (
         <div
           key={index}
-          className="grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-2xl border border-border/70 bg-background/80 p-4"
+          className={cn(
+            'rounded-xl border px-4 py-3',
+            emphasized ? 'border-success/20 bg-success/5' : 'border-border bg-card'
+          )}
         >
-          <Skeleton className="h-9 w-9 rounded-full" />
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-40" />
-            <Skeleton className="h-3 w-20" />
-          </div>
-          <div className="space-y-1 text-right">
-            <Skeleton className="ml-auto h-3 w-12" />
-            <Skeleton className="ml-auto h-6 w-10" />
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0 flex-1 space-y-2">
+              <Skeleton className="h-4 w-36" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+            <Skeleton className="h-6 w-8" />
           </div>
         </div>
       ))}
@@ -157,7 +210,6 @@ export default function DashboardPage() {
       }
 
       const payload = (await response.json()) as QueueApiResponse;
-
       setQueues(payload.data);
       hasDataRef.current = payload.data.length > 0;
       setUpdatedAt(payload.updatedAt ? new Date(payload.updatedAt) : null);
@@ -183,141 +235,137 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, [fetchQueues]);
 
-  const validQueues = useMemo(
-    () => queues.filter((queue) => queue.queueCount !== null),
-    [queues]
-  );
+  const { availableQueues, lowQueues, busyQueues, invalidQueues } = useMemo(() => {
+    const available: QueueItem[] = [];
+    const low: QueueItem[] = [];
+    const busy: QueueItem[] = [];
+    const invalid: QueueItem[] = [];
 
-  const topQueues = useMemo(() => {
-    if (queues.length < 3) {
-      return queues.slice(0, 3);
+    queues.forEach((queue) => {
+      if (queue.queueCount === null) {
+        invalid.push(queue);
+      } else if (queue.queueCount === 0) {
+        available.push(queue);
+      } else if (queue.queueCount <= 15) {
+        low.push(queue);
+      } else {
+        busy.push(queue);
+      }
+    });
+
+    return {
+      availableQueues: available,
+      lowQueues: low,
+      busyQueues: busy,
+      invalidQueues: invalid,
+    };
+  }, [queues]);
+
+  const recommendedQueues = useMemo(() => {
+    const recommended = availableQueues.slice(0, 3);
+
+    if (recommended.length < 3) {
+      recommended.push(...lowQueues.slice(0, 3 - recommended.length));
     }
 
-    return validQueues.slice(0, 3);
-  }, [queues, validQueues]);
-
-  const totalWaitingGroups = useMemo(
-    () => validQueues.reduce((sum, queue) => sum + (queue.queueCount ?? 0), 0),
-    [validQueues]
-  );
-
-  const lowestQueue = useMemo(() => {
-    if (validQueues.length === 0) {
-      return null;
+    if (recommended.length < 3) {
+      recommended.push(...busyQueues.slice(0, 3 - recommended.length));
     }
 
-    return validQueues[0];
-  }, [validQueues]);
+    if (recommended.length === 0) {
+      recommended.push(...invalidQueues.slice(0, 3));
+    }
+
+    return recommended;
+  }, [availableQueues, busyQueues, invalidQueues, lowQueues]);
+
+  const recommendedAvailableCount = useMemo(
+    () =>
+      recommendedQueues.filter((queue) => queue.queueCount === 0).length,
+    [recommendedQueues]
+  );
+
+  const additionalAvailableCount = Math.max(
+    0,
+    availableQueues.length - recommendedAvailableCount
+  );
 
   const showBlockingError =
     errorMessage !== null && queues.length === 0 && !isLoading;
   const showInlineError = errorMessage !== null && queues.length > 0;
 
+  const getStatusText = useCallback(
+    (item: QueueItem) => {
+      if (item.queueCount === null) {
+        return t('invalid');
+      }
+
+      if (item.queueCount === 0) {
+        return t('availableNowStatus');
+      }
+
+      if (item.queueCount <= 15) {
+        return t('lowStatus');
+      }
+
+      return t('busyStatus');
+    },
+    [t]
+  );
+
   return (
-    <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-5 pb-10 pt-2 sm:gap-6 sm:pt-4">
-      <div className="pointer-events-none absolute inset-x-6 top-0 -z-10 h-48 rounded-full bg-gradient-to-r from-primary/10 via-primary/5 to-transparent blur-3xl" />
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 pb-10 pt-4 sm:pt-6">
+      <div className="space-y-4">
+        <div className="space-y-1">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {t('liveMonitor')}
+          </p>
+          <h1 className="text-xl font-semibold text-foreground sm:text-2xl">
+            {t('title')}
+          </h1>
+          <p className="max-w-xl text-sm text-muted-foreground">{t('subtitle')}</p>
+        </div>
 
-      <Card className="overflow-hidden rounded-3xl border-border/60 bg-card/90 shadow-[0_12px_40px_hsl(var(--foreground)/0.08)] backdrop-blur">
-        <CardContent className="space-y-5 p-4 sm:p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="space-y-1">
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                {t('liveMonitor')}
-              </p>
-              <h1 className="text-xl font-semibold leading-tight text-foreground sm:text-3xl">
-                {t('title')}
-              </h1>
-              <p className="max-w-2xl text-sm text-muted-foreground">
-                {t('subtitle')}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 self-start sm:gap-3">
-              <div className="rounded-xl border border-border/60 bg-background/70 px-3 py-2 text-xs text-muted-foreground">
-                <div className="flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5" />
-                  <span>
-                    {t('updatedAtLabel')}: {updatedAt ? updatedAt.toLocaleTimeString() : t('loading')}
-                  </span>
-                </div>
-              </div>
-
-              <Button
-                onClick={() => {
-                  void fetchQueues();
-                }}
-                disabled={isLoading || isRefreshing}
-                variant="outline"
-                size="sm"
-                className="gap-2 rounded-xl border-border/70 bg-background/70"
-              >
-                <RefreshCw
-                  className={cn(
-                    'h-3.5 w-3.5',
-                    (isLoading || isRefreshing) && 'animate-spin'
-                  )}
-                />
-                  <span className="hidden sm:inline">
-                  {isRefreshing ? t('refreshing') : t('refresh')}
-                </span>
-              </Button>
-
-              <LanguageSwitcher />
-            </div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Clock className="h-3.5 w-3.5" />
+            <span>
+              {t('updatedAtLabel')}:{' '}
+              {updatedAt ? updatedAt.toLocaleTimeString() : t('loading')}
+            </span>
           </div>
 
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
-            <div className="rounded-2xl border border-border/60 bg-background/70 p-4">
-              <div className="flex items-center justify-between">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                  {t('branches')}
-                </p>
-                <Store className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <p className="mt-2 text-2xl font-semibold leading-none text-foreground">
-                {queues.length}
-              </p>
-            </div>
+          <div className="flex items-center justify-between gap-2 sm:justify-end">
+            <Button
+              onClick={() => {
+                void fetchQueues();
+              }}
+              disabled={isLoading || isRefreshing}
+              variant="outline"
+              size="sm"
+              className="gap-2"
+            >
+              <RefreshCw
+                className={cn(
+                  'h-4 w-4',
+                  (isLoading || isRefreshing) && 'animate-spin'
+                )}
+              />
+              <span>{isRefreshing ? t('refreshing') : t('refresh')}</span>
+            </Button>
 
-            <div className="rounded-2xl border border-border/60 bg-background/70 p-4">
-              <div className="flex items-center justify-between">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                  {t('waitingGroups')}
-                </p>
-                <Timer className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <p className="mt-2 text-2xl font-semibold leading-none text-foreground">
-                {totalWaitingGroups}
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-border/60 bg-background/70 p-4">
-              <div className="flex items-center justify-between">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                  {t('bestOptionNow')}
-                </p>
-                <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <p className="mt-2 truncate text-sm font-semibold text-foreground">
-                {lowestQueue?.name ?? '--'}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {lowestQueue?.queueCount ?? '--'} {t('groupsWaiting')}
-              </p>
-            </div>
+            <LanguageSwitcher />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {showBlockingError ? (
-        <Card className="rounded-2xl border border-border/60 bg-card/90">
+        <Card className="border border-border bg-card">
           <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
             <AlertCircle className="h-10 w-10 text-destructive" />
             <div className="space-y-1">
               <p className="font-medium text-foreground">{t('error')}</p>
-              <p className="text-sm text-muted-foreground">
-                {t('retryHint')}
-              </p>
+              <p className="text-sm text-muted-foreground">{t('retryHint')}</p>
             </div>
             <Button
               onClick={() => {
@@ -331,75 +379,92 @@ export default function DashboardPage() {
       ) : (
         <>
           {showInlineError && (
-            <div className="flex items-center gap-2 rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            <div className="flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               <AlertCircle className="h-4 w-4 shrink-0" />
-              <span>{t('error')}</span>
+              <span>{errorMessage}</span>
             </div>
           )}
 
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
-            <section className="space-y-2 lg:col-span-2">
-              <div className="flex items-center justify-between px-1">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                  {t('topThree')}
+          <section className="space-y-3 rounded-2xl border border-success/20 bg-success/5 p-4 sm:p-5">
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-semibold text-success">
+                  {t('availableNow')}
                 </h2>
-                <p className="text-xs text-muted-foreground">{t('fastPick')}</p>
+                <span className="text-xs text-success/80">
+                  {recommendedQueues.length}/{Math.max(3, availableQueues.length)}
+                </span>
               </div>
-
-              {isLoading ? (
-                <QueueListSkeleton />
-              ) : topQueues.length > 0 ? (
-                <div className="space-y-2.5">
-                  {topQueues.map((item, index) => (
-                    <QueueRow
-                      key={`top-${item.name}-${index}`}
-                      index={index}
-                      item={item}
-                      queueLevelLabel={t('queueLevel')}
-                      groupsLabel={t('groups')}
-                      invalidLabel={t('invalid')}
-                      highlighted
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="rounded-2xl border border-border/70 bg-background/70 px-4 py-6 text-sm text-muted-foreground">
-                  {t('empty')}
-                </div>
-              )}
-            </section>
-
-            <section className="space-y-2 lg:col-span-3">
-              <div className="flex items-center justify-between px-1">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                  {t('fullList')}
-                </h2>
-                <p className="text-xs text-muted-foreground">
-                  {queues.length} {t('branches')}
+              <p className="text-sm text-success/90">{t('availableNowHint')}</p>
+              {additionalAvailableCount > 0 && (
+                <p className="text-xs text-success/80">
+                  {t('moreAvailableHint', { count: additionalAvailableCount })}
                 </p>
-              </div>
-
-              {isLoading ? (
-                <QueueListSkeleton />
-              ) : queues.length > 0 ? (
-                <div className="space-y-2.5">
-                  {queues.map((item, index) => (
-                    <QueueRow
-                      key={`${item.name}-${index}`}
-                      index={index}
-                      item={item}
-                      queueLevelLabel={t('queueLevel')}
-                      groupsLabel={t('groups')}
-                      invalidLabel={t('invalid')}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="rounded-2xl border border-border/70 bg-background/70 px-4 py-6 text-sm text-muted-foreground">
-                  {t('empty')}
-                </div>
               )}
-            </section>
+            </div>
+
+            {isLoading ? (
+              <QueueListSkeleton emphasized />
+            ) : recommendedQueues.length > 0 ? (
+              <div className="space-y-2">
+                {recommendedQueues.map((item, index) => (
+                  <QueueRow
+                    key={`recommended-${item.name}-${index}`}
+                    item={item}
+                    statusText={getStatusText(item)}
+                    tone={getRowTone(item)}
+                    emphasized
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-dashed border-success/30 px-4 py-5 text-sm text-success/90">
+                {t('empty')}
+              </div>
+            )}
+          </section>
+
+          <div className="space-y-4">
+            {isLoading ? (
+              <>
+                <QueueListSkeleton />
+                <QueueListSkeleton />
+                <QueueListSkeleton />
+              </>
+            ) : (
+              <>
+                <QueueGroup
+                  title={t('availableGroup')}
+                  count={availableQueues.length}
+                  items={availableQueues}
+                  emptyText={t('emptyGroup')}
+                  getStatusText={getStatusText}
+                />
+                <QueueGroup
+                  title={t('lowGroup')}
+                  count={lowQueues.length}
+                  items={lowQueues}
+                  emptyText={t('emptyGroup')}
+                  getStatusText={getStatusText}
+                />
+                <QueueGroup
+                  title={t('busyGroup')}
+                  count={busyQueues.length}
+                  items={busyQueues}
+                  emptyText={t('emptyGroup')}
+                  getStatusText={getStatusText}
+                />
+                {invalidQueues.length > 0 && (
+                  <QueueGroup
+                    title={t('otherGroup')}
+                    count={invalidQueues.length}
+                    items={invalidQueues}
+                    emptyText={t('emptyGroup')}
+                    getStatusText={getStatusText}
+                  />
+                )}
+              </>
+            )}
           </div>
         </>
       )}
