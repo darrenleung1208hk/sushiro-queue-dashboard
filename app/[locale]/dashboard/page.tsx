@@ -235,15 +235,29 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, [fetchQueues]);
 
-  const { availableQueues, lowQueues, busyQueues, invalidQueues } = useMemo(() => {
+  const {
+    availableQueues,
+    lowQueues,
+    busyQueues,
+    unavailableQueues,
+    recommendableQueues,
+  } = useMemo(() => {
     const available: QueueItem[] = [];
     const low: QueueItem[] = [];
     const busy: QueueItem[] = [];
-    const invalid: QueueItem[] = [];
+    const unavailable: QueueItem[] = [];
+    const recommendable: QueueItem[] = [];
 
     queues.forEach((queue) => {
+      if (
+        queue.recommendationState === 'IMMEDIATE' ||
+        queue.recommendationState === 'WAITING'
+      ) {
+        recommendable.push(queue);
+      }
+
       if (queue.queueCount === null) {
-        invalid.push(queue);
+        unavailable.push(queue);
       } else if (queue.queueCount === 0) {
         available.push(queue);
       } else if (queue.queueCount <= 15) {
@@ -257,38 +271,45 @@ export default function DashboardPage() {
       availableQueues: available,
       lowQueues: low,
       busyQueues: busy,
-      invalidQueues: invalid,
+      unavailableQueues: unavailable,
+      recommendableQueues: recommendable,
     };
   }, [queues]);
 
   const recommendedQueues = useMemo(() => {
-    const recommended = availableQueues.slice(0, 3);
+    const immediateQueues = recommendableQueues.filter(
+      (queue) => queue.recommendationState === 'IMMEDIATE'
+    );
+    const waitingQueues = recommendableQueues.filter(
+      (queue) => queue.recommendationState === 'WAITING'
+    );
+    const recommended = immediateQueues.slice(0, 3);
 
     if (recommended.length < 3) {
-      recommended.push(...lowQueues.slice(0, 3 - recommended.length));
-    }
-
-    if (recommended.length < 3) {
-      recommended.push(...busyQueues.slice(0, 3 - recommended.length));
-    }
-
-    if (recommended.length === 0) {
-      recommended.push(...invalidQueues.slice(0, 3));
+      recommended.push(...waitingQueues.slice(0, 3 - recommended.length));
     }
 
     return recommended;
-  }, [availableQueues, busyQueues, invalidQueues, lowQueues]);
+  }, [recommendableQueues]);
 
-  const recommendedAvailableCount = useMemo(
+  const recommendedImmediateCount = useMemo(
     () =>
-      recommendedQueues.filter((queue) => queue.queueCount === 0).length,
+      recommendedQueues.filter(
+        (queue) => queue.recommendationState === 'IMMEDIATE'
+      ).length,
     [recommendedQueues]
   );
 
-  const additionalAvailableCount = Math.max(
+  const additionalImmediateCount = Math.max(
     0,
-    availableQueues.length - recommendedAvailableCount
+    availableQueues.length - recommendedImmediateCount
   );
+  const hasImmediateRecommendations = recommendedImmediateCount > 0;
+  const hasRecommendedQueues = recommendedQueues.length > 0;
+  const recommendationCountLabel =
+    recommendableQueues.length > 0
+      ? `${recommendedQueues.length}/${recommendableQueues.length}`
+      : '0';
 
   const showBlockingError =
     errorMessage !== null && queues.length === 0 && !isLoading;
@@ -296,8 +317,16 @@ export default function DashboardPage() {
 
   const getStatusText = useCallback(
     (item: QueueItem) => {
+      if (item.recommendationState === 'UNAVAILABLE') {
+        return t('queueUnavailableStatus');
+      }
+
       if (item.storeStatus === 'CLOSED') {
         return t('closedStatus');
+      }
+
+      if (item.storeStatus === 'MAINTENANCE') {
+        return t('maintenanceStatus');
       }
 
       if (item.queueCount === null) {
@@ -393,23 +422,29 @@ export default function DashboardPage() {
             <div className="space-y-1">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-semibold text-success">
-                  {t('availableNow')}
+                  {hasImmediateRecommendations
+                    ? t('availableNow')
+                    : t('bestOptions')}
                 </h2>
                 <span className="text-xs text-success/80">
-                  {recommendedQueues.length}/{Math.max(3, availableQueues.length)}
+                  {recommendationCountLabel}
                 </span>
               </div>
-              <p className="text-sm text-success/90">{t('availableNowHint')}</p>
-              {additionalAvailableCount > 0 && (
+              <p className="text-sm text-success/90">
+                {hasImmediateRecommendations
+                  ? t('availableNowHint')
+                  : t('bestOptionsHint')}
+              </p>
+              {hasImmediateRecommendations && additionalImmediateCount > 0 && (
                 <p className="text-xs text-success/80">
-                  {t('moreAvailableHint', { count: additionalAvailableCount })}
+                  {t('moreAvailableHint', { count: additionalImmediateCount })}
                 </p>
               )}
             </div>
 
             {isLoading ? (
               <QueueListSkeleton emphasized />
-            ) : recommendedQueues.length > 0 ? (
+            ) : hasRecommendedQueues ? (
               <div className="space-y-2">
                 {recommendedQueues.map((item, index) => (
                   <QueueRow
@@ -423,7 +458,7 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div className="rounded-xl border border-dashed border-success/30 px-4 py-5 text-sm text-success/90">
-                {t('empty')}
+                {t('noRecommendedStores')}
               </div>
             )}
           </section>
@@ -458,11 +493,11 @@ export default function DashboardPage() {
                   emptyText={t('emptyGroup')}
                   getStatusText={getStatusText}
                 />
-                {invalidQueues.length > 0 && (
+                {unavailableQueues.length > 0 && (
                   <QueueGroup
-                    title={t('otherGroup')}
-                    count={invalidQueues.length}
-                    items={invalidQueues}
+                    title={t('unavailableGroup')}
+                    count={unavailableQueues.length}
+                    items={unavailableQueues}
                     emptyText={t('emptyGroup')}
                     getStatusText={getStatusText}
                   />

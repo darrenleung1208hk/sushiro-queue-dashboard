@@ -4,6 +4,10 @@ import { fetchLiveStores } from '@/lib/live-stores';
 import { QueueApiResponse, QueueItem } from '@/lib/types';
 import { getQueuePriority } from '@/lib/utils';
 
+function isRecommendableStatus(storeStatus: string): boolean {
+  return storeStatus === 'OPEN' || storeStatus === 'BUSY';
+}
+
 function normalizeQueueCount(value: unknown): number | null {
   return typeof value === 'number' && Number.isFinite(value) && value >= 0
     ? value
@@ -35,13 +39,23 @@ function buildQueueItem(
   rawQueueCount: unknown
 ): QueueItem {
   const normalizedQueueCount = normalizeQueueCount(rawQueueCount);
-  const queueCount = storeStatus === 'OPEN' ? normalizedQueueCount : null;
+  const queueCount = isRecommendableStatus(storeStatus)
+    ? normalizedQueueCount
+    : null;
+  const recommendationState = !isRecommendableStatus(storeStatus)
+    ? 'INELIGIBLE'
+    : queueCount === null
+      ? 'UNAVAILABLE'
+      : queueCount === 0
+        ? 'IMMEDIATE'
+        : 'WAITING';
 
   return {
     name,
     storeStatus,
     queueCount,
     level: getQueuePriority(queueCount ?? 0),
+    recommendationState,
   };
 }
 

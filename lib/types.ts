@@ -145,11 +145,18 @@ export interface ErrorResponse {
   timestamp: string;
 }
 
+export type QueueRecommendationState =
+  | 'IMMEDIATE'
+  | 'WAITING'
+  | 'UNAVAILABLE'
+  | 'INELIGIBLE';
+
 export interface QueueItem {
   name: string;
   storeStatus: string;
   queueCount: number | null;
   level: QueueLevel;
+  recommendationState: QueueRecommendationState;
 }
 
 export interface QueueApiResponse {
