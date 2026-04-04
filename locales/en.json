@@ -17,7 +17,7 @@
     "open": "Open",
     "languages": {
       "en": "English",
-      "zh-HK": "繁體中文"
+      "zh-HK": "Traditional Chinese"
     },
     "regions": {
       "香港島": "Hong Kong Island",
@@ -117,5 +117,30 @@
     "status": "Status",
     "columns": "Columns",
     "toggleColumns": "Toggle columns"
+  },
+  "dashboardQueue": {
+    "title": "Sushiro Queue Dashboard",
+    "subtitle": "Scan all branches and spot the shortest queue first.",
+    "availableNow": "Fastest Seating",
+    "availableNowHint": "Start with branches that can seat you immediately, then compare the shortest waits.",
+    "moreAvailableHint": "+{count} more available below",
+    "updatedAtLabel": "Updated",
+    "refresh": "Refresh",
+    "retry": "Retry",
+    "loading": "Loading...",
+    "empty": "No queue data is available right now.",
+    "error": "Unable to load queue data.",
+    "refreshing": "Refreshing",
+    "retryHint": "Try refreshing to load the latest queue view.",
+    "liveMonitor": "Live Queue Monitor",
+    "availableGroup": "Available",
+    "lowGroup": "Low",
+    "busyGroup": "Busy",
+    "otherGroup": "Other",
+    "availableNowStatus": "Available now",
+    "lowStatus": "Low wait",
+    "busyStatus": "Busy",
+    "invalid": "Unavailable",
+    "emptyGroup": "No branches in this group."
   }
 }

@@ -158,12 +158,12 @@ export const FiltersSection: React.FC<FiltersSectionProps> = ({
     if (status === null) return '';
     switch (status) {
       case 'LOW':
-        return 'text-green-600 dark:text-green-400';
+        return 'text-success';
       case 'MEDIUM':
-        return 'text-yellow-600 dark:text-yellow-400';
+        return 'text-warning';
       case 'HIGH':
       case 'EXTREME':
-        return 'text-red-600 dark:text-red-400';
+        return 'text-destructive';
       default:
         return '';
     }

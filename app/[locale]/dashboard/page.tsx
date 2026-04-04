@@ -1,176 +1,473 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { toast } from 'sonner';
-import { Store } from '@/lib/types';
-import { useDashboardFilters } from '@/lib/hooks/use-dashboard-filters';
-import { useViewMode } from '@/lib/hooks/use-view-mode';
+import { AlertCircle, Clock, RefreshCw } from 'lucide-react';
 
-import { DashboardHeader } from './_components/DashboardHeader';
-import { FiltersSection } from './_components/FiltersSection';
-import { ViewModeHeader } from './_components/ViewModeHeader';
-import { StoreDisplay } from './_components/StoreDisplay';
-import { TickerTape } from './_components/TickerTape';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { QueueApiResponse, QueueItem } from '@/lib/types';
+import { cn } from '@/lib/utils';
 
-// Auto-refresh configuration
-const AUTO_REFRESH_INTERVAL_MS = 60000; // 60 seconds
+const AUTO_REFRESH_INTERVAL_MS = 30000;
+
+interface QueueRowProps {
+  item: QueueItem;
+  statusText: string;
+  tone: 'available' | 'low' | 'busy' | 'invalid';
+  emphasized?: boolean;
+}
+
+interface QueueGroupProps {
+  title: string;
+  count: number;
+  items: QueueItem[];
+  emptyText: string;
+  getStatusText: (item: QueueItem) => string;
+}
+
+function getRowTone(item: QueueItem): QueueRowProps['tone'] {
+  if (item.queueCount === null) {
+    return 'invalid';
+  }
+
+  if (item.queueCount === 0) {
+    return 'available';
+  }
+
+  if (item.queueCount <= 15) {
+    return 'low';
+  }
+
+  return 'busy';
+}
+
+function getRowClasses(tone: QueueRowProps['tone'], emphasized: boolean) {
+  if (tone === 'available') {
+    return cn(
+      'border-success/25 bg-success/10',
+      emphasized && 'border-success/35 bg-success/12'
+    );
+  }
+
+  if (tone === 'invalid') {
+    return 'border-border bg-background/60 opacity-70';
+  }
+
+  return cn(
+    'border-border bg-background',
+    emphasized && 'border-border/80 bg-background/90'
+  );
+}
+
+function getValueText(item: QueueItem): string | null {
+  if (item.queueCount === null) {
+    return '--';
+  }
+
+  return item.queueCount.toString();
+}
+
+function QueueRow({
+  item,
+  statusText,
+  tone,
+  emphasized = false,
+}: QueueRowProps) {
+  const valueText = getValueText(item);
+
+  return (
+    <div
+      className={cn(
+        'flex items-center justify-between gap-3 rounded-xl border px-4 py-3',
+        getRowClasses(tone, emphasized)
+      )}
+    >
+      <div className="min-w-0 flex-1">
+        <p
+          className={cn(
+            'truncate text-sm font-medium',
+            tone === 'available' ? 'text-success' : 'text-foreground'
+          )}
+        >
+          {item.name}
+        </p>
+        <p
+          className={cn(
+            'mt-1 text-sm',
+            tone === 'available' ? 'text-success/90' : 'text-muted-foreground'
+          )}
+        >
+          {statusText}
+        </p>
+      </div>
+
+      {valueText !== null && (
+        <div
+          className={cn(
+            'shrink-0 text-right text-lg font-semibold tabular-nums',
+            tone === 'available' ? 'text-success' : 'text-muted-foreground'
+          )}
+        >
+          {valueText}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function QueueGroup({
+  title,
+  count,
+  items,
+  emptyText,
+  getStatusText,
+}: QueueGroupProps) {
+  return (
+    <section className="space-y-2">
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+        <span className="text-xs text-muted-foreground">{count}</span>
+      </div>
+
+      {items.length > 0 ? (
+        <div className="space-y-2">
+          {items.map((item, index) => (
+            <QueueRow
+              key={`${title}-${item.name}-${index}`}
+              item={item}
+              statusText={getStatusText(item)}
+              tone={getRowTone(item)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-xl border border-dashed border-border px-4 py-5 text-sm text-muted-foreground">
+          {emptyText}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function QueueListSkeleton({ emphasized = false }: { emphasized?: boolean }) {
+  return (
+    <div className="space-y-2">
+      {Array.from({ length: 3 }).map((_, index) => (
+        <div
+          key={index}
+          className={cn(
+            'rounded-xl border px-4 py-3',
+            emphasized ? 'border-success/20 bg-success/5' : 'border-border bg-card'
+          )}
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0 flex-1 space-y-2">
+              <Skeleton className="h-4 w-36" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+            <Skeleton className="h-6 w-8" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function DashboardPage() {
-  const t = useTranslations();
-  const [stores, setStores] = useState<Store[]>([]);
-  const [previousStores, setPreviousStores] = useState<Store[]>([]);
+  const t = useTranslations('dashboardQueue');
+  const [queues, setQueues] = useState<QueueItem[]>([]);
+  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [, setError] = useState<Error | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [autoRefreshEnabled] = useState(true);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const isFetchingRef = useRef(false);
-  const isInitialLoadRef = useRef(true);
-  const storesRef = useRef<Store[]>([]);
+  const hasDataRef = useRef(false);
 
-  // Data fetching function with deduplication
-  const fetchStores = useCallback(async () => {
-    // Prevent multiple simultaneous requests
-    if (isFetchingRef.current) return;
+  const fetchQueues = useCallback(async () => {
+    if (isFetchingRef.current) {
+      return;
+    }
 
-    const isRefresh = !isInitialLoadRef.current;
+    const hasExistingData = hasDataRef.current;
 
     try {
       isFetchingRef.current = true;
-      setIsLoading(true);
-      setError(null);
+      setErrorMessage(null);
 
-      // Show toast only for auto-refresh, not initial load
-      if (isRefresh) {
-        toast.loading(t('common.refreshStarted'), { id: 'refresh-toast' });
+      if (hasExistingData) {
+        setIsRefreshing(true);
+      } else {
+        setIsLoading(true);
       }
 
-      const response = await fetch('/api/stores/live');
+      const response = await fetch('/api/queues', { cache: 'no-store' });
 
       if (!response.ok) {
-        throw new Error(
-          `${t('errors.apiRequestFailed')}: ${response.status} ${response.statusText}`
-        );
+        throw new Error(`Queue API error: ${response.status}`);
       }
 
-      const apiResponse = await response.json();
-
-      if (!apiResponse.success) {
-        throw new Error(apiResponse.message || t('errors.failedToLoadData'));
-      }
-
-      // Save current stores as previous before updating (for delta calculation)
-      setPreviousStores(storesRef.current);
-      setStores(apiResponse.data);
-      storesRef.current = apiResponse.data;
-      setLastUpdated(new Date());
-
-      // Mark initial load as complete after first successful fetch
-      if (isInitialLoadRef.current) {
-        setIsInitialLoad(false);
-      }
-
-      // Show success toast only for refresh
-      if (isRefresh) {
-        toast.success(t('common.refreshComplete'), { id: 'refresh-toast' });
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error ? err : new Error(t('errors.unknownError'))
-      );
-      console.error('Error fetching stores:', err);
-
-      // Dismiss loading toast on error
-      if (isRefresh) {
-        toast.error(t('errors.failedToLoadData'), { id: 'refresh-toast' });
-      }
+      const payload = (await response.json()) as QueueApiResponse;
+      setQueues(payload.data);
+      hasDataRef.current = payload.data.length > 0;
+      setUpdatedAt(payload.updatedAt ? new Date(payload.updatedAt) : null);
+    } catch (error) {
+      console.error('Error fetching queues:', error);
+      setErrorMessage(t('error'));
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
       isFetchingRef.current = false;
-      isInitialLoadRef.current = false;
     }
   }, [t]);
 
-  // Initial load
   useEffect(() => {
-    void fetchStores();
-  }, [fetchStores]);
+    void fetchQueues();
+  }, [fetchQueues]);
 
-  // Polling logic - refresh every minute
   useEffect(() => {
-    if (!autoRefreshEnabled) return;
-
     const interval = setInterval(() => {
-      void fetchStores();
+      void fetchQueues();
     }, AUTO_REFRESH_INTERVAL_MS);
 
     return () => clearInterval(interval);
-  }, [fetchStores, autoRefreshEnabled]);
+  }, [fetchQueues]);
 
-  // Tab visibility handling
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      // Handle visibility changes if needed in the future
+  const { availableQueues, lowQueues, busyQueues, invalidQueues } = useMemo(() => {
+    const available: QueueItem[] = [];
+    const low: QueueItem[] = [];
+    const busy: QueueItem[] = [];
+    const invalid: QueueItem[] = [];
+
+    queues.forEach((queue) => {
+      if (queue.queueCount === null) {
+        invalid.push(queue);
+      } else if (queue.queueCount === 0) {
+        available.push(queue);
+      } else if (queue.queueCount <= 15) {
+        low.push(queue);
+      } else {
+        busy.push(queue);
+      }
+    });
+
+    return {
+      availableQueues: available,
+      lowQueues: low,
+      busyQueues: busy,
+      invalidQueues: invalid,
     };
+  }, [queues]);
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () =>
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
+  const recommendedQueues = useMemo(() => {
+    const recommended = availableQueues.slice(0, 3);
 
-  const {
-    searchTerm,
-    setSearchTerm,
-    regionFilter,
-    setRegionFilter,
-    waitingStatusFilter,
-    setWaitingStatusFilter,
-    filteredStores,
-    uniqueRegions,
-    waitingStatusOptions,
-  } = useDashboardFilters(stores);
-  const { viewMode, handleViewModeChange } = useViewMode();
+    if (recommended.length < 3) {
+      recommended.push(...lowQueues.slice(0, 3 - recommended.length));
+    }
+
+    if (recommended.length < 3) {
+      recommended.push(...busyQueues.slice(0, 3 - recommended.length));
+    }
+
+    if (recommended.length === 0) {
+      recommended.push(...invalidQueues.slice(0, 3));
+    }
+
+    return recommended;
+  }, [availableQueues, busyQueues, invalidQueues, lowQueues]);
+
+  const recommendedAvailableCount = useMemo(
+    () =>
+      recommendedQueues.filter((queue) => queue.queueCount === 0).length,
+    [recommendedQueues]
+  );
+
+  const additionalAvailableCount = Math.max(
+    0,
+    availableQueues.length - recommendedAvailableCount
+  );
+
+  const showBlockingError =
+    errorMessage !== null && queues.length === 0 && !isLoading;
+  const showInlineError = errorMessage !== null && queues.length > 0;
+
+  const getStatusText = useCallback(
+    (item: QueueItem) => {
+      if (item.queueCount === null) {
+        return t('invalid');
+      }
+
+      if (item.queueCount === 0) {
+        return t('availableNowStatus');
+      }
+
+      if (item.queueCount <= 15) {
+        return t('lowStatus');
+      }
+
+      return t('busyStatus');
+    },
+    [t]
+  );
 
   return (
-    <div className="space-y-4 pb-14">
-      <DashboardHeader
-        isLoading={isLoading}
-        lastUpdated={lastUpdated}
-        onManualRefresh={() => {
-          void fetchStores();
-        }}
-      />
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 pb-10 pt-4 sm:pt-6">
+      <div className="space-y-4">
+        <div className="space-y-1">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            {t('liveMonitor')}
+          </p>
+          <h1 className="text-xl font-semibold text-foreground sm:text-2xl">
+            {t('title')}
+          </h1>
+          <p className="max-w-xl text-sm text-muted-foreground">{t('subtitle')}</p>
+        </div>
 
-      <TickerTape
-        stores={stores}
-        previousStores={previousStores}
-        isInitialLoad={isInitialLoad}
-      />
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Clock className="h-3.5 w-3.5" />
+            <span>
+              {t('updatedAtLabel')}:{' '}
+              {updatedAt ? updatedAt.toLocaleTimeString() : t('loading')}
+            </span>
+          </div>
 
-      <FiltersSection
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        regionFilter={regionFilter}
-        onRegionFilterChange={setRegionFilter}
-        waitingStatusFilter={waitingStatusFilter}
-        onWaitingStatusFilterChange={setWaitingStatusFilter}
-        uniqueRegions={uniqueRegions}
-        waitingStatusOptions={waitingStatusOptions}
-        filteredCount={filteredStores.length}
-      />
+          <div className="flex items-center justify-between gap-2 sm:justify-end">
+            <Button
+              onClick={() => {
+                void fetchQueues();
+              }}
+              disabled={isLoading || isRefreshing}
+              variant="outline"
+              size="sm"
+              className="gap-2"
+            >
+              <RefreshCw
+                className={cn(
+                  'h-4 w-4',
+                  (isLoading || isRefreshing) && 'animate-spin'
+                )}
+              />
+              <span>{isRefreshing ? t('refreshing') : t('refresh')}</span>
+            </Button>
 
-      <ViewModeHeader
-        filteredCount={filteredStores.length}
-        viewMode={viewMode}
-        onViewModeChange={handleViewModeChange}
-      />
+            <LanguageSwitcher />
+          </div>
+        </div>
+      </div>
 
-      <StoreDisplay
-        stores={filteredStores}
-        viewMode={viewMode}
-        isLoading={isLoading}
-      />
+      {showBlockingError ? (
+        <Card className="border border-border bg-card">
+          <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
+            <AlertCircle className="h-10 w-10 text-destructive" />
+            <div className="space-y-1">
+              <p className="font-medium text-foreground">{t('error')}</p>
+              <p className="text-sm text-muted-foreground">{t('retryHint')}</p>
+            </div>
+            <Button
+              onClick={() => {
+                void fetchQueues();
+              }}
+            >
+              {t('retry')}
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          {showInlineError && (
+            <div className="flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
+          <section className="space-y-3 rounded-2xl border border-success/20 bg-success/5 p-4 sm:p-5">
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-semibold text-success">
+                  {t('availableNow')}
+                </h2>
+                <span className="text-xs text-success/80">
+                  {recommendedQueues.length}/{Math.max(3, availableQueues.length)}
+                </span>
+              </div>
+              <p className="text-sm text-success/90">{t('availableNowHint')}</p>
+              {additionalAvailableCount > 0 && (
+                <p className="text-xs text-success/80">
+                  {t('moreAvailableHint', { count: additionalAvailableCount })}
+                </p>
+              )}
+            </div>
+
+            {isLoading ? (
+              <QueueListSkeleton emphasized />
+            ) : recommendedQueues.length > 0 ? (
+              <div className="space-y-2">
+                {recommendedQueues.map((item, index) => (
+                  <QueueRow
+                    key={`recommended-${item.name}-${index}`}
+                    item={item}
+                    statusText={getStatusText(item)}
+                    tone={getRowTone(item)}
+                    emphasized
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-dashed border-success/30 px-4 py-5 text-sm text-success/90">
+                {t('empty')}
+              </div>
+            )}
+          </section>
+
+          <div className="space-y-4">
+            {isLoading ? (
+              <>
+                <QueueListSkeleton />
+                <QueueListSkeleton />
+                <QueueListSkeleton />
+              </>
+            ) : (
+              <>
+                <QueueGroup
+                  title={t('availableGroup')}
+                  count={availableQueues.length}
+                  items={availableQueues}
+                  emptyText={t('emptyGroup')}
+                  getStatusText={getStatusText}
+                />
+                <QueueGroup
+                  title={t('lowGroup')}
+                  count={lowQueues.length}
+                  items={lowQueues}
+                  emptyText={t('emptyGroup')}
+                  getStatusText={getStatusText}
+                />
+                <QueueGroup
+                  title={t('busyGroup')}
+                  count={busyQueues.length}
+                  items={busyQueues}
+                  emptyText={t('emptyGroup')}
+                  getStatusText={getStatusText}
+                />
+                {invalidQueues.length > 0 && (
+                  <QueueGroup
+                    title={t('otherGroup')}
+                    count={invalidQueues.length}
+                    items={invalidQueues}
+                    emptyText={t('emptyGroup')}
+                    getStatusText={getStatusText}
+                  />
+                )}
+              </>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }

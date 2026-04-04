@@ -110,9 +110,11 @@ export const TickerTape = ({
               {showDelta && (
                 <span
                   className={cn(
-                    'ml-1.5 flex items-center gap-0.5 text-sm font-bold text-white px-1 py-0.5 rounded-sm tabular-nums',
-                    store.deltaDirection === 'up' && 'bg-destructive',
-                    store.deltaDirection === 'down' && 'bg-green-600'
+                    'ml-1.5 flex items-center gap-0.5 rounded-sm px-1 py-0.5 text-sm font-bold tabular-nums',
+                    store.deltaDirection === 'up' &&
+                      'bg-destructive text-destructive-foreground',
+                    store.deltaDirection === 'down' &&
+                      'bg-success text-success-foreground'
                   )}
                 >
                   {store.deltaDirection === 'up' && (

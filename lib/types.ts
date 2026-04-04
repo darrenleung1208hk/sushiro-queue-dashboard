@@ -87,6 +87,8 @@ export type StoreStatus = (typeof STORE_STATUS)[keyof typeof STORE_STATUS];
 export type QueuePriority =
   (typeof QUEUE_PRIORITY)[keyof typeof QUEUE_PRIORITY];
 
+export type QueueLevel = Extract<QueuePriority, 'LOW' | 'MEDIUM' | 'HIGH'>;
+
 // Store region constants
 export const STORE_REGIONS = {
   HONG_KONG_ISLAND: '香港島',
@@ -141,6 +143,17 @@ export interface ErrorResponse {
   error: string;
   message: string;
   timestamp: string;
+}
+
+export interface QueueItem {
+  name: string;
+  queueCount: number | null;
+  level: QueueLevel;
+}
+
+export interface QueueApiResponse {
+  updatedAt: string;
+  data: QueueItem[];
 }
 
 // Dashboard specific types
