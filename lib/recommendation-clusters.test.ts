@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { deriveRecommendationCluster } from '@/lib/recommendation-clusters';
+import {
+  CLUSTER_ADJACENCY,
+  deriveRecommendationCluster,
+} from '@/lib/recommendation-clusters';
 import {
   RECOMMENDATION_CLUSTERS,
   STORE_AREAS,
@@ -8,12 +11,21 @@ import {
 } from '@/lib/types';
 
 describe('recommendation cluster derivation', () => {
-  it('maps Hong Kong Island districts to HK_ISLAND', () => {
+  it('maps west Hong Kong Island districts to HK_ISLAND_WEST', () => {
     expect(
       deriveRecommendationCluster('', STORE_AREAS.CENTRAL_WESTERN)
-    ).toBe(RECOMMENDATION_CLUSTERS.HK_ISLAND);
+    ).toBe(RECOMMENDATION_CLUSTERS.HK_ISLAND_WEST);
     expect(deriveRecommendationCluster('', STORE_AREAS.WAN_CHAI)).toBe(
-      RECOMMENDATION_CLUSTERS.HK_ISLAND
+      RECOMMENDATION_CLUSTERS.HK_ISLAND_WEST
+    );
+    expect(deriveRecommendationCluster('', STORE_AREAS.SOUTHERN)).toBe(
+      RECOMMENDATION_CLUSTERS.HK_ISLAND_WEST
+    );
+  });
+
+  it('maps eastern district to HK_ISLAND_EAST', () => {
+    expect(deriveRecommendationCluster('', STORE_AREAS.EASTERN)).toBe(
+      RECOMMENDATION_CLUSTERS.HK_ISLAND_EAST
     );
   });
 
@@ -43,6 +55,9 @@ describe('recommendation cluster derivation', () => {
       RECOMMENDATION_CLUSTERS.TSEUNG_KWAN_O
     );
     expect(deriveRecommendationCluster('', '將軍澳')).toBe(
+      RECOMMENDATION_CLUSTERS.TSEUNG_KWAN_O
+    );
+    expect(deriveRecommendationCluster('', STORE_AREAS.SAI_KUNG)).toBe(
       RECOMMENDATION_CLUSTERS.TSEUNG_KWAN_O
     );
   });
@@ -83,15 +98,30 @@ describe('recommendation cluster derivation', () => {
     );
   });
 
-  it('uses narrow region fallback for Hong Kong Island', () => {
+  it('uses west Hong Kong Island region fallback when area is unavailable', () => {
     expect(deriveRecommendationCluster(STORE_REGIONS.HONG_KONG_ISLAND, '')).toBe(
-      RECOMMENDATION_CLUSTERS.HK_ISLAND
+      RECOMMENDATION_CLUSTERS.HK_ISLAND_WEST
     );
   });
 
   it('returns UNKNOWN for unmapped inputs', () => {
     expect(deriveRecommendationCluster('', 'Unknown Area')).toBe(
       RECOMMENDATION_CLUSTERS.UNKNOWN
+    );
+  });
+
+  it('uses symmetric adjacency for key cluster pairs', () => {
+    expect(CLUSTER_ADJACENCY.HK_ISLAND_WEST).toContain(
+      RECOMMENDATION_CLUSTERS.WEST_KOWLOON
+    );
+    expect(CLUSTER_ADJACENCY.WEST_KOWLOON).toContain(
+      RECOMMENDATION_CLUSTERS.HK_ISLAND_WEST
+    );
+    expect(CLUSTER_ADJACENCY.HK_ISLAND_EAST).toContain(
+      RECOMMENDATION_CLUSTERS.EAST_KOWLOON
+    );
+    expect(CLUSTER_ADJACENCY.EAST_KOWLOON).toContain(
+      RECOMMENDATION_CLUSTERS.HK_ISLAND_EAST
     );
   });
 });
