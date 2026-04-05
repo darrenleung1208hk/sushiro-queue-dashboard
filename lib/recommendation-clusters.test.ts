@@ -42,6 +42,9 @@ describe('recommendation cluster derivation', () => {
     expect(deriveRecommendationCluster('', 'Tseung Kwan O')).toBe(
       RECOMMENDATION_CLUSTERS.TSEUNG_KWAN_O
     );
+    expect(deriveRecommendationCluster('', '將軍澳')).toBe(
+      RECOMMENDATION_CLUSTERS.TSEUNG_KWAN_O
+    );
   });
 
   it('maps Sha Tin to SHA_TIN_BELT', () => {
@@ -63,7 +66,7 @@ describe('recommendation cluster derivation', () => {
     expect(deriveRecommendationCluster('', STORE_AREAS.KWAI_TSING)).toBe(
       RECOMMENDATION_CLUSTERS.TSUEN_KWAN_WEST
     );
-    expect(deriveRecommendationCluster('', STORE_AREAS.ISLANDS)).toBe(
+    expect(deriveRecommendationCluster('', STORE_AREAS.TSUEN_WAN)).toBe(
       RECOMMENDATION_CLUSTERS.TSUEN_KWAN_WEST
     );
     expect(deriveRecommendationCluster('', 'Tsuen Wan')).toBe(
