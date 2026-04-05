@@ -1,63 +1,13 @@
 import { NextResponse } from 'next/server';
 
 import { fetchLiveStores } from '@/lib/live-stores';
-import { QueueApiResponse, QueueItem } from '@/lib/types';
-import { getQueuePriority } from '@/lib/utils';
-
-function isRecommendableStatus(storeStatus: string): boolean {
-  return storeStatus === 'OPEN' || storeStatus === 'BUSY';
-}
-
-function normalizeQueueCount(value: unknown): number | null {
-  return typeof value === 'number' && Number.isFinite(value) && value >= 0
-    ? value
-    : null;
-}
-
-function getSortableQueueCount(queueCount: number | null): number {
-  return queueCount ?? Number.POSITIVE_INFINITY;
-}
-
-function compareQueueItems(left: QueueItem, right: QueueItem): number {
-  const leftCount = getSortableQueueCount(left.queueCount);
-  const rightCount = getSortableQueueCount(right.queueCount);
-
-  if (leftCount < rightCount) {
-    return -1;
-  }
-
-  if (leftCount > rightCount) {
-    return 1;
-  }
-
-  return left.name.localeCompare(right.name, 'zh-HK');
-}
-
-function buildQueueItem(
-  name: string,
-  storeStatus: string,
-  rawQueueCount: unknown
-): QueueItem {
-  const normalizedQueueCount = normalizeQueueCount(rawQueueCount);
-  const queueCount = isRecommendableStatus(storeStatus)
-    ? normalizedQueueCount
-    : null;
-  const recommendationState = !isRecommendableStatus(storeStatus)
-    ? 'INELIGIBLE'
-    : queueCount === null
-      ? 'UNAVAILABLE'
-      : queueCount === 0
-        ? 'IMMEDIATE'
-        : 'WAITING';
-
-  return {
-    name,
-    storeStatus,
-    queueCount,
-    level: getQueuePriority(queueCount ?? 0),
-    recommendationState,
-  };
-}
+import { buildQueueItem, compareQueueItems } from '@/lib/queue-items';
+import {
+  buildQueueGroups,
+  buildRecommendedQueues,
+  createEmptyQueueGroups,
+} from '@/lib/queue-response';
+import { QueueApiResponse } from '@/lib/types';
 
 export async function GET(): Promise<NextResponse<QueueApiResponse>> {
   try {
@@ -69,10 +19,14 @@ export async function GET(): Promise<NextResponse<QueueApiResponse>> {
         buildQueueItem(store.name, store.storeStatus, store.waitingGroup)
       )
       .sort(compareQueueItems);
+    const groups = buildQueueGroups(data);
+    const recommended = buildRecommendedQueues(groups);
 
     return NextResponse.json({
       updatedAt: updatedAt.toISOString(),
       data,
+      recommended,
+      groups,
     });
   } catch (error) {
     console.error('Error in queues API:', error);
@@ -81,6 +35,8 @@ export async function GET(): Promise<NextResponse<QueueApiResponse>> {
       {
         updatedAt: new Date().toISOString(),
         data: [],
+        recommended: [],
+        groups: createEmptyQueueGroups(),
       },
       { status: 503 }
     );
