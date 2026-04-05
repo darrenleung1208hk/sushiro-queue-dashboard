@@ -6,10 +6,10 @@ import {
 } from '@/lib/types';
 
 const AREA_CLUSTER_ENTRIES: Array<readonly [string, RecommendationCluster]> = [
-  [STORE_AREAS.CENTRAL_WESTERN, RECOMMENDATION_CLUSTERS.HK_ISLAND],
-  [STORE_AREAS.WAN_CHAI, RECOMMENDATION_CLUSTERS.HK_ISLAND],
-  [STORE_AREAS.EASTERN, RECOMMENDATION_CLUSTERS.HK_ISLAND],
-  [STORE_AREAS.SOUTHERN, RECOMMENDATION_CLUSTERS.HK_ISLAND],
+  [STORE_AREAS.CENTRAL_WESTERN, RECOMMENDATION_CLUSTERS.HK_ISLAND_WEST],
+  [STORE_AREAS.WAN_CHAI, RECOMMENDATION_CLUSTERS.HK_ISLAND_WEST],
+  [STORE_AREAS.SOUTHERN, RECOMMENDATION_CLUSTERS.HK_ISLAND_WEST],
+  [STORE_AREAS.EASTERN, RECOMMENDATION_CLUSTERS.HK_ISLAND_EAST],
   [STORE_AREAS.YAU_TSIM_MONG, RECOMMENDATION_CLUSTERS.WEST_KOWLOON],
   [STORE_AREAS.SHAM_SHUI_PO, RECOMMENDATION_CLUSTERS.WEST_KOWLOON],
   [STORE_AREAS.KOWLOON_CITY, RECOMMENDATION_CLUSTERS.WEST_KOWLOON],
@@ -33,10 +33,10 @@ const AREA_TO_CLUSTER = new Map<string, RecommendationCluster>(
 );
 
 const AREA_ALIAS_ENTRIES: Array<readonly [string, RecommendationCluster]> = [
-  ['CENTRAL AND WESTERN', RECOMMENDATION_CLUSTERS.HK_ISLAND],
-  ['WAN CHAI', RECOMMENDATION_CLUSTERS.HK_ISLAND],
-  ['EASTERN', RECOMMENDATION_CLUSTERS.HK_ISLAND],
-  ['SOUTHERN', RECOMMENDATION_CLUSTERS.HK_ISLAND],
+  ['CENTRAL AND WESTERN', RECOMMENDATION_CLUSTERS.HK_ISLAND_WEST],
+  ['WAN CHAI', RECOMMENDATION_CLUSTERS.HK_ISLAND_WEST],
+  ['SOUTHERN', RECOMMENDATION_CLUSTERS.HK_ISLAND_WEST],
+  ['EASTERN', RECOMMENDATION_CLUSTERS.HK_ISLAND_EAST],
   ['YAU TSIM MONG', RECOMMENDATION_CLUSTERS.WEST_KOWLOON],
   ['SHAM SHUI PO', RECOMMENDATION_CLUSTERS.WEST_KOWLOON],
   ['KOWLOON CITY', RECOMMENDATION_CLUSTERS.WEST_KOWLOON],
@@ -55,15 +55,67 @@ const AREA_ALIAS_ENTRIES: Array<readonly [string, RecommendationCluster]> = [
 ];
 
 const AREA_ALIAS_TO_CLUSTER = new Map<string, RecommendationCluster>(
-  AREA_ALIAS_ENTRIES.map(([area, cluster]) => [normalizeLocationValue(area), cluster])
+  AREA_ALIAS_ENTRIES.map(([area, cluster]) => [
+    normalizeLocationValue(area),
+    cluster,
+  ])
 );
 
 const REGION_TO_CLUSTER = new Map<string, RecommendationCluster>([
   [
     normalizeLocationValue(STORE_REGIONS.HONG_KONG_ISLAND),
-    RECOMMENDATION_CLUSTERS.HK_ISLAND,
+    RECOMMENDATION_CLUSTERS.HK_ISLAND_WEST,
   ],
 ]);
+
+export const CLUSTER_ADJACENCY: Record<
+  RecommendationCluster,
+  RecommendationCluster[]
+> = {
+  HK_ISLAND_WEST: [
+    RECOMMENDATION_CLUSTERS.WEST_KOWLOON,
+    RECOMMENDATION_CLUSTERS.HK_ISLAND_EAST,
+  ],
+  HK_ISLAND_EAST: [
+    RECOMMENDATION_CLUSTERS.HK_ISLAND_WEST,
+    RECOMMENDATION_CLUSTERS.EAST_KOWLOON,
+  ],
+  WEST_KOWLOON: [
+    RECOMMENDATION_CLUSTERS.HK_ISLAND_WEST,
+    RECOMMENDATION_CLUSTERS.EAST_KOWLOON,
+    RECOMMENDATION_CLUSTERS.TSUEN_KWAN_WEST,
+  ],
+  EAST_KOWLOON: [
+    RECOMMENDATION_CLUSTERS.HK_ISLAND_EAST,
+    RECOMMENDATION_CLUSTERS.WEST_KOWLOON,
+    RECOMMENDATION_CLUSTERS.TSEUNG_KWAN_O,
+    RECOMMENDATION_CLUSTERS.SHA_TIN_BELT,
+  ],
+  TSEUNG_KWAN_O: [
+    RECOMMENDATION_CLUSTERS.EAST_KOWLOON,
+    RECOMMENDATION_CLUSTERS.SHA_TIN_BELT,
+  ],
+  SHA_TIN_BELT: [
+    RECOMMENDATION_CLUSTERS.EAST_KOWLOON,
+    RECOMMENDATION_CLUSTERS.TSEUNG_KWAN_O,
+    RECOMMENDATION_CLUSTERS.NORTH_NT,
+    RECOMMENDATION_CLUSTERS.TSUEN_KWAN_WEST,
+  ],
+  NORTH_NT: [
+    RECOMMENDATION_CLUSTERS.SHA_TIN_BELT,
+    RECOMMENDATION_CLUSTERS.FAR_WEST_NT,
+  ],
+  TSUEN_KWAN_WEST: [
+    RECOMMENDATION_CLUSTERS.WEST_KOWLOON,
+    RECOMMENDATION_CLUSTERS.SHA_TIN_BELT,
+    RECOMMENDATION_CLUSTERS.FAR_WEST_NT,
+  ],
+  FAR_WEST_NT: [
+    RECOMMENDATION_CLUSTERS.TSUEN_KWAN_WEST,
+    RECOMMENDATION_CLUSTERS.NORTH_NT,
+  ],
+  UNKNOWN: [],
+};
 
 function normalizeLocationValue(value: string): string {
   return value.trim().replace(/\s+/g, ' ').toUpperCase();
@@ -73,7 +125,6 @@ export function deriveRecommendationCluster(
   region: string,
   area: string
 ): RecommendationCluster {
-  // Prefer district-level mapping first since it gives tighter practical clusters.
   const normalizedArea = normalizeLocationValue(area);
 
   const mappedAreaCluster = AREA_TO_CLUSTER.get(normalizedArea);
@@ -88,7 +139,6 @@ export function deriveRecommendationCluster(
     return mappedAreaAliasCluster;
   }
 
-  // Region fallback is intentionally narrow to avoid over-broad grouping.
   const normalizedRegion = normalizeLocationValue(region);
 
   const mappedRegionCluster = REGION_TO_CLUSTER.get(normalizedRegion);
@@ -97,6 +147,5 @@ export function deriveRecommendationCluster(
     return mappedRegionCluster;
   }
 
-  // Unknown is treated as a normal recommendation bucket upstream.
   return RECOMMENDATION_CLUSTERS.UNKNOWN;
 }
