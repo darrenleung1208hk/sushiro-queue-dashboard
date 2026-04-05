@@ -42,6 +42,7 @@ export function buildRecommendedQueues(
     buckets.set(store.recommendationCluster, [item]);
   });
 
+  // Phase 1: take one best candidate per cluster to diversify recommendations.
   const regionWinners = Array.from(buckets.values())
     .map((bucket) => bucket.sort(compareQueueItems)[0])
     .sort(compareQueueItems)
@@ -51,6 +52,7 @@ export function buildRecommendedQueues(
     return regionWinners;
   }
 
+  // Phase 2: fill remaining slots from the globally best non-selected candidates.
   const selectedShopIds = new Set(regionWinners.map((item) => item.shopId));
   const remainingCandidates = Array.from(buckets.values())
     .flatMap((bucket) => bucket)

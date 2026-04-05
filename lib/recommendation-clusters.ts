@@ -72,6 +72,7 @@ export function deriveRecommendationCluster(
   region: string,
   area: string
 ): RecommendationCluster {
+  // Prefer district-level mapping first since it gives tighter practical clusters.
   const normalizedArea = normalizeLocationValue(area);
 
   const mappedAreaCluster = AREA_TO_CLUSTER.get(normalizedArea);
@@ -86,6 +87,7 @@ export function deriveRecommendationCluster(
     return mappedAreaAliasCluster;
   }
 
+  // Region fallback is intentionally narrow to avoid over-broad grouping.
   const normalizedRegion = normalizeLocationValue(region);
 
   const mappedRegionCluster = REGION_TO_CLUSTER.get(normalizedRegion);
@@ -94,5 +96,6 @@ export function deriveRecommendationCluster(
     return mappedRegionCluster;
   }
 
+  // Unknown is treated as a normal recommendation bucket upstream.
   return RECOMMENDATION_CLUSTERS.UNKNOWN;
 }
