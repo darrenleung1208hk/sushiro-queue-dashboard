@@ -1,6 +1,10 @@
 import { useState, useMemo } from 'react';
+
+import {
+  filterDashboardStores,
+  type DashboardFilterValues,
+} from '@/lib/dashboard-filters';
 import { Store } from '@/lib/types';
-import { getQueuePriority } from '@/lib/utils';
 
 export const useDashboardFilters = (stores: Store[]) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -10,21 +14,13 @@ export const useDashboardFilters = (stores: Store[]) => {
   );
 
   const filteredStores = useMemo(() => {
-    return stores.filter((store) => {
-      const matchesSearch =
-        store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        store.nameEn.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        store.region.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        store.area.toLowerCase().includes(searchTerm.toLowerCase());
+    const filters: DashboardFilterValues = {
+      searchTerm,
+      regionFilter,
+      waitingStatusFilter,
+    };
 
-      const matchesRegion = !regionFilter || store.region === regionFilter;
-
-      const matchesWaitingStatus =
-        !waitingStatusFilter ||
-        getQueuePriority(store.waitingGroup) === waitingStatusFilter;
-
-      return matchesSearch && matchesRegion && matchesWaitingStatus;
-    });
+    return filterDashboardStores(stores, filters);
   }, [stores, searchTerm, regionFilter, waitingStatusFilter]);
 
   const uniqueRegions = useMemo(
