@@ -38,34 +38,6 @@ function getAnchorCluster(
   return getClusterForItem(bestCandidate, storesByShopId);
 }
 
-function getExpandedClusters(
-  anchorCluster: RecommendationCluster
-): RecommendationCluster[] {
-  const visited = new Set<RecommendationCluster>([anchorCluster]);
-  const orderedClusters: RecommendationCluster[] = [anchorCluster];
-  let frontier: RecommendationCluster[] = [anchorCluster];
-
-  while (frontier.length > 0) {
-    const nextFrontier: RecommendationCluster[] = [];
-
-    frontier.forEach((cluster) => {
-      CLUSTER_ADJACENCY[cluster].forEach((adjacentCluster) => {
-        if (visited.has(adjacentCluster)) {
-          return;
-        }
-
-        visited.add(adjacentCluster);
-        orderedClusters.push(adjacentCluster);
-        nextFrontier.push(adjacentCluster);
-      });
-    });
-
-    frontier = nextFrontier;
-  }
-
-  return orderedClusters;
-}
-
 function getEligibleCandidates(
   data: QueueItem[],
   storesByShopId: Map<number, Store>
@@ -88,37 +60,88 @@ function getCandidatesInClusters(
   });
 }
 
+function getEligibleItemsInCluster(
+  candidates: QueueItem[],
+  storesByShopId: Map<number, Store>,
+  cluster: RecommendationCluster
+): QueueItem[] {
+  return candidates
+    .filter((item) => getClusterForItem(item, storesByShopId) === cluster)
+    .sort(compareQueueItems);
+}
+
 function getScopedFallbackRecommendations(
   candidates: QueueItem[],
   storesByShopId: Map<number, Store>,
   anchorCluster: RecommendationCluster,
   excludedShopIds: Set<number>
 ): QueueItem[] {
-  const orderedClusters = getExpandedClusters(anchorCluster);
-  const relevantClusters = new Set<RecommendationCluster>([
-    anchorCluster,
-    ...CLUSTER_ADJACENCY[anchorCluster],
-  ]);
+  const adjacentClusters = new Set<RecommendationCluster>(
+    CLUSTER_ADJACENCY[anchorCluster]
+  );
+  return getCandidatesInClusters(
+    candidates,
+    adjacentClusters,
+    storesByShopId
+  )
+    .filter((item) => !excludedShopIds.has(item.shopId))
+    .sort(compareQueueItems);
+}
 
-  for (const cluster of orderedClusters) {
-    relevantClusters.add(cluster);
-
-    const scopedCandidates = getCandidatesInClusters(
-      candidates,
-      relevantClusters,
-      storesByShopId
-    )
-      .filter((item) => !excludedShopIds.has(item.shopId))
-      .sort(compareQueueItems);
-
-    if (scopedCandidates.length >= 3) {
-      return scopedCandidates;
-    }
-  }
-
+function getGlobalFallbackRecommendations(
+  candidates: QueueItem[],
+  excludedShopIds: Set<number>
+): QueueItem[] {
   return candidates
     .filter((item) => !excludedShopIds.has(item.shopId))
     .sort(compareQueueItems);
+}
+
+function buildPrimaryThenFallbackRecommendations(
+  candidates: QueueItem[],
+  storesByShopId: Map<number, Store>,
+  primaryCluster: RecommendationCluster
+): QueueItem[] {
+  const primaryCandidates = getEligibleItemsInCluster(
+    candidates,
+    storesByShopId,
+    primaryCluster
+  );
+  const selectedPrimary = primaryCandidates.slice(0, 3);
+
+  if (selectedPrimary.length === 3) {
+    return selectedPrimary;
+  }
+
+  const selectedShopIds = new Set(selectedPrimary.map((item) => item.shopId));
+  const fallbackCandidates = getScopedFallbackRecommendations(
+    candidates,
+    storesByShopId,
+    primaryCluster,
+    selectedShopIds
+  );
+  const selectedWithAdjacentFallback = [
+    ...selectedPrimary,
+    ...fallbackCandidates,
+  ].slice(0, 3);
+
+  if (selectedWithAdjacentFallback.length === 3) {
+    return selectedWithAdjacentFallback;
+  }
+
+  const adjacentFallbackShopIds = new Set([
+    ...Array.from(selectedShopIds),
+    ...fallbackCandidates.map((item) => item.shopId),
+  ]);
+  const globalFallbackCandidates = getGlobalFallbackRecommendations(
+    candidates,
+    adjacentFallbackShopIds
+  );
+
+  return [...selectedWithAdjacentFallback, ...globalFallbackCandidates].slice(
+    0,
+    3
+  );
 }
 
 export function buildRecommendedQueues(
@@ -129,29 +152,11 @@ export function buildRecommendedQueues(
   const eligibleCandidates = getEligibleCandidates(data, storesByShopId);
 
   if (preferredCluster) {
-    const preferredCandidates = eligibleCandidates
-      .filter(
-        (item) => getClusterForItem(item, storesByShopId) === preferredCluster
-      )
-      .sort(compareQueueItems);
-
-    const selectedPreferred = preferredCandidates.slice(0, 3);
-
-    if (selectedPreferred.length === 3) {
-      return selectedPreferred;
-    }
-
-    const selectedShopIds = new Set(
-      selectedPreferred.map((item) => item.shopId)
-    );
-    const fallbackCandidates = getScopedFallbackRecommendations(
+    return buildPrimaryThenFallbackRecommendations(
       eligibleCandidates,
       storesByShopId,
-      preferredCluster,
-      selectedShopIds
+      preferredCluster
     );
-
-    return [...selectedPreferred, ...fallbackCandidates].slice(0, 3);
   }
 
   const anchorCluster = getAnchorCluster(eligibleCandidates, storesByShopId);
@@ -160,10 +165,9 @@ export function buildRecommendedQueues(
     return [];
   }
 
-  return getScopedFallbackRecommendations(
+  return buildPrimaryThenFallbackRecommendations(
     eligibleCandidates,
     storesByShopId,
-    anchorCluster,
-    new Set<number>()
-  ).slice(0, 3);
+    anchorCluster
+  );
 }

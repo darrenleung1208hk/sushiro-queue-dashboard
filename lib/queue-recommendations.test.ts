@@ -141,7 +141,7 @@ describe('queue recommendations', () => {
     expect(recommended).toEqual([tsuenWan, kwaiFong, shaTin]);
   });
 
-  it('expands to second-ring clusters when the initial scope has fewer than 3 candidates', () => {
+  it('falls back to the global eligible pool after 1-hop adjacent clusters are exhausted', () => {
     const anchor = createQueueItem(1, 'Tseung Kwan O', 1);
     const eastKowloon = createQueueItem(2, 'Kwun Tong', 2);
     const westKowloon = createQueueItem(3, 'Jordan', 3);
@@ -158,7 +158,7 @@ describe('queue recommendations', () => {
     expect(recommended).toEqual([anchor, eastKowloon, westKowloon]);
   });
 
-  it('falls back to the remaining global eligible pool after exhausting adjacency expansion', () => {
+  it('falls back to the remaining global eligible pool after exhausting 1-hop adjacency', () => {
     const unknown = createQueueItem(1, 'Unknown', 1);
     const islandWest = createQueueItem(2, 'Central', 2);
     const westKowloon = createQueueItem(3, 'Jordan', 3);
@@ -207,7 +207,7 @@ describe('queue recommendations', () => {
     expect(recommended).toEqual([eligible]);
   });
 
-  it('pairs queue items to stores by shopId instead of array order', () => {
+  it('pairs queue items to stores by shopId instead of array order when building the 1-hop scope', () => {
     const islandWest = createQueueItem(1, 'Central', 2);
     const eastKowloon = createQueueItem(2, 'Kwun Tong', 1);
     const islandEast = createQueueItem(3, 'North Point', 3);
@@ -221,6 +221,6 @@ describe('queue recommendations', () => {
       ])
     );
 
-    expect(recommended).toEqual([eastKowloon, islandWest, islandEast]);
+    expect(recommended).toEqual([eastKowloon, islandEast, islandWest]);
   });
 });
