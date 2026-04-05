@@ -1,4 +1,4 @@
-/**
+﻿/**
  * TypeScript interfaces for Sushiro store queue data
  * Based on n8n workflow "get-store-queue-status"
  */
@@ -102,27 +102,27 @@ export type StoreRegion = (typeof STORE_REGIONS)[keyof typeof STORE_REGIONS];
 // Store area constants (common areas in Hong Kong)
 export const STORE_AREAS = {
   // Hong Kong Island
+  SOUTHERN: '南區',
   CENTRAL_WESTERN: '中西區',
   WAN_CHAI: '灣仔區',
   EASTERN: '東區',
-  SOUTHERN: '南區',
 
   // Kowloon
   YAU_TSIM_MONG: '油尖旺區',
-  SHAM_SHUI_PO: '深水埗區',
-  WONG_TAI_SIN: '黃大仙區',
   KOWLOON_CITY: '九龍城區',
+  SHAM_SHUI_PO: '深水埗區',
   KWUN_TONG: '觀塘區',
+  WONG_TAI_SIN: '黃大仙區',
 
   // New Territories
   KWAI_TSING: '葵青區',
+  TSUEN_WAN: '荃灣區',
   TUEN_MUN: '屯門區',
-  YUEN_LONG: '元朗區',
-  NORTH: '北區',
-  TAI_PO: '大埔區',
-  SHA_TIN: '沙田區',
   SAI_KUNG: '西貢區',
-  ISLANDS: '離島區',
+  SHA_TIN: '沙田區',
+  YUEN_LONG: '元朗區',
+  TAI_PO: '大埔區',
+  NORTH: '北區',
 } as const;
 
 export type StoreArea = (typeof STORE_AREAS)[keyof typeof STORE_AREAS];
@@ -218,3 +218,4 @@ export interface SortOptions {
   field: 'name' | 'waitingGroup' | 'queueLength' | 'region' | 'area';
   direction: 'asc' | 'desc';
 }
+
