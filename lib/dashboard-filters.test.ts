@@ -13,11 +13,11 @@ function createStore(overrides: Partial<Store> = {}): Store {
     waitingGroup: 0,
     storeQueue: [],
     timestamp: new Date('2026-04-05T00:00:00.000Z'),
-    name: '旺角',
+    name: '?箄?',
     nameEn: 'Mong Kok',
     address: 'Example Address',
-    region: '九龍',
-    area: '油尖旺區',
+    region: '銋?',
+    area: '瘝孵??箏?',
     latitude: 22.3193,
     longitude: 114.1694,
     ...overrides,
@@ -37,7 +37,38 @@ describe('dashboard filter helpers', () => {
     ).toBe(true);
     expect(
       matchesDashboardFilters(store, {
-        searchTerm: '油尖',
+        searchTerm: '瘝孵?',
+        regionFilter: null,
+        waitingStatusFilter: null,
+      })
+    ).toBe(true);
+    expect(
+      matchesDashboardFilters(store, {
+        searchTerm: 'central',
+        regionFilter: null,
+        waitingStatusFilter: null,
+      })
+    ).toBe(false);
+  });
+
+  it('handles empty strings, mixed casing, and partial matches in searchable fields', () => {
+    const store = createStore({
+      name: '',
+      nameEn: 'MONG KOK',
+      region: '',
+      area: 'Jordan District',
+    });
+
+    expect(
+      matchesDashboardFilters(store, {
+        searchTerm: 'mong',
+        regionFilter: null,
+        waitingStatusFilter: null,
+      })
+    ).toBe(true);
+    expect(
+      matchesDashboardFilters(store, {
+        searchTerm: 'jord',
         regionFilter: null,
         waitingStatusFilter: null,
       })
@@ -53,28 +84,28 @@ describe('dashboard filter helpers', () => {
 
   it('applies region and wait-status filters together', () => {
     const store = createStore({
-      region: '新界',
+      region: '?啁?',
       waitingGroup: 20,
     });
 
     expect(
       matchesDashboardFilters(store, {
         searchTerm: '',
-        regionFilter: '新界',
+        regionFilter: '?啁?',
         waitingStatusFilter: 'MEDIUM',
       })
     ).toBe(true);
     expect(
       matchesDashboardFilters(store, {
         searchTerm: '',
-        regionFilter: '九龍',
+        regionFilter: '銋?',
         waitingStatusFilter: 'MEDIUM',
       })
     ).toBe(false);
     expect(
       matchesDashboardFilters(store, {
         searchTerm: '',
-        regionFilter: '新界',
+        regionFilter: '?啁?',
         waitingStatusFilter: 'LOW',
       })
     ).toBe(false);
@@ -85,18 +116,18 @@ describe('dashboard filter helpers', () => {
       createStore({ shopId: 1, nameEn: 'Mong Kok', waitingGroup: 0 }),
       createStore({
         shopId: 2,
-        name: '沙田',
+        name: '瘝',
         nameEn: 'Sha Tin',
-        region: '新界',
-        area: '沙田區',
+        region: '?啁?',
+        area: '瘝?',
         waitingGroup: 18,
       }),
       createStore({
         shopId: 3,
-        name: '銅鑼灣',
+        name: '???',
         nameEn: 'Causeway Bay',
-        region: '香港島',
-        area: '灣仔區',
+        region: '擐葛撜?',
+        area: '????',
         waitingGroup: 35,
       }),
     ];
@@ -108,5 +139,36 @@ describe('dashboard filter helpers', () => {
     });
 
     expect(filteredStores.map((store) => store.shopId)).toEqual([2]);
+  });
+
+  it('documents current wait-status behavior for invalid waitingGroup values', () => {
+    const nanStore = createStore({ shopId: 1, waitingGroup: Number.NaN });
+    const negativeStore = createStore({ shopId: 2, waitingGroup: -1 });
+    const infiniteStore = createStore({
+      shopId: 3,
+      waitingGroup: Number.POSITIVE_INFINITY,
+    });
+
+    expect(
+      matchesDashboardFilters(nanStore, {
+        searchTerm: '',
+        regionFilter: null,
+        waitingStatusFilter: 'HIGH',
+      })
+    ).toBe(true);
+    expect(
+      matchesDashboardFilters(negativeStore, {
+        searchTerm: '',
+        regionFilter: null,
+        waitingStatusFilter: 'LOW',
+      })
+    ).toBe(true);
+    expect(
+      matchesDashboardFilters(infiniteStore, {
+        searchTerm: '',
+        regionFilter: null,
+        waitingStatusFilter: 'HIGH',
+      })
+    ).toBe(true);
   });
 });
