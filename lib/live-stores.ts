@@ -1,4 +1,5 @@
 import { QueueResponse, Store, StoreListResponse } from '@/lib/types';
+import { deriveRecommendationCluster } from '@/lib/recommendation-clusters';
 
 const CORS_PROXY = process.env.CORS_PROXY_URL as string;
 const STORE_LIST_API = process.env.SUSHIRO_STORE_LIST_API as string;
@@ -102,6 +103,10 @@ function buildStores(
     address: store.address || '',
     region: store.region || '',
     area: store.area || '',
+    recommendationCluster: deriveRecommendationCluster(
+      store.region || '',
+      store.area || ''
+    ),
     timestamp,
     latitude: store.latitude,
     longitude: store.longitude,

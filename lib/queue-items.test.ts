@@ -30,7 +30,8 @@ describe('queue item helpers', () => {
   });
 
   it('builds queue items with normalized queue data', () => {
-    expect(buildQueueItem('Mong Kok', 'OPEN', 0)).toEqual({
+    expect(buildQueueItem(1, 'Mong Kok', 'OPEN', 0)).toEqual({
+      shopId: 1,
       name: 'Mong Kok',
       storeStatus: 'OPEN',
       queueCount: 0,
@@ -38,7 +39,8 @@ describe('queue item helpers', () => {
       recommendationState: 'IMMEDIATE',
     });
 
-    expect(buildQueueItem('Central', 'OPEN', 'unknown')).toEqual({
+    expect(buildQueueItem(2, 'Central', 'OPEN', 'unknown')).toEqual({
+      shopId: 2,
       name: 'Central',
       storeStatus: 'OPEN',
       queueCount: null,
@@ -46,7 +48,8 @@ describe('queue item helpers', () => {
       recommendationState: 'UNAVAILABLE',
     });
 
-    expect(buildQueueItem('Sha Tin', 'CLOSED', 5)).toEqual({
+    expect(buildQueueItem(3, 'Sha Tin', 'CLOSED', 5)).toEqual({
+      shopId: 3,
       name: 'Sha Tin',
       storeStatus: 'CLOSED',
       queueCount: null,
@@ -56,10 +59,10 @@ describe('queue item helpers', () => {
   });
 
   it('sorts by queue count first and then by name', () => {
-    const immediate = buildQueueItem('Zeta', 'OPEN', 0);
-    const waiting = buildQueueItem('Alpha', 'OPEN', 2);
-    const unavailableA = buildQueueItem('Beta', 'OPEN', 'unknown');
-    const unavailableB = buildQueueItem('Alpha', 'CLOSED', 0);
+    const immediate = buildQueueItem(1, 'Zeta', 'OPEN', 0);
+    const waiting = buildQueueItem(2, 'Alpha', 'OPEN', 2);
+    const unavailableA = buildQueueItem(3, 'Beta', 'OPEN', 'unknown');
+    const unavailableB = buildQueueItem(4, 'Alpha', 'CLOSED', 0);
 
     const sorted = [unavailableA, immediate, unavailableB, waiting].sort(
       compareQueueItems

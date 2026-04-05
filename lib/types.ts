@@ -48,6 +48,7 @@ export interface Store extends StoreQueueData {
   address: string;
   region: string;
   area: string;
+  recommendationCluster: RecommendationCluster;
   latitude?: number;
   longitude?: number;
 }
@@ -145,6 +146,21 @@ export interface ErrorResponse {
   timestamp: string;
 }
 
+export const RECOMMENDATION_CLUSTERS = {
+  HK_ISLAND: 'HK_ISLAND',
+  WEST_KOWLOON: 'WEST_KOWLOON',
+  EAST_KOWLOON: 'EAST_KOWLOON',
+  TSEUNG_KWAN_O: 'TSEUNG_KWAN_O',
+  SHA_TIN_BELT: 'SHA_TIN_BELT',
+  NORTH_NT: 'NORTH_NT',
+  TSUEN_KWAN_WEST: 'TSUEN_KWAN_WEST',
+  FAR_WEST_NT: 'FAR_WEST_NT',
+  UNKNOWN: 'UNKNOWN',
+} as const;
+
+export type RecommendationCluster =
+  (typeof RECOMMENDATION_CLUSTERS)[keyof typeof RECOMMENDATION_CLUSTERS];
+
 export type QueueRecommendationState =
   | 'IMMEDIATE'
   | 'WAITING'
@@ -152,6 +168,7 @@ export type QueueRecommendationState =
   | 'INELIGIBLE';
 
 export interface QueueItem {
+  shopId: number;
   name: string;
   storeStatus: string;
   queueCount: number | null;

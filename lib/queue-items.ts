@@ -50,6 +50,7 @@ export function compareQueueItems(left: QueueItem, right: QueueItem): number {
 }
 
 export function buildQueueItem(
+  shopId: number,
   name: string,
   storeStatus: string,
   rawQueueCount: unknown
@@ -59,6 +60,7 @@ export function buildQueueItem(
     : null;
 
   return {
+    shopId,
     name,
     storeStatus,
     queueCount,
