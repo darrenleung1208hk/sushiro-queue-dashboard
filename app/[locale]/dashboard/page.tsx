@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { AlertCircle, Clock, RefreshCw } from 'lucide-react';
 
@@ -8,7 +8,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { QueueApiResponse, QueueItem } from '@/lib/types';
+import { QueueApiResponse, QueueGroups, QueueItem } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 const AUTO_REFRESH_INTERVAL_MS = 30000;
@@ -176,9 +176,20 @@ function QueueListSkeleton({ emphasized = false }: { emphasized?: boolean }) {
   );
 }
 
+function createEmptyGroups(): QueueGroups {
+  return {
+    available: [],
+    low: [],
+    busy: [],
+    unavailable: [],
+  };
+}
+
 export default function DashboardPage() {
   const t = useTranslations('dashboardQueue');
   const [queues, setQueues] = useState<QueueItem[]>([]);
+  const [recommendedQueues, setRecommendedQueues] = useState<QueueItem[]>([]);
+  const [queueGroups, setQueueGroups] = useState<QueueGroups>(createEmptyGroups);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -211,6 +222,8 @@ export default function DashboardPage() {
 
       const payload = (await response.json()) as QueueApiResponse;
       setQueues(payload.data);
+      setRecommendedQueues(payload.recommended);
+      setQueueGroups(payload.groups);
       hasDataRef.current = payload.data.length > 0;
       setUpdatedAt(payload.updatedAt ? new Date(payload.updatedAt) : null);
     } catch (error) {
@@ -235,80 +248,22 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, [fetchQueues]);
 
-  const {
-    availableQueues,
-    lowQueues,
-    busyQueues,
-    unavailableQueues,
-    recommendableQueues,
-  } = useMemo(() => {
-    const available: QueueItem[] = [];
-    const low: QueueItem[] = [];
-    const busy: QueueItem[] = [];
-    const unavailable: QueueItem[] = [];
-    const recommendable: QueueItem[] = [];
-
-    queues.forEach((queue) => {
-      if (
-        queue.recommendationState === 'IMMEDIATE' ||
-        queue.recommendationState === 'WAITING'
-      ) {
-        recommendable.push(queue);
-      }
-
-      if (queue.queueCount === null) {
-        unavailable.push(queue);
-      } else if (queue.queueCount === 0) {
-        available.push(queue);
-      } else if (queue.queueCount <= 15) {
-        low.push(queue);
-      } else {
-        busy.push(queue);
-      }
-    });
-
-    return {
-      availableQueues: available,
-      lowQueues: low,
-      busyQueues: busy,
-      unavailableQueues: unavailable,
-      recommendableQueues: recommendable,
-    };
-  }, [queues]);
-
-  const recommendedQueues = useMemo(() => {
-    const immediateQueues = recommendableQueues.filter(
-      (queue) => queue.recommendationState === 'IMMEDIATE'
-    );
-    const waitingQueues = recommendableQueues.filter(
-      (queue) => queue.recommendationState === 'WAITING'
-    );
-    const recommended = immediateQueues.slice(0, 3);
-
-    if (recommended.length < 3) {
-      recommended.push(...waitingQueues.slice(0, 3 - recommended.length));
-    }
-
-    return recommended;
-  }, [recommendableQueues]);
-
-  const recommendedImmediateCount = useMemo(
-    () =>
-      recommendedQueues.filter(
-        (queue) => queue.recommendationState === 'IMMEDIATE'
-      ).length,
-    [recommendedQueues]
-  );
-
+  const eligibleCount =
+    queueGroups.available.length +
+    queueGroups.low.length +
+    queueGroups.busy.length;
+  const recommendedImmediateCount = recommendedQueues.filter(
+    (queue) => queue.queueCount === 0
+  ).length;
   const additionalImmediateCount = Math.max(
     0,
-    availableQueues.length - recommendedImmediateCount
+    queueGroups.available.length - recommendedImmediateCount
   );
   const hasImmediateRecommendations = recommendedImmediateCount > 0;
   const hasRecommendedQueues = recommendedQueues.length > 0;
   const recommendationCountLabel =
-    recommendableQueues.length > 0
-      ? `${recommendedQueues.length}/${recommendableQueues.length}`
+    eligibleCount > 0
+      ? `${recommendedQueues.length}/${eligibleCount}`
       : '0';
 
   const showBlockingError =
@@ -474,30 +429,30 @@ export default function DashboardPage() {
               <>
                 <QueueGroup
                   title={t('availableGroup')}
-                  count={availableQueues.length}
-                  items={availableQueues}
+                  count={queueGroups.available.length}
+                  items={queueGroups.available}
                   emptyText={t('emptyGroup')}
                   getStatusText={getStatusText}
                 />
                 <QueueGroup
                   title={t('lowGroup')}
-                  count={lowQueues.length}
-                  items={lowQueues}
+                  count={queueGroups.low.length}
+                  items={queueGroups.low}
                   emptyText={t('emptyGroup')}
                   getStatusText={getStatusText}
                 />
                 <QueueGroup
                   title={t('busyGroup')}
-                  count={busyQueues.length}
-                  items={busyQueues}
+                  count={queueGroups.busy.length}
+                  items={queueGroups.busy}
                   emptyText={t('emptyGroup')}
                   getStatusText={getStatusText}
                 />
-                {unavailableQueues.length > 0 && (
+                {queueGroups.unavailable.length > 0 && (
                   <QueueGroup
                     title={t('unavailableGroup')}
-                    count={unavailableQueues.length}
-                    items={unavailableQueues}
+                    count={queueGroups.unavailable.length}
+                    items={queueGroups.unavailable}
                     emptyText={t('emptyGroup')}
                     getStatusText={getStatusText}
                   />
