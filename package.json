@@ -6,6 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "vitest",
+    "test:watch": "vitest",
+    "test:run": "vitest run",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "prepare": "husky"
@@ -80,10 +83,12 @@
     "eslint": "^8.57.0",
     "eslint-config-next": "^15.4.6",
     "husky": "^9.1.7",
+    "jsdom": "^29.0.1",
     "lint-staged": "^16.2.7",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^4.1.2"
   }
 }

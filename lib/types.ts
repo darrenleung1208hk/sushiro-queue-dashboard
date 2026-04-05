@@ -159,9 +159,20 @@ export interface QueueItem {
   recommendationState: QueueRecommendationState;
 }
 
+export type QueueGroupKey = 'available' | 'low' | 'busy' | 'unavailable';
+
+export interface QueueGroups {
+  available: QueueItem[];
+  low: QueueItem[];
+  busy: QueueItem[];
+  unavailable: QueueItem[];
+}
+
 export interface QueueApiResponse {
   updatedAt: string;
   data: QueueItem[];
+  recommended: QueueItem[];
+  groups: QueueGroups;
 }
 
 // Dashboard specific types

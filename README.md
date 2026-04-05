@@ -346,8 +346,19 @@ The app can be deployed to any platform that supports Next.js:
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run start` - Start production server
+- `npm run test` - Run Vitest in watch mode
+- `npm run test:watch` - Alias for Vitest watch mode
+- `npm run test:run` - Run unit tests once
 - `npm run lint` - Run ESLint
 - `npm run type-check` - Run TypeScript type checking without emitting files
+
+## Testing
+
+- Unit tests use Vitest.
+- Logic-first tests are co-located as `*.test.ts` beside the module they cover.
+- Keep pure, deterministic logic in plain `lib/` modules when it can be tested without rendering UI or calling the network.
+- This setup is intentionally scoped to unit testing logic modules for now.
+- Component tests, hook rendering tests, route integration tests, and browser/E2E tests are out of scope for this pass.
 
 ## 📋 Git Workflow & Standards
 
