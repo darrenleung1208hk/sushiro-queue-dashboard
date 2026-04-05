@@ -198,9 +198,30 @@ Husky runs ESLint + Prettier + Commitlint on every commit. Fix all lint errors b
 npm run dev        # start development server (localhost:3000)
 npm run build      # production build
 npm run start      # start production server
+npm run test       # run unit tests in watch mode with Vitest
+npm run test:watch # alias for Vitest watch mode
+npm run test:run   # run unit tests once
 npm run lint       # ESLint check
 npm run type-check # TypeScript check (no emit)
 ```
+
+---
+
+## Testing
+
+- Test runner: Vitest
+- Current scope: logic-first unit tests only
+- Test location: co-locate `*.test.ts` files next to the module they cover
+- Keep testable logic in plain `lib/` modules whenever it does not need React rendering or network access
+- Route handlers should stay thin and delegate deterministic transforms/classification/sorting/grouping to plain modules when tests add value
+- Client pages/components should keep UI state and rendering concerns; move non-UI deterministic logic into plain helpers only when it meaningfully improves testability
+
+Out of scope for the current test setup:
+
+- component rendering tests
+- hook rendering tests
+- route integration tests
+- browser or E2E tests
 
 ---
 

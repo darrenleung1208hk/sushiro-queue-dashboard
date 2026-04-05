@@ -7,6 +7,14 @@
     "project": "./tsconfig.json"
   },
   "plugins": ["@typescript-eslint"],
+  "overrides": [
+    {
+      "files": ["**/*.test.ts", "**/*.test.tsx", "vitest.config.ts"],
+      "parserOptions": {
+        "project": "./tsconfig.vitest.json"
+      }
+    }
+  ],
   "rules": {
     "@typescript-eslint/no-unused-vars": [
       "error",
