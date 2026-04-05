@@ -34,7 +34,3 @@ export function buildQueueGroups(data: QueueItem[]): QueueGroups {
 
   return groups;
 }
-
-export function buildRecommendedQueues(groups: QueueGroups): QueueItem[] {
-  return [...groups.available, ...groups.low, ...groups.busy].slice(0, 3);
-}
