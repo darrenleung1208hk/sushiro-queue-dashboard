@@ -24,10 +24,17 @@ interface QueueError {
   error: string;
 }
 
+interface QueueFetchResult {
+  queueData: QueueResponse | null;
+  error?: string;
+}
+
 export interface LiveStoresResult {
   stores: Store[];
   timestamp: Date;
+  totalStores: number;
   successfulQueueFetches: number;
+  failedQueueFetches: number;
   queueErrors: QueueError[];
 }
 
@@ -57,7 +64,7 @@ async function fetchStoreList(
 async function fetchStoreQueue(
   storeId: number,
   region: string
-): Promise<QueueResponse | null> {
+): Promise<QueueFetchResult> {
   const queryParams = new URLSearchParams({
     region,
     storeid: storeId.toString(),
@@ -70,7 +77,10 @@ async function fetchStoreQueue(
 
     if (!response.ok) {
       if (response.status === 404) {
-        return null;
+        return {
+          queueData: null,
+          error: 'Queue data unavailable for this branch',
+        };
       }
 
       throw new Error(
@@ -79,16 +89,18 @@ async function fetchStoreQueue(
     }
 
     const data = await response.json();
-    return data as QueueResponse;
+    return { queueData: data as QueueResponse };
   } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown queue API error';
     console.error(`Error fetching queue for store ${storeId}:`, error);
-    return null;
+    return { queueData: null, error: errorMessage };
   }
 }
 
 function buildStores(
   storeList: StoreListResponse[],
-  queueData: Map<number, QueueResponse | null>,
+  queueData: Map<number, QueueFetchResult>,
   timestamp: Date
 ): Store[] {
   return storeList.map((store) => ({
@@ -99,7 +111,7 @@ function buildStores(
     waitingGroup: Number.isFinite(store.waitingGroup)
       ? store.waitingGroup
       : Number.NaN,
-    storeQueue: queueData.get(store.id)?.storeQueue || [],
+    storeQueue: queueData.get(store.id)?.queueData?.storeQueue || [],
     address: store.address || '',
     region: store.region || '',
     area: store.area || '',
@@ -122,13 +134,15 @@ export async function fetchLiveStores(
     return {
       stores: [],
       timestamp: new Date(),
+      totalStores: 0,
       successfulQueueFetches: 0,
+      failedQueueFetches: 0,
       queueErrors: [],
     };
   }
 
   const region = params.region ?? DEFAULT_PARAMS.region;
-  const queueDataMap = new Map<number, QueueResponse | null>();
+  const queueDataMap = new Map<number, QueueFetchResult>();
   const queueErrors: QueueError[] = [];
   let successfulQueueFetches = 0;
   const concurrencyLimit = 5;
@@ -138,24 +152,19 @@ export async function fetchLiveStores(
 
     const results = await Promise.all(
       chunk.map(async (store) => {
-        try {
-          const queueData = await fetchStoreQueue(store.id, region);
-          if (queueData !== null) {
-            successfulQueueFetches += 1;
-          }
-
-          return { storeId: store.id, queueData };
-        } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : 'Unknown error';
-          queueErrors.push({ storeId: store.id, error: errorMessage });
-          return { storeId: store.id, queueData: null };
+        const result = await fetchStoreQueue(store.id, region);
+        if (result.queueData !== null) {
+          successfulQueueFetches += 1;
+        } else if (result.error) {
+          queueErrors.push({ storeId: store.id, error: result.error });
         }
+
+        return { storeId: store.id, result };
       })
     );
 
-    results.forEach(({ storeId, queueData }) => {
-      queueDataMap.set(storeId, queueData);
+    results.forEach(({ storeId, result }) => {
+      queueDataMap.set(storeId, result);
     });
 
     if (index + concurrencyLimit < storeList.length) {
@@ -168,7 +177,9 @@ export async function fetchLiveStores(
   return {
     stores: buildStores(storeList, queueDataMap, timestamp),
     timestamp,
+    totalStores: storeList.length,
     successfulQueueFetches,
+    failedQueueFetches: storeList.length - successfulQueueFetches,
     queueErrors,
   };
 }

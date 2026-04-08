@@ -8,7 +8,14 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { QueueApiResponse, QueueGroups, QueueItem } from '@/lib/types';
+import {
+  QUEUE_SNAPSHOT_STATUS,
+  QueueApiResponse,
+  QueueGroups,
+  QueueItem,
+  QueueSnapshotMeta,
+  QueueSnapshotStatus,
+} from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 const AUTO_REFRESH_INTERVAL_MS = 30000;
@@ -185,11 +192,24 @@ function createEmptyGroups(): QueueGroups {
   };
 }
 
+function createEmptyMeta(): QueueSnapshotMeta {
+  return {
+    totalStores: 0,
+    successfulQueueFetches: 0,
+    failedQueueFetches: 0,
+  };
+}
+
 export default function DashboardPage() {
   const t = useTranslations('dashboardQueue');
   const [queues, setQueues] = useState<QueueItem[]>([]);
   const [recommendedQueues, setRecommendedQueues] = useState<QueueItem[]>([]);
   const [queueGroups, setQueueGroups] = useState<QueueGroups>(createEmptyGroups);
+  const [snapshotStatus, setSnapshotStatus] = useState<QueueSnapshotStatus>(
+    QUEUE_SNAPSHOT_STATUS.SUCCESS
+  );
+  const [meta, setMeta] = useState<QueueSnapshotMeta>(createEmptyMeta);
+  const [warnings, setWarnings] = useState<string[]>([]);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -215,19 +235,25 @@ export default function DashboardPage() {
       }
 
       const response = await fetch('/api/queues', { cache: 'no-store' });
-
-      if (!response.ok) {
-        throw new Error(`Queue API error: ${response.status}`);
-      }
-
       const payload = (await response.json()) as QueueApiResponse;
+
       setQueues(payload.data);
       setRecommendedQueues(payload.recommended);
       setQueueGroups(payload.groups);
+      setSnapshotStatus(payload.status);
+      setMeta(payload.meta);
+      setWarnings(payload.warnings);
       hasDataRef.current = payload.data.length > 0;
       setUpdatedAt(payload.updatedAt ? new Date(payload.updatedAt) : null);
+
+      if (!response.ok && payload.status !== QUEUE_SNAPSHOT_STATUS.UNAVAILABLE) {
+        throw new Error(`Queue API error: ${response.status}`);
+      }
     } catch (error) {
       console.error('Error fetching queues:', error);
+      setSnapshotStatus(QUEUE_SNAPSHOT_STATUS.UNAVAILABLE);
+      setWarnings([]);
+      setMeta(createEmptyMeta());
       setErrorMessage(t('error'));
     } finally {
       setIsLoading(false);
@@ -266,9 +292,16 @@ export default function DashboardPage() {
       ? `${recommendedQueues.length}/${eligibleCount}`
       : '0';
 
-  const showBlockingError =
-    errorMessage !== null && queues.length === 0 && !isLoading;
-  const showInlineError = errorMessage !== null && queues.length > 0;
+  const showBlockingUnavailable =
+    !isLoading && snapshotStatus === QUEUE_SNAPSHOT_STATUS.UNAVAILABLE;
+  const showPartialNotice =
+    snapshotStatus === QUEUE_SNAPSHOT_STATUS.PARTIAL &&
+    meta.failedQueueFetches > 0 &&
+    !showBlockingUnavailable;
+  const showInlineError =
+    errorMessage !== null &&
+    queues.length > 0 &&
+    snapshotStatus !== QUEUE_SNAPSHOT_STATUS.PARTIAL;
 
   const getStatusText = useCallback(
     (item: QueueItem) => {
@@ -347,13 +380,17 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {showBlockingError ? (
+      {showBlockingUnavailable ? (
         <Card className="border border-border bg-card">
           <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
             <AlertCircle className="h-10 w-10 text-destructive" />
             <div className="space-y-1">
-              <p className="font-medium text-foreground">{t('error')}</p>
-              <p className="text-sm text-muted-foreground">{t('retryHint')}</p>
+              <p className="font-medium text-foreground">
+                {t('unavailableTitle')}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {errorMessage ?? t('unavailableHint')}
+              </p>
             </div>
             <Button
               onClick={() => {
@@ -366,6 +403,20 @@ export default function DashboardPage() {
         </Card>
       ) : (
         <>
+          {showPartialNotice && (
+            <div className="rounded-xl border border-amber-300/40 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              <p className="font-medium">{t('partialDataTitle')}</p>
+              <p className="mt-1">
+                {t('partialDataMessage', {
+                  count: meta.failedQueueFetches,
+                })}
+              </p>
+              {warnings.length > 0 && (
+                <p className="mt-1 text-xs text-amber-800/90">{warnings[0]}</p>
+              )}
+            </div>
+          )}
+
           {showInlineError && (
             <div className="flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               <AlertCircle className="h-4 w-4 shrink-0" />
@@ -390,6 +441,11 @@ export default function DashboardPage() {
                   ? t('availableNowHint')
                   : t('bestOptionsHint')}
               </p>
+              {showPartialNotice && (
+                <p className="text-xs text-success/80">
+                  {t('recommendationsPartialHint')}
+                </p>
+              )}
               {hasImmediateRecommendations && additionalImmediateCount > 0 && (
                 <p className="text-xs text-success/80">
                   {t('moreAvailableHint', { count: additionalImmediateCount })}

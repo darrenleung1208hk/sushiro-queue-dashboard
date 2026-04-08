@@ -1,0 +1,111 @@
+import { describe, expect, it } from 'vitest';
+
+import type { LiveStoresResult } from '@/lib/live-stores';
+import {
+  buildQueueSnapshot,
+  buildUnavailableQueueSnapshot,
+} from '@/lib/queue-snapshot';
+import { RECOMMENDATION_CLUSTERS, Store } from '@/lib/types';
+
+function createStore(
+  shopId: number,
+  waitingGroup: number,
+  storeStatus = 'OPEN'
+): Store {
+  return {
+    shopId,
+    name: `Store ${shopId}`,
+    nameEn: `Store ${shopId}`,
+    address: '',
+    region: '',
+    area: '',
+    recommendationCluster: RECOMMENDATION_CLUSTERS.WEST_KOWLOON,
+    storeStatus,
+    waitingGroup,
+    storeQueue: [],
+    timestamp: new Date('2026-01-01T00:00:00.000Z'),
+  };
+}
+
+function createLiveStoresResult(
+  overrides: Partial<LiveStoresResult> = {}
+): LiveStoresResult {
+  return {
+    stores: [],
+    timestamp: new Date('2026-01-01T00:00:00.000Z'),
+    totalStores: 0,
+    successfulQueueFetches: 0,
+    failedQueueFetches: 0,
+    queueErrors: [],
+    ...overrides,
+  };
+}
+
+describe('queue snapshot builder', () => {
+  it('returns success when all queue fetches succeed', () => {
+    const snapshot = buildQueueSnapshot(
+      createLiveStoresResult({
+        stores: [createStore(1, 0), createStore(2, 5)],
+        totalStores: 2,
+        successfulQueueFetches: 2,
+      })
+    );
+
+    expect(snapshot.status).toBe('success');
+    expect(snapshot.partialData).toBe(false);
+    expect(snapshot.errorCode).toBeUndefined();
+    expect(snapshot.meta.failedQueueFetches).toBe(0);
+    expect(snapshot.recommended).toHaveLength(2);
+  });
+
+  it('returns partial when store metadata exists but some queue fetches fail', () => {
+    const snapshot = buildQueueSnapshot(
+      createLiveStoresResult({
+        stores: [createStore(1, 0), createStore(2, Number.NaN)],
+        totalStores: 2,
+        successfulQueueFetches: 1,
+        failedQueueFetches: 1,
+      })
+    );
+
+    expect(snapshot.status).toBe('partial');
+    expect(snapshot.partialData).toBe(true);
+    expect(snapshot.errorCode).toBe('QUEUE_DATA_PARTIAL');
+    expect(snapshot.warnings[0]).toContain('1 branches');
+    expect(snapshot.meta.successfulQueueFetches).toBe(1);
+  });
+
+  it('returns partial when all queue fetches fail but stores are still available', () => {
+    const snapshot = buildQueueSnapshot(
+      createLiveStoresResult({
+        stores: [createStore(1, Number.NaN)],
+        totalStores: 1,
+        successfulQueueFetches: 0,
+        failedQueueFetches: 1,
+      })
+    );
+
+    expect(snapshot.status).toBe('partial');
+    expect(snapshot.errorCode).toBe('QUEUE_DATA_UNAVAILABLE');
+    expect(snapshot.recommended).toEqual([]);
+    expect(snapshot.groups.unavailable).toHaveLength(1);
+  });
+
+  it('returns unavailable when no stores are available', () => {
+    const snapshot = buildQueueSnapshot(createLiveStoresResult());
+
+    expect(snapshot.status).toBe('unavailable');
+    expect(snapshot.errorCode).toBe('STORE_DATA_UNAVAILABLE');
+    expect(snapshot.data).toEqual([]);
+  });
+
+  it('builds an explicit unavailable snapshot for route failures', () => {
+    const snapshot = buildUnavailableQueueSnapshot(
+      new Date('2026-01-01T00:00:00.000Z')
+    );
+
+    expect(snapshot.status).toBe('unavailable');
+    expect(snapshot.partialData).toBe(false);
+    expect(snapshot.groups.available).toEqual([]);
+  });
+});
