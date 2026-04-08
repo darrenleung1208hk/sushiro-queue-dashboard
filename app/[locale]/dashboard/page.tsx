@@ -209,7 +209,6 @@ export default function DashboardPage() {
     QUEUE_SNAPSHOT_STATUS.SUCCESS
   );
   const [meta, setMeta] = useState<QueueSnapshotMeta>(createEmptyMeta);
-  const [warnings, setWarnings] = useState<string[]>([]);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -242,7 +241,6 @@ export default function DashboardPage() {
       setQueueGroups(payload.groups);
       setSnapshotStatus(payload.status);
       setMeta(payload.meta);
-      setWarnings(payload.warnings);
       hasDataRef.current = payload.data.length > 0;
       setUpdatedAt(payload.updatedAt ? new Date(payload.updatedAt) : null);
 
@@ -252,7 +250,6 @@ export default function DashboardPage() {
     } catch (error) {
       console.error('Error fetching queues:', error);
       setSnapshotStatus(QUEUE_SNAPSHOT_STATUS.UNAVAILABLE);
-      setWarnings([]);
       setMeta(createEmptyMeta());
       setErrorMessage(t('error'));
     } finally {
