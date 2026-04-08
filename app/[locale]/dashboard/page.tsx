@@ -411,9 +411,6 @@ export default function DashboardPage() {
                   count: meta.failedQueueFetches,
                 })}
               </p>
-              {warnings.length > 0 && (
-                <p className="mt-1 text-xs text-amber-800/90">{warnings[0]}</p>
-              )}
             </div>
           )}
 
