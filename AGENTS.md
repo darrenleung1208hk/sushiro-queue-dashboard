@@ -57,7 +57,7 @@ Rules:
 - Recommendation ranking lives in `lib/queue-recommendations.ts`.
 - Queue normalization lives in `lib/queue-items.ts`.
 - Cluster mapping lives in `lib/recommendation-clusters.ts`.
-- Recommendations may render in `partial` mode, but they must only use successfully fetched queue data.
+- Recommendations may render in `partial` mode because ranking uses the normalized branch snapshot, not queue-fetch success alone.
 - If recommendation behavior changes, update tests and docs in the same change.
 
 ## Internationalization

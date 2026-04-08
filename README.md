@@ -148,5 +148,5 @@ Vitest covers logic-first modules under `lib/`, including:
 ## Notes
 
 - The dashboard can still render useful results in `partial` mode.
-- Recommendations in `partial` mode are based only on queue data that was successfully fetched.
+- Recommendations can still render in `partial` mode because ranking is derived from the normalized branch snapshot, even when some per-branch queue fetches fail.
 - `zh-HK` locale content should stay UTF-8 encoded to avoid text corruption.
