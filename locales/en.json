@@ -153,6 +153,44 @@
     "busyStatus": "Busy",
     "queueUnavailableStatus": "Queue unavailable",
     "invalid": "Unavailable",
-    "emptyGroup": "No branches in this group."
+    "emptyGroup": "No branches in this group.",
+    "preference": {
+      "title": "Recommendation preference",
+      "subtitle": "Pick a branch or area and we will anchor the recommendation there before widening out.",
+      "branchLabel": "Preferred branch",
+      "clusterLabel": "Preferred area",
+      "autoOption": "Auto",
+      "activeMode": {
+        "branch": "Using your preferred branch: {name}",
+        "cluster": "Using your selected area: {cluster}",
+        "auto": "Using automatic recommendations"
+      },
+      "fallbackMessages": {
+        "PREFERRED_BRANCH_NOT_FOUND": "The selected branch is no longer available, so we widened the scope.",
+        "PREFERRED_BRANCH_INELIGIBLE": "The selected branch is not recommendable right now, so we widened the scope.",
+        "PREFERRED_CLUSTER_UNAVAILABLE": "The selected area has no recommendable branches right now, so we widened the scope."
+      },
+      "reasonLabels": {
+        "PREFERRED_BRANCH": "your preferred branch",
+        "SAME_CLUSTER_AS_PREFERRED_BRANCH": "same area as your preferred branch",
+        "IN_SELECTED_CLUSTER": "in your selected area",
+        "NEARBY_FALLBACK": "nearby fallback",
+        "BEST_FALLBACK": "best fallback",
+        "OPEN_NOW": "open now",
+        "SHORT_WAIT": "short wait"
+      },
+      "clusterLabels": {
+        "HK_ISLAND_WEST": "Hong Kong Island West",
+        "HK_ISLAND_EAST": "Hong Kong Island East",
+        "WEST_KOWLOON": "West Kowloon",
+        "EAST_KOWLOON": "East Kowloon",
+        "TSEUNG_KWAN_O": "Tseung Kwan O",
+        "SHA_TIN_BELT": "Sha Tin belt",
+        "NORTH_NT": "North New Territories",
+        "TSUEN_KWAN_WEST": "Tsuen Wan / Kwai Tsing",
+        "FAR_WEST_NT": "Tuen Mun / Yuen Long",
+        "UNKNOWN": "Unknown"
+      }
+    }
   }
 }

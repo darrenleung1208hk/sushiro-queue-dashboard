@@ -1,10 +1,12 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { AlertCircle, Clock, RefreshCw } from 'lucide-react';
 
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -15,16 +17,27 @@ import {
   QueueItem,
   QueueSnapshotMeta,
   QueueSnapshotStatus,
+  RECOMMENDATION_FALLBACK_REASON_CODES,
+  RECOMMENDATION_MODES,
+  RECOMMENDATION_REASON_CODES,
+  RecommendedQueueItem,
+  RecommendationBranchOption,
+  RecommendationCluster,
+  RecommendationFallbackReasonCode,
+  RecommendationPreferenceMeta,
+  RecommendationReasonCode,
 } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 const AUTO_REFRESH_INTERVAL_MS = 30000;
 
 interface QueueRowProps {
-  item: QueueItem;
+  item: QueueItem | RecommendedQueueItem;
   statusText: string;
   tone: 'available' | 'low' | 'busy' | 'invalid';
   emphasized?: boolean;
+  reasonCodes?: RecommendationReasonCode[];
+  getReasonLabel?: (reasonCode: RecommendationReasonCode) => string;
 }
 
 interface QueueGroupProps {
@@ -82,6 +95,8 @@ function QueueRow({
   statusText,
   tone,
   emphasized = false,
+  reasonCodes,
+  getReasonLabel,
 }: QueueRowProps) {
   const valueText = getValueText(item);
 
@@ -109,6 +124,19 @@ function QueueRow({
         >
           {statusText}
         </p>
+        {reasonCodes !== undefined && getReasonLabel !== undefined && (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {reasonCodes.map((reasonCode) => (
+              <Badge
+                key={`${item.shopId}-${reasonCode}`}
+                variant={emphasized ? 'outline' : 'secondary'}
+                className="text-[11px]"
+              >
+                {getReasonLabel(reasonCode)}
+              </Badge>
+            ))}
+          </div>
+        )}
       </div>
 
       {valueText !== null && (
@@ -200,15 +228,32 @@ function createEmptyMeta(): QueueSnapshotMeta {
   };
 }
 
+function createEmptyPreferenceMeta(): RecommendationPreferenceMeta {
+  return {
+    activeMode: RECOMMENDATION_MODES.AUTO,
+    branchOptions: [],
+    clusterOptions: [],
+  };
+}
+
 export default function DashboardPage() {
   const t = useTranslations('dashboardQueue');
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const queryString = searchParams.toString();
   const [queues, setQueues] = useState<QueueItem[]>([]);
-  const [recommendedQueues, setRecommendedQueues] = useState<QueueItem[]>([]);
+  const [recommendedQueues, setRecommendedQueues] = useState<
+    RecommendedQueueItem[]
+  >([]);
   const [queueGroups, setQueueGroups] = useState<QueueGroups>(createEmptyGroups);
   const [snapshotStatus, setSnapshotStatus] = useState<QueueSnapshotStatus>(
     QUEUE_SNAPSHOT_STATUS.SUCCESS
   );
   const [meta, setMeta] = useState<QueueSnapshotMeta>(createEmptyMeta);
+  const [preferenceMeta, setPreferenceMeta] = useState<RecommendationPreferenceMeta>(
+    createEmptyPreferenceMeta
+  );
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -233,7 +278,10 @@ export default function DashboardPage() {
         setIsLoading(true);
       }
 
-      const response = await fetch('/api/queues', { cache: 'no-store' });
+      const response = await fetch(
+        queryString.length > 0 ? `/api/queues?${queryString}` : '/api/queues',
+        { cache: 'no-store' }
+      );
       const payload = (await response.json()) as QueueApiResponse;
 
       setQueues(payload.data);
@@ -241,6 +289,7 @@ export default function DashboardPage() {
       setQueueGroups(payload.groups);
       setSnapshotStatus(payload.status);
       setMeta(payload.meta);
+      setPreferenceMeta(payload.preferences);
       hasDataRef.current = payload.data.length > 0;
       setUpdatedAt(payload.updatedAt ? new Date(payload.updatedAt) : null);
 
@@ -251,13 +300,14 @@ export default function DashboardPage() {
       console.error('Error fetching queues:', error);
       setSnapshotStatus(QUEUE_SNAPSHOT_STATUS.UNAVAILABLE);
       setMeta(createEmptyMeta());
+      setPreferenceMeta(createEmptyPreferenceMeta());
       setErrorMessage(t('error'));
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
       isFetchingRef.current = false;
     }
-  }, [t]);
+  }, [queryString, t]);
 
   useEffect(() => {
     void fetchQueues();
@@ -299,6 +349,127 @@ export default function DashboardPage() {
     errorMessage !== null &&
     queues.length > 0 &&
     snapshotStatus !== QUEUE_SNAPSHOT_STATUS.PARTIAL;
+
+  const clusterLabelMap: Record<RecommendationCluster, string> = {
+    HK_ISLAND_WEST: t('preference.clusterLabels.HK_ISLAND_WEST'),
+    HK_ISLAND_EAST: t('preference.clusterLabels.HK_ISLAND_EAST'),
+    WEST_KOWLOON: t('preference.clusterLabels.WEST_KOWLOON'),
+    EAST_KOWLOON: t('preference.clusterLabels.EAST_KOWLOON'),
+    TSEUNG_KWAN_O: t('preference.clusterLabels.TSEUNG_KWAN_O'),
+    SHA_TIN_BELT: t('preference.clusterLabels.SHA_TIN_BELT'),
+    NORTH_NT: t('preference.clusterLabels.NORTH_NT'),
+    TSUEN_KWAN_WEST: t('preference.clusterLabels.TSUEN_KWAN_WEST'),
+    FAR_WEST_NT: t('preference.clusterLabels.FAR_WEST_NT'),
+    UNKNOWN: t('preference.clusterLabels.UNKNOWN'),
+  };
+
+  const getClusterLabel = useCallback(
+    (cluster: RecommendationCluster | undefined) =>
+      cluster === undefined ? '' : clusterLabelMap[cluster],
+    [clusterLabelMap]
+  );
+
+  const getReasonLabel = useCallback(
+    (reasonCode: RecommendationReasonCode) => {
+      switch (reasonCode) {
+        case RECOMMENDATION_REASON_CODES.PREFERRED_BRANCH:
+          return t('preference.reasonLabels.PREFERRED_BRANCH');
+        case RECOMMENDATION_REASON_CODES.SAME_CLUSTER_AS_PREFERRED_BRANCH:
+          return t('preference.reasonLabels.SAME_CLUSTER_AS_PREFERRED_BRANCH');
+        case RECOMMENDATION_REASON_CODES.IN_SELECTED_CLUSTER:
+          return t('preference.reasonLabels.IN_SELECTED_CLUSTER');
+        case RECOMMENDATION_REASON_CODES.NEARBY_FALLBACK:
+          return t('preference.reasonLabels.NEARBY_FALLBACK');
+        case RECOMMENDATION_REASON_CODES.BEST_FALLBACK:
+          return t('preference.reasonLabels.BEST_FALLBACK');
+        case RECOMMENDATION_REASON_CODES.OPEN_NOW:
+          return t('preference.reasonLabels.OPEN_NOW');
+        case RECOMMENDATION_REASON_CODES.SHORT_WAIT:
+          return t('preference.reasonLabels.SHORT_WAIT');
+      }
+    },
+    [t]
+  );
+
+  const replacePreferenceParams = useCallback(
+    (updater: (params: URLSearchParams) => void) => {
+      const nextParams = new URLSearchParams(queryString);
+      updater(nextParams);
+      const nextQuery = nextParams.toString();
+
+      router.replace(nextQuery.length > 0 ? `${pathname}?${nextQuery}` : pathname);
+    },
+    [pathname, queryString, router]
+  );
+
+  const handleBranchChange = useCallback(
+    (nextValue: string) => {
+      replacePreferenceParams((params) => {
+        if (nextValue.length === 0) {
+          params.delete('preferredBranch');
+          return;
+        }
+
+        params.set('preferredBranch', nextValue);
+      });
+    },
+    [replacePreferenceParams]
+  );
+
+  const handleClusterChange = useCallback(
+    (nextValue: string) => {
+      replacePreferenceParams((params) => {
+        if (nextValue.length === 0) {
+          params.delete('preferredCluster');
+          return;
+        }
+
+        params.set('preferredCluster', nextValue);
+        const currentBranch = preferenceMeta.branchOptions.find(
+          (option) => option.shopId === preferenceMeta.requestedBranchShopId
+        );
+
+        if (
+          currentBranch !== undefined &&
+          currentBranch.cluster !== nextValue
+        ) {
+          params.delete('preferredBranch');
+        }
+      });
+    },
+    [preferenceMeta.branchOptions, preferenceMeta.requestedBranchShopId, replacePreferenceParams]
+  );
+
+  const activeBranch = preferenceMeta.branchOptions.find(
+    (option) => option.shopId === preferenceMeta.activeBranchShopId
+  );
+
+  const getFallbackMessage = useCallback(
+    (fallbackReasonCode: RecommendationFallbackReasonCode | undefined) => {
+      switch (fallbackReasonCode) {
+        case RECOMMENDATION_FALLBACK_REASON_CODES.PREFERRED_BRANCH_NOT_FOUND:
+          return t('preference.fallbackMessages.PREFERRED_BRANCH_NOT_FOUND');
+        case RECOMMENDATION_FALLBACK_REASON_CODES.PREFERRED_BRANCH_INELIGIBLE:
+          return t('preference.fallbackMessages.PREFERRED_BRANCH_INELIGIBLE');
+        case RECOMMENDATION_FALLBACK_REASON_CODES.PREFERRED_CLUSTER_UNAVAILABLE:
+          return t('preference.fallbackMessages.PREFERRED_CLUSTER_UNAVAILABLE');
+        default:
+          return null;
+      }
+    },
+    [t]
+  );
+
+  const activeModeLabel =
+    preferenceMeta.activeMode === RECOMMENDATION_MODES.BRANCH &&
+    activeBranch !== undefined
+      ? t('preference.activeMode.branch', { name: activeBranch.name })
+      : preferenceMeta.activeMode === RECOMMENDATION_MODES.CLUSTER &&
+          preferenceMeta.activeCluster !== undefined
+        ? t('preference.activeMode.cluster', {
+            cluster: getClusterLabel(preferenceMeta.activeCluster),
+          })
+        : t('preference.activeMode.auto');
 
   const getStatusText = useCallback(
     (item: QueueItem) => {
@@ -376,6 +547,68 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      <section className="rounded-2xl border border-border bg-card p-4">
+        <div className="flex flex-col gap-4">
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-foreground">
+              {t('preference.title')}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {t('preference.subtitle')}
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="space-y-2 text-sm">
+              <span className="font-medium text-foreground">
+                {t('preference.branchLabel')}
+              </span>
+              <select
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
+                value={preferenceMeta.requestedBranchShopId?.toString() ?? ''}
+                onChange={(event) => handleBranchChange(event.target.value)}
+                disabled={isLoading || preferenceMeta.branchOptions.length === 0}
+              >
+                <option value="">{t('preference.autoOption')}</option>
+                {preferenceMeta.branchOptions.map((option) => (
+                  <option key={option.shopId} value={option.shopId}>
+                    {option.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="space-y-2 text-sm">
+              <span className="font-medium text-foreground">
+                {t('preference.clusterLabel')}
+              </span>
+              <select
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
+                value={preferenceMeta.requestedCluster ?? ''}
+                onChange={(event) => handleClusterChange(event.target.value)}
+                disabled={isLoading || preferenceMeta.clusterOptions.length === 0}
+              >
+                <option value="">{t('preference.autoOption')}</option>
+                {preferenceMeta.clusterOptions.map((cluster) => (
+                  <option key={cluster} value={cluster}>
+                    {getClusterLabel(cluster)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="outline">{activeModeLabel}</Badge>
+            {preferenceMeta.fallbackReasonCode !== undefined && (
+              <span className="text-sm text-muted-foreground">
+                {getFallbackMessage(preferenceMeta.fallbackReasonCode)}
+              </span>
+            )}
+          </div>
+        </div>
+      </section>
 
       {showBlockingUnavailable ? (
         <Card className="border border-border bg-card">
@@ -458,6 +691,8 @@ export default function DashboardPage() {
                     statusText={getStatusText(item)}
                     tone={getRowTone(item)}
                     emphasized
+                    reasonCodes={item.reasonCodes}
+                    getReasonLabel={getReasonLabel}
                   />
                 ))}
               </div>

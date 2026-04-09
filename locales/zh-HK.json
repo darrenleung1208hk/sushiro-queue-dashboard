@@ -153,6 +153,44 @@
     "busyStatus": "繁忙",
     "queueUnavailableStatus": "排隊資料未齊",
     "invalid": "未能提供",
-    "emptyGroup": "呢個分組暫時冇分店。"
+    "emptyGroup": "呢個分組暫時冇分店。",
+    "preference": {
+      "title": "推薦偏好",
+      "subtitle": "揀一間分店或者一個區域，我哋會先喺嗰個範圍幫你排推薦，再慢慢向外 fallback。",
+      "branchLabel": "偏好分店",
+      "clusterLabel": "偏好區域",
+      "autoOption": "自動",
+      "activeMode": {
+        "branch": "而家跟你揀嘅分店：{name}",
+        "cluster": "而家跟你揀嘅區域：{cluster}",
+        "auto": "而家用自動推薦"
+      },
+      "fallbackMessages": {
+        "PREFERRED_BRANCH_NOT_FOUND": "你揀嗰間分店而家冇喺結果入面，所以已經自動擴大範圍。",
+        "PREFERRED_BRANCH_INELIGIBLE": "你揀嗰間分店而家唔適合推薦，所以已經自動擴大範圍。",
+        "PREFERRED_CLUSTER_UNAVAILABLE": "你揀嗰個區域而家冇可推薦分店，所以已經自動擴大範圍。"
+      },
+      "reasonLabels": {
+        "PREFERRED_BRANCH": "你揀嘅分店",
+        "SAME_CLUSTER_AS_PREFERRED_BRANCH": "同你偏好分店同區",
+        "IN_SELECTED_CLUSTER": "喺你揀嘅區域",
+        "NEARBY_FALLBACK": "附近 fallback",
+        "BEST_FALLBACK": "最佳 fallback",
+        "OPEN_NOW": "而家有位",
+        "SHORT_WAIT": "輪候較短"
+      },
+      "clusterLabels": {
+        "HK_ISLAND_WEST": "港島西",
+        "HK_ISLAND_EAST": "港島東",
+        "WEST_KOWLOON": "西九龍",
+        "EAST_KOWLOON": "東九龍",
+        "TSEUNG_KWAN_O": "將軍澳",
+        "SHA_TIN_BELT": "沙田帶",
+        "NORTH_NT": "新界北",
+        "TSUEN_KWAN_WEST": "荃灣／葵青",
+        "FAR_WEST_NT": "屯門／元朗",
+        "UNKNOWN": "未知"
+      }
+    }
   }
 }

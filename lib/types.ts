@@ -168,6 +168,37 @@ export type QueueRecommendationState =
   | 'UNAVAILABLE'
   | 'INELIGIBLE';
 
+export const RECOMMENDATION_MODES = {
+  BRANCH: 'branch',
+  CLUSTER: 'cluster',
+  AUTO: 'auto',
+} as const;
+
+export type RecommendationMode =
+  (typeof RECOMMENDATION_MODES)[keyof typeof RECOMMENDATION_MODES];
+
+export const RECOMMENDATION_REASON_CODES = {
+  PREFERRED_BRANCH: 'PREFERRED_BRANCH',
+  SAME_CLUSTER_AS_PREFERRED_BRANCH: 'SAME_CLUSTER_AS_PREFERRED_BRANCH',
+  IN_SELECTED_CLUSTER: 'IN_SELECTED_CLUSTER',
+  NEARBY_FALLBACK: 'NEARBY_FALLBACK',
+  BEST_FALLBACK: 'BEST_FALLBACK',
+  OPEN_NOW: 'OPEN_NOW',
+  SHORT_WAIT: 'SHORT_WAIT',
+} as const;
+
+export type RecommendationReasonCode =
+  (typeof RECOMMENDATION_REASON_CODES)[keyof typeof RECOMMENDATION_REASON_CODES];
+
+export const RECOMMENDATION_FALLBACK_REASON_CODES = {
+  PREFERRED_BRANCH_NOT_FOUND: 'PREFERRED_BRANCH_NOT_FOUND',
+  PREFERRED_BRANCH_INELIGIBLE: 'PREFERRED_BRANCH_INELIGIBLE',
+  PREFERRED_CLUSTER_UNAVAILABLE: 'PREFERRED_CLUSTER_UNAVAILABLE',
+} as const;
+
+export type RecommendationFallbackReasonCode =
+  (typeof RECOMMENDATION_FALLBACK_REASON_CODES)[keyof typeof RECOMMENDATION_FALLBACK_REASON_CODES];
+
 export interface QueueItem {
   shopId: number;
   name: string;
@@ -175,6 +206,32 @@ export interface QueueItem {
   queueCount: number | null;
   level: QueueLevel;
   recommendationState: QueueRecommendationState;
+}
+
+export interface RecommendedQueueItem extends QueueItem {
+  reasonCodes: RecommendationReasonCode[];
+}
+
+export interface RecommendationPreferenceInput {
+  preferredBranchShopId?: number;
+  preferredCluster?: RecommendationCluster;
+}
+
+export interface RecommendationBranchOption {
+  shopId: number;
+  name: string;
+  cluster: RecommendationCluster;
+}
+
+export interface RecommendationPreferenceMeta {
+  requestedBranchShopId?: number;
+  requestedCluster?: RecommendationCluster;
+  activeMode: RecommendationMode;
+  activeBranchShopId?: number;
+  activeCluster?: RecommendationCluster;
+  fallbackReasonCode?: RecommendationFallbackReasonCode;
+  branchOptions: RecommendationBranchOption[];
+  clusterOptions: RecommendationCluster[];
 }
 
 export type QueueGroupKey = 'available' | 'low' | 'busy' | 'unavailable';
@@ -205,12 +262,13 @@ export interface QueueApiResponse {
   status: QueueSnapshotStatus;
   updatedAt: string;
   data: QueueItem[];
-  recommended: QueueItem[];
+  recommended: RecommendedQueueItem[];
   groups: QueueGroups;
   warnings: string[];
   partialData: boolean;
   errorCode?: string;
   meta: QueueSnapshotMeta;
+  preferences: RecommendationPreferenceMeta;
 }
 
 // Dashboard specific types

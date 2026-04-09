@@ -5,7 +5,12 @@ import {
   buildQueueSnapshot,
   buildUnavailableQueueSnapshot,
 } from '@/lib/queue-snapshot';
-import { RECOMMENDATION_CLUSTERS, Store } from '@/lib/types';
+import {
+  RECOMMENDATION_CLUSTERS,
+  RECOMMENDATION_MODES,
+  RECOMMENDATION_REASON_CODES,
+  Store,
+} from '@/lib/types';
 
 function createStore(
   shopId: number,
@@ -56,6 +61,7 @@ describe('queue snapshot builder', () => {
     expect(snapshot.errorCode).toBeUndefined();
     expect(snapshot.meta.failedQueueFetches).toBe(0);
     expect(snapshot.recommended).toHaveLength(2);
+    expect(snapshot.preferences.activeMode).toBe(RECOMMENDATION_MODES.AUTO);
   });
 
   it('returns partial when store metadata exists but some queue fetches fail', () => {
@@ -91,12 +97,37 @@ describe('queue snapshot builder', () => {
     expect(snapshot.groups.unavailable).toHaveLength(1);
   });
 
+  it('returns branch preference meta and explainability when a preferred branch is requested', () => {
+    const snapshot = buildQueueSnapshot(
+      createLiveStoresResult({
+        stores: [
+          createStore(1, 4),
+          createStore(2, 1),
+          createStore(3, 2),
+        ],
+        totalStores: 3,
+        successfulQueueFetches: 3,
+      }),
+      {
+        preferredBranchShopId: 1,
+      }
+    );
+
+    expect(snapshot.preferences.activeMode).toBe(RECOMMENDATION_MODES.BRANCH);
+    expect(snapshot.preferences.activeBranchShopId).toBe(1);
+    expect(snapshot.recommended[0].shopId).toBe(1);
+    expect(snapshot.recommended[0].reasonCodes).toContain(
+      RECOMMENDATION_REASON_CODES.PREFERRED_BRANCH
+    );
+  });
+
   it('returns unavailable when no stores are available', () => {
     const snapshot = buildQueueSnapshot(createLiveStoresResult());
 
     expect(snapshot.status).toBe('unavailable');
     expect(snapshot.errorCode).toBe('STORE_DATA_UNAVAILABLE');
     expect(snapshot.data).toEqual([]);
+    expect(snapshot.preferences.activeMode).toBe(RECOMMENDATION_MODES.AUTO);
   });
 
   it('builds an explicit unavailable snapshot for route failures', () => {
