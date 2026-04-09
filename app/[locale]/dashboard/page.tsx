@@ -1,6 +1,13 @@
 'use client';
 
-import { type ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  Suspense,
+  type ChangeEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { AlertCircle, Clock, RefreshCw } from 'lucide-react';
@@ -247,7 +254,7 @@ function findBranchOption(
   return branchOptions.find((option) => option.shopId === shopId);
 }
 
-export default function DashboardPage() {
+function DashboardPageContent() {
   const t = useTranslations('dashboardQueue');
   const router = useRouter();
   const pathname = usePathname();
@@ -375,23 +382,36 @@ export default function DashboardPage() {
       ? preferenceMeta.activeCluster ?? ''
       : preferenceMeta.requestedCluster ?? '';
 
-  const clusterLabelMap: Record<RecommendationCluster, string> = {
-    HK_ISLAND_WEST: t('preference.clusterLabels.HK_ISLAND_WEST'),
-    HK_ISLAND_EAST: t('preference.clusterLabels.HK_ISLAND_EAST'),
-    WEST_KOWLOON: t('preference.clusterLabels.WEST_KOWLOON'),
-    EAST_KOWLOON: t('preference.clusterLabels.EAST_KOWLOON'),
-    TSEUNG_KWAN_O: t('preference.clusterLabels.TSEUNG_KWAN_O'),
-    SHA_TIN_BELT: t('preference.clusterLabels.SHA_TIN_BELT'),
-    NORTH_NT: t('preference.clusterLabels.NORTH_NT'),
-    TSUEN_KWAN_WEST: t('preference.clusterLabels.TSUEN_KWAN_WEST'),
-    FAR_WEST_NT: t('preference.clusterLabels.FAR_WEST_NT'),
-    UNKNOWN: t('preference.clusterLabels.UNKNOWN'),
-  };
-
   const getClusterLabel = useCallback(
-    (cluster: RecommendationCluster | undefined) =>
-      cluster === undefined ? '' : clusterLabelMap[cluster],
-    [clusterLabelMap]
+    (cluster: RecommendationCluster | undefined) => {
+      if (cluster === undefined) {
+        return '';
+      }
+
+      switch (cluster) {
+        case 'HK_ISLAND_WEST':
+          return t('preference.clusterLabels.HK_ISLAND_WEST');
+        case 'HK_ISLAND_EAST':
+          return t('preference.clusterLabels.HK_ISLAND_EAST');
+        case 'WEST_KOWLOON':
+          return t('preference.clusterLabels.WEST_KOWLOON');
+        case 'EAST_KOWLOON':
+          return t('preference.clusterLabels.EAST_KOWLOON');
+        case 'TSEUNG_KWAN_O':
+          return t('preference.clusterLabels.TSEUNG_KWAN_O');
+        case 'SHA_TIN_BELT':
+          return t('preference.clusterLabels.SHA_TIN_BELT');
+        case 'NORTH_NT':
+          return t('preference.clusterLabels.NORTH_NT');
+        case 'TSUEN_KWAN_WEST':
+          return t('preference.clusterLabels.TSUEN_KWAN_WEST');
+        case 'FAR_WEST_NT':
+          return t('preference.clusterLabels.FAR_WEST_NT');
+        case 'UNKNOWN':
+          return t('preference.clusterLabels.UNKNOWN');
+      }
+    },
+    [t]
   );
 
   const getReasonLabel = useCallback(
@@ -786,5 +806,39 @@ export default function DashboardPage() {
         </>
       )}
     </div>
+  );
+}
+
+function DashboardPageFallback() {
+  return (
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 pb-10 pt-4 sm:pt-6">
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-28" />
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-4 w-full max-w-xl" />
+        </div>
+        <div className="grid gap-3 rounded-2xl border border-border bg-card p-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        </div>
+      </div>
+      <QueueListSkeleton emphasized />
+      <QueueListSkeleton />
+    </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<DashboardPageFallback />}>
+      <DashboardPageContent />
+    </Suspense>
   );
 }
