@@ -2,7 +2,7 @@
   "common": {
     "loading": "載入中...",
     "error": "錯誤",
-    "retry": "再試一次",
+    "retry": "重試",
     "close": "關閉",
     "save": "儲存",
     "cancel": "取消",
@@ -13,8 +13,8 @@
     "refreshing": "更新中...",
     "refreshStarted": "開始更新資料...",
     "refreshComplete": "資料已成功更新",
-    "last": "最後更新",
-    "open": "營業中",
+    "last": "最後更新時間",
+    "open": "開啟",
     "languages": {
       "en": "English",
       "zh-HK": "繁體中文"
@@ -41,39 +41,38 @@
       "北區": "北區",
       "大埔區": "大埔區",
       "沙田區": "沙田區",
-      "西貢區": "西貢區",
-      "離島區": "離島區"
+      "西貢區": "西貢區"
     }
   },
   "dashboard": {
-    "title": "分店排隊儀表板",
-    "subtitle": "即時查看各分店排隊及輪候狀況",
+    "title": "分店輪候 Dashboard",
+    "subtitle": "即時睇分店輪候情況同等候壓力",
     "stats": {
       "totalStores": "分店總數",
       "totalWaiting": "輪候總數",
-      "currentQueue": "目前隊列",
+      "currentQueue": "目前輪候",
       "filteredResults": "篩選結果",
       "openStores": "營業中",
-      "acrossAllStores": "所有分店合計",
+      "acrossAllStores": "所有分店",
       "activeTickets": "有效票號",
       "showing": "顯示中"
     },
     "filters": {
-      "searchPlaceholder": "按分店名、地區或區域搜尋...",
-      "allRegions": "所有地區",
-      "allWaitTimes": "所有輪候時間",
-      "lowWait": "短輪候",
-      "mediumWait": "中輪候",
-      "highWait": "長輪候",
-      "extremeWait": "極長輪候"
+      "searchPlaceholder": "按分店、地區或分區搜尋...",
+      "allRegions": "全部地區",
+      "allWaitTimes": "全部等候時間",
+      "lowWait": "較短等候",
+      "mediumWait": "中等等候",
+      "highWait": "較長等候",
+      "extremeWait": "極長等候"
     },
     "viewMode": {
       "grid": "網格",
       "showingStores": "顯示 {count} 間分店",
-      "inViewMode": "以 {mode} 檢視"
+      "inViewMode": "{mode} 檢視"
     },
     "noResults": {
-      "title": "找不到分店",
+      "title": "搵唔到分店",
       "message": "試下調整搜尋或篩選條件"
     }
   },
@@ -83,23 +82,23 @@
       "closed": "已關閉",
       "disconnected": "未連線"
     },
-    "waiting": "輪候",
+    "waiting": "輪候中",
     "current": "目前",
-    "queue": "隊列",
-    "currentQueue": "目前隊列",
-    "moreTickets": "另有 {count} 張票",
-    "noTickets": "沒有票號"
+    "queue": "輪候",
+    "currentQueue": "目前輪候",
+    "moreTickets": "仲有 +{count}",
+    "noTickets": "冇票號"
   },
   "navigation": {
     "home": "首頁",
-    "dashboard": "儀表板"
+    "dashboard": "Dashboard"
   },
   "errors": {
     "general": "發生錯誤",
-    "notFound": "找不到頁面",
+    "notFound": "搵唔到頁面",
     "networkError": "網絡錯誤",
     "failedToLoadData": "載入資料失敗",
-    "unableToFetchStores": "未能從伺服器取得分店資料。",
+    "unableToFetchStores": "暫時未能從伺服器取得分店資料。",
     "unableToLoadData": "未能載入資料",
     "apiRequestFailed": "API 請求失敗",
     "unknownError": "發生未知錯誤"
@@ -108,76 +107,77 @@
     "grid": "網格",
     "table": "表格",
     "switchToView": "切換到 {view} 檢視",
-    "viewModeSelector": "檢視模式選擇"
+    "viewModeSelector": "檢視模式選擇器"
   },
   "table": {
     "store": "分店",
     "region": "地區",
-    "district": "區域",
+    "district": "分區",
     "status": "狀態",
     "columns": "欄位",
     "toggleColumns": "切換欄位"
   },
   "dashboardQueue": {
-    "title": "壽司郎排隊睇板",
-    "subtitle": "一次過睇晒各分店排隊情況，快手搵到較短嘅隊。",
-    "availableNow": "即刻可入座",
-    "availableNowHint": "先睇而家可以即刻入座嘅分店，再比較其餘較短輪候時間。",
-    "bestOptions": "較佳選擇",
-    "bestOptionsHint": "而家未有即刻可入座分店，以下係目前已知輪候時間較短嘅選擇。",
-    "moreAvailableHint": "下面仲有 {count} 間即刻可入座",
+    "title": "Sushiro 輪候 Dashboard",
+    "subtitle": "先揀心水分店或者心水區域，再比較而家最值得去嘅 live queue 選擇。",
+    "availableNow": "最快可入座",
+    "availableNowHint": "以下分店而家可以即刻入座，同時都保留附近替代選擇畀你比較。",
+    "bestOptions": "最佳選擇",
+    "bestOptionsHint": "而家未有即時入座選項，所以以下係目前 live queue 最有機會嘅選擇。",
+    "moreAvailableHint": "下面仲有 +{count} 間可即時入座",
     "updatedAtLabel": "更新時間",
     "refresh": "重新整理",
-    "retry": "再試一次",
+    "retry": "重試",
     "loading": "載入中...",
-    "empty": "而家暫時未有可用排隊資料。",
-    "noRecommendedStores": "而家所有分店不是休業中，就是暫時未能提供排隊資料。",
-    "error": "未能載入排隊資料。",
-    "partialDataTitle": "排隊資料部分可用",
-    "partialDataMessage": "而家仍然會顯示 live queue 結果，但有 {count} 間分店暫時未拎到排隊資料。",
-    "recommendationsPartialHint": "目前推薦只根據而家拎到嘅 live queue data 計算。",
-    "unavailableTitle": "暫時無法載入 live queue 資料",
-    "unavailableHint": "而家未能載入分店資料或者排隊資料，過一陣再 refresh 試下。",
+    "empty": "而家未有 queue data。",
+    "noRecommendedStores": "而家全部分店都未能推薦，可能已休息或者暫時冇 live queue 資料。",
+    "error": "未能載入 queue data。",
+    "partialDataTitle": "Queue data 只有部分可用",
+    "partialDataMessage": "而家照樣顯示 live queue 結果，但有 {count} 間分店暫時未有 queue 資料。",
+    "recommendationsPartialHint": "以下推薦係根據目前攞到嘅 live queue data 產生。",
+    "unavailableTitle": "暫時未能載入 live queue data",
+    "unavailableHint": "而家未能載入分店 metadata 或 queue data，請稍後再試。",
     "refreshing": "更新中",
-    "retryHint": "試下重新整理，載入最新排隊畫面。",
-    "liveMonitor": "即時排隊監察",
+    "retryHint": "重新整理以載入最新 queue 情況。",
+    "liveMonitor": "Live Queue Monitor",
     "availableGroup": "可即時入座",
-    "lowGroup": "較短輪候",
+    "lowGroup": "較短等候",
     "busyGroup": "繁忙",
     "otherGroup": "其他",
-    "unavailableGroup": "資料未齊",
-    "availableNowStatus": "即刻可入座",
-    "closedStatus": "休業中",
+    "unavailableGroup": "未能提供",
+    "availableNowStatus": "可即時入座",
+    "closedStatus": "已關閉",
     "maintenanceStatus": "維護中",
-    "lowStatus": "較短輪候",
-    "busyStatus": "繁忙",
-    "queueUnavailableStatus": "排隊資料未齊",
+    "lowStatus": "等候較短",
+    "busyStatus": "較繁忙",
+    "queueUnavailableStatus": "未有 queue 資料",
     "invalid": "未能提供",
-    "emptyGroup": "呢個分組暫時冇分店。",
+    "emptyGroup": "呢組暫時冇分店。",
     "preference": {
       "title": "推薦偏好",
-      "subtitle": "揀一間分店或者一個區域，我哋會先喺嗰個範圍幫你排推薦，再慢慢向外 fallback。",
-      "branchLabel": "偏好分店",
-      "clusterLabel": "偏好區域",
-      "autoOption": "自動",
+      "subtitle": "你可以揀心水分店或者心水區域，系統會先跟呢個偏好，再逐步向外擴闊推薦。",
+      "branchLabel": "心水分店",
+      "clusterLabel": "心水區域",
+      "autoOption": "最佳可選",
+      "branchPriorityHint": "如果有心水分店，系統會優先跟分店；改區域會清除分店偏好。",
       "activeMode": {
-        "branch": "而家跟你揀嘅分店：{name}",
-        "cluster": "而家跟你揀嘅區域：{cluster}",
-        "auto": "而家用自動推薦"
+        "branch": "而家以你嘅心水分店為主：{name}",
+        "cluster": "而家以你揀嘅區域為主：{cluster}",
+        "auto": "而家顯示全局最佳可選"
       },
       "fallbackMessages": {
-        "PREFERRED_BRANCH_NOT_FOUND": "你揀嗰間分店而家冇喺結果入面，所以已經自動擴大範圍。",
-        "PREFERRED_BRANCH_INELIGIBLE": "你揀嗰間分店而家唔適合推薦，所以已經自動擴大範圍。",
-        "PREFERRED_CLUSTER_UNAVAILABLE": "你揀嗰個區域而家冇可推薦分店，所以已經自動擴大範圍。"
+        "PREFERRED_BRANCH_NOT_FOUND": "搵唔到你揀嘅心水分店，所以系統改用下一層偏好去推薦。",
+        "PREFERRED_BRANCH_INELIGIBLE": "你揀嘅心水分店而家唔適合推薦，所以先顯示附近替代選擇。",
+        "PREFERRED_CLUSTER_UNAVAILABLE": "你揀嘅區域而家冇可推薦分店，所以 dashboard 先退回全局最佳可選。"
       },
       "reasonLabels": {
-        "PREFERRED_BRANCH": "你揀嘅分店",
-        "SAME_CLUSTER_AS_PREFERRED_BRANCH": "同你偏好分店同區",
-        "IN_SELECTED_CLUSTER": "喺你揀嘅區域",
-        "NEARBY_FALLBACK": "附近 fallback",
+        "PREFERRED_BRANCH": "你揀咗呢間",
+        "SAME_CLUSTER_AS_PREFERRED_BRANCH": "同你心水分店同區",
+        "IN_SELECTED_CLUSTER": "屬於你揀嘅區域",
+        "NEARBY_FALLBACK": "附近替代選擇",
         "BEST_FALLBACK": "最佳 fallback",
-        "OPEN_NOW": "而家有位",
-        "SHORT_WAIT": "輪候較短"
+        "OPEN_NOW": "而家可入座",
+        "SHORT_WAIT": "等候較短"
       },
       "clusterLabels": {
         "HK_ISLAND_WEST": "港島西",
@@ -187,8 +187,8 @@
         "TSEUNG_KWAN_O": "將軍澳",
         "SHA_TIN_BELT": "沙田帶",
         "NORTH_NT": "新界北",
-        "TSUEN_KWAN_WEST": "荃灣／葵青",
-        "FAR_WEST_NT": "屯門／元朗",
+        "TSUEN_KWAN_WEST": "荃灣 / 葵青",
+        "FAR_WEST_NT": "屯門 / 元朗",
         "UNKNOWN": "未知"
       }
     }

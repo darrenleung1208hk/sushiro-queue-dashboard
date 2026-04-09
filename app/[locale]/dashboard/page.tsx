@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { type ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { AlertCircle, Clock, RefreshCw } from 'lucide-react';
@@ -236,6 +236,17 @@ function createEmptyPreferenceMeta(): RecommendationPreferenceMeta {
   };
 }
 
+function findBranchOption(
+  branchOptions: RecommendationBranchOption[],
+  shopId?: number
+): RecommendationBranchOption | undefined {
+  if (shopId === undefined) {
+    return undefined;
+  }
+
+  return branchOptions.find((option) => option.shopId === shopId);
+}
+
 export default function DashboardPage() {
   const t = useTranslations('dashboardQueue');
   const router = useRouter();
@@ -349,6 +360,20 @@ export default function DashboardPage() {
     errorMessage !== null &&
     queues.length > 0 &&
     snapshotStatus !== QUEUE_SNAPSHOT_STATUS.PARTIAL;
+  const selectedBranchOption = findBranchOption(
+    preferenceMeta.branchOptions,
+    preferenceMeta.requestedBranchShopId
+  );
+  const activeBranch = findBranchOption(
+    preferenceMeta.branchOptions,
+    preferenceMeta.activeBranchShopId
+  );
+  const branchSelectValue =
+    selectedBranchOption?.shopId.toString() ?? '';
+  const clusterSelectValue =
+    selectedBranchOption !== undefined
+      ? preferenceMeta.activeCluster ?? ''
+      : preferenceMeta.requestedCluster ?? '';
 
   const clusterLabelMap: Record<RecommendationCluster, string> = {
     HK_ISLAND_WEST: t('preference.clusterLabels.HK_ISLAND_WEST'),
@@ -410,10 +435,18 @@ export default function DashboardPage() {
           return;
         }
 
+        const selectedOption = preferenceMeta.branchOptions.find(
+          (option) => option.shopId === Number(nextValue)
+        );
+
         params.set('preferredBranch', nextValue);
+
+        if (selectedOption !== undefined) {
+          params.set('preferredCluster', selectedOption.cluster);
+        }
       });
     },
-    [replacePreferenceParams]
+    [preferenceMeta.branchOptions, replacePreferenceParams]
   );
 
   const handleClusterChange = useCallback(
@@ -438,10 +471,6 @@ export default function DashboardPage() {
       });
     },
     [preferenceMeta.branchOptions, preferenceMeta.requestedBranchShopId, replacePreferenceParams]
-  );
-
-  const activeBranch = preferenceMeta.branchOptions.find(
-    (option) => option.shopId === preferenceMeta.activeBranchShopId
   );
 
   const getFallbackMessage = useCallback(
@@ -566,8 +595,10 @@ export default function DashboardPage() {
               </span>
               <select
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
-                value={preferenceMeta.requestedBranchShopId?.toString() ?? ''}
-                onChange={(event) => handleBranchChange(event.target.value)}
+                value={branchSelectValue}
+                onChange={(event: ChangeEvent<HTMLSelectElement>) =>
+                  handleBranchChange(event.target.value)
+                }
                 disabled={isLoading || preferenceMeta.branchOptions.length === 0}
               >
                 <option value="">{t('preference.autoOption')}</option>
@@ -585,8 +616,10 @@ export default function DashboardPage() {
               </span>
               <select
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
-                value={preferenceMeta.requestedCluster ?? ''}
-                onChange={(event) => handleClusterChange(event.target.value)}
+                value={clusterSelectValue}
+                onChange={(event: ChangeEvent<HTMLSelectElement>) =>
+                  handleClusterChange(event.target.value)
+                }
                 disabled={isLoading || preferenceMeta.clusterOptions.length === 0}
               >
                 <option value="">{t('preference.autoOption')}</option>
@@ -596,6 +629,11 @@ export default function DashboardPage() {
                   </option>
                 ))}
               </select>
+              {selectedBranchOption !== undefined && (
+                <p className="text-xs text-muted-foreground">
+                  {t('preference.branchPriorityHint')}
+                </p>
+              )}
             </label>
           </div>
 
