@@ -186,11 +186,31 @@ export interface QueueGroups {
   unavailable: QueueItem[];
 }
 
+export const QUEUE_SNAPSHOT_STATUS = {
+  SUCCESS: 'success',
+  PARTIAL: 'partial',
+  UNAVAILABLE: 'unavailable',
+} as const;
+
+export type QueueSnapshotStatus =
+  (typeof QUEUE_SNAPSHOT_STATUS)[keyof typeof QUEUE_SNAPSHOT_STATUS];
+
+export interface QueueSnapshotMeta {
+  totalStores: number;
+  successfulQueueFetches: number;
+  failedQueueFetches: number;
+}
+
 export interface QueueApiResponse {
+  status: QueueSnapshotStatus;
   updatedAt: string;
   data: QueueItem[];
   recommended: QueueItem[];
   groups: QueueGroups;
+  warnings: string[];
+  partialData: boolean;
+  errorCode?: string;
+  meta: QueueSnapshotMeta;
 }
 
 // Dashboard specific types

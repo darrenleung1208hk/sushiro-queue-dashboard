@@ -2,18 +2,18 @@
   "common": {
     "loading": "載入中...",
     "error": "錯誤",
-    "retry": "重試",
+    "retry": "再試一次",
     "close": "關閉",
     "save": "儲存",
     "cancel": "取消",
     "refresh": "重新整理",
     "pause": "暫停",
     "resume": "繼續",
-    "connected": "已連接",
-    "refreshing": "重新整理中...",
-    "refreshStarted": "正在更新資料...",
-    "refreshComplete": "資料更新成功",
-    "last": "更新",
+    "connected": "已連線",
+    "refreshing": "更新中...",
+    "refreshStarted": "開始更新資料...",
+    "refreshComplete": "資料已成功更新",
+    "last": "最後更新",
     "open": "營業中",
     "languages": {
       "en": "English",
@@ -46,49 +46,49 @@
     }
   },
   "dashboard": {
-    "title": "壽司郎排隊儀表板",
-    "subtitle": "即時監察分店排隊與等候情況",
+    "title": "分店排隊儀表板",
+    "subtitle": "即時查看各分店排隊及輪候狀況",
     "stats": {
       "totalStores": "分店總數",
-      "totalWaiting": "總等候組數",
-      "currentQueue": "目前叫號",
+      "totalWaiting": "輪候總數",
+      "currentQueue": "目前隊列",
       "filteredResults": "篩選結果",
       "openStores": "營業中",
-      "acrossAllStores": "所有分店",
-      "activeTickets": "目前進行號碼",
-      "showing": "顯示"
+      "acrossAllStores": "所有分店合計",
+      "activeTickets": "有效票號",
+      "showing": "顯示中"
     },
     "filters": {
-      "searchPlaceholder": "按分店、地區或區域搜尋...",
+      "searchPlaceholder": "按分店名、地區或區域搜尋...",
       "allRegions": "所有地區",
-      "allWaitTimes": "所有等候時段",
-      "lowWait": "低等候",
-      "mediumWait": "中等候",
-      "highWait": "高等候",
-      "extremeWait": "極高等候"
+      "allWaitTimes": "所有輪候時間",
+      "lowWait": "短輪候",
+      "mediumWait": "中輪候",
+      "highWait": "長輪候",
+      "extremeWait": "極長輪候"
     },
     "viewMode": {
       "grid": "網格",
       "showingStores": "顯示 {count} 間分店",
-      "inViewMode": "目前為 {mode} 檢視"
+      "inViewMode": "以 {mode} 檢視"
     },
     "noResults": {
       "title": "找不到分店",
-      "message": "請調整搜尋或篩選條件"
+      "message": "試下調整搜尋或篩選條件"
     }
   },
   "store": {
     "status": {
       "open": "營業中",
-      "closed": "已休息",
-      "disconnected": "連線中斷"
+      "closed": "已關閉",
+      "disconnected": "未連線"
     },
-    "waiting": "等候",
+    "waiting": "輪候",
     "current": "目前",
     "queue": "隊列",
     "currentQueue": "目前隊列",
-    "moreTickets": "另有 {count} 個",
-    "noTickets": "暫無號碼"
+    "moreTickets": "另有 {count} 張票",
+    "noTickets": "沒有票號"
   },
   "navigation": {
     "home": "首頁",
@@ -98,17 +98,17 @@
     "general": "發生錯誤",
     "notFound": "找不到頁面",
     "networkError": "網絡錯誤",
-    "failedToLoadData": "資料載入失敗",
-    "unableToFetchStores": "暫時無法從伺服器取得分店資料。",
-    "unableToLoadData": "無法載入資料",
+    "failedToLoadData": "載入資料失敗",
+    "unableToFetchStores": "未能從伺服器取得分店資料。",
+    "unableToLoadData": "未能載入資料",
     "apiRequestFailed": "API 請求失敗",
     "unknownError": "發生未知錯誤"
   },
   "ui": {
     "grid": "網格",
     "table": "表格",
-    "switchToView": "切換至 {view} 檢視",
-    "viewModeSelector": "檢視模式選擇器"
+    "switchToView": "切換到 {view} 檢視",
+    "viewModeSelector": "檢視模式選擇"
   },
   "table": {
     "store": "分店",
@@ -119,35 +119,40 @@
     "toggleColumns": "切換欄位"
   },
   "dashboardQueue": {
-    "title": "壽司郎排隊儀表板",
-    "subtitle": "快速查看所有分店，優先選擇最短隊列。",
-    "availableNow": "最快入座",
-    "availableNowHint": "先看即刻有位的分店，再比較最短等候時間。",
-    "bestOptions": "最佳選擇",
-    "bestOptionsHint": "目前沒有即刻入座選項，以下是已知等候時間最短的分店。",
-    "moreAvailableHint": "下面還有 {count} 間即刻有位",
+    "title": "壽司郎排隊睇板",
+    "subtitle": "一次過睇晒各分店排隊情況，快手搵到較短嘅隊。",
+    "availableNow": "即刻可入座",
+    "availableNowHint": "先睇而家可以即刻入座嘅分店，再比較其餘較短輪候時間。",
+    "bestOptions": "較佳選擇",
+    "bestOptionsHint": "而家未有即刻可入座分店，以下係目前已知輪候時間較短嘅選擇。",
+    "moreAvailableHint": "下面仲有 {count} 間即刻可入座",
     "updatedAtLabel": "更新時間",
     "refresh": "重新整理",
     "retry": "再試一次",
     "loading": "載入中...",
-    "empty": "目前沒有可用排隊資料。",
-    "noRecommendedStores": "目前所有分店不是已休息，就是暫時未能提供排隊資料。",
-    "error": "無法載入排隊資料。",
+    "empty": "而家暫時未有可用排隊資料。",
+    "noRecommendedStores": "而家所有分店不是休業中，就是暫時未能提供排隊資料。",
+    "error": "未能載入排隊資料。",
+    "partialDataTitle": "排隊資料部分可用",
+    "partialDataMessage": "而家仍然會顯示 live queue 結果，但有 {count} 間分店暫時未拎到排隊資料。",
+    "recommendationsPartialHint": "目前推薦只根據而家拎到嘅 live queue data 計算。",
+    "unavailableTitle": "暫時無法載入 live queue 資料",
+    "unavailableHint": "而家未能載入分店資料或者排隊資料，過一陣再 refresh 試下。",
     "refreshing": "更新中",
-    "retryHint": "請重新整理以取得最新排隊狀況。",
+    "retryHint": "試下重新整理，載入最新排隊畫面。",
     "liveMonitor": "即時排隊監察",
-    "availableGroup": "即刻有位",
-    "lowGroup": "較少人",
+    "availableGroup": "可即時入座",
+    "lowGroup": "較短輪候",
     "busyGroup": "繁忙",
     "otherGroup": "其他",
-    "unavailableGroup": "暫未提供",
-    "availableNowStatus": "即刻有位",
-    "closedStatus": "已休息",
+    "unavailableGroup": "資料未齊",
+    "availableNowStatus": "即刻可入座",
+    "closedStatus": "休業中",
     "maintenanceStatus": "維護中",
-    "lowStatus": "較少人",
+    "lowStatus": "較短輪候",
     "busyStatus": "繁忙",
-    "queueUnavailableStatus": "暫未提供排隊資料",
-    "invalid": "暫未提供",
-    "emptyGroup": "暫時沒有分店。"
+    "queueUnavailableStatus": "排隊資料未齊",
+    "invalid": "未能提供",
+    "emptyGroup": "呢個分組暫時冇分店。"
   }
 }
