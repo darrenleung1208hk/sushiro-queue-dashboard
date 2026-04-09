@@ -54,6 +54,13 @@ npm run dev
 
 The dashboard consumes `GET /api/queues`.
 
+Public request interface:
+
+- `preferredBranch=<shopId>`: optional positive integer branch preference
+- `preferredCluster=<clusterId>`: optional cluster preference using a valid `RecommendationCluster` value
+- If both are present, the backend resolves precedence as `preferredBranch > preferredCluster > auto`
+- Invalid query-param values are ignored during parsing; the backend still returns explicit resolved `preferences` metadata so the frontend does not guess
+
 The route always returns the same JSON shape:
 
 ```ts
@@ -63,7 +70,7 @@ interface QueueApiResponse {
   status: QueueSnapshotStatus;
   updatedAt: string;
   data: QueueItem[];
-  recommended: QueueItem[];
+  recommended: RecommendedQueueItem[];
   groups: QueueGroups;
   warnings: string[];
   partialData: boolean;
@@ -73,8 +80,32 @@ interface QueueApiResponse {
     successfulQueueFetches: number;
     failedQueueFetches: number;
   };
+  preferences: {
+    requestedBranchShopId?: number;
+    requestedCluster?: RecommendationCluster;
+    activeMode: 'branch' | 'cluster' | 'auto';
+    activeBranchShopId?: number;
+    activeCluster?: RecommendationCluster;
+    fallbackReasonCode?:
+      | 'PREFERRED_BRANCH_NOT_FOUND'
+      | 'PREFERRED_BRANCH_INELIGIBLE'
+      | 'PREFERRED_CLUSTER_UNAVAILABLE';
+    branchOptions: Array<{
+      shopId: number;
+      name: string;
+      cluster: RecommendationCluster;
+    }>;
+    clusterOptions: RecommendationCluster[];
+  };
 }
 ```
+
+`preferences` is part of the public response contract. Treat it as the backend-owned source of truth for:
+
+- which preference inputs were accepted from the URL
+- which recommendation mode is actually active
+- whether the backend fell back from branch to cluster or auto
+- which selector options the frontend should render
 
 Status semantics:
 
@@ -101,12 +132,15 @@ HTTP semantics:
 Recommendations currently:
 
 - include only `IMMEDIATE` and `WAITING` queue items
+- resolve preference precedence backend-side as `preferred branch > preferred cluster > auto`
+- fall back from an invalid or ineligible branch to cluster when possible
+- fall back from an unavailable cluster to auto
 - prefer the best branch inside the anchor cluster
 - fall back to adjacent clusters
 - then fall back to the remaining eligible global pool
 - cap the list at 3 branches
 
-This keeps the recommendations deterministic and testable without needing persistence or personalization.
+This keeps the recommendations deterministic and testable without needing persistence or personalization. The frontend should only sync URL params and render the resolved `preferences` metadata returned by the API.
 
 ## Project Structure
 

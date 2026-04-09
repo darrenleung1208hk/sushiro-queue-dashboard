@@ -58,6 +58,24 @@ describe('recommendation preferences', () => {
     });
   });
 
+  it('ignores missing or invalid query-param values during parsing', () => {
+    const invalidBranchParams = new URLSearchParams(
+      'preferredBranch=abc&preferredCluster=NOT_A_CLUSTER'
+    );
+    const missingBranchParams = new URLSearchParams(
+      'preferredCluster=EAST_KOWLOON'
+    );
+
+    expect(parseRecommendationPreference(invalidBranchParams)).toEqual({
+      preferredBranchShopId: undefined,
+      preferredCluster: undefined,
+    });
+    expect(parseRecommendationPreference(missingBranchParams)).toEqual({
+      preferredBranchShopId: undefined,
+      preferredCluster: RECOMMENDATION_CLUSTERS.EAST_KOWLOON,
+    });
+  });
+
   it('activates branch mode when the preferred branch is eligible', () => {
     const preference = resolveRecommendationPreference(
       {
@@ -76,7 +94,7 @@ describe('recommendation preferences', () => {
     expect(preference.activeCluster).toBe(RECOMMENDATION_CLUSTERS.WEST_KOWLOON);
   });
 
-  it('falls back from invalid branch to cluster mode when a valid cluster exists', () => {
+  it('falls back from an ineligible preferred branch to cluster mode when a valid cluster exists', () => {
     const preference = resolveRecommendationPreference(
       {
         preferredBranchShopId: 1,
@@ -93,6 +111,26 @@ describe('recommendation preferences', () => {
     expect(preference.activeCluster).toBe(RECOMMENDATION_CLUSTERS.EAST_KOWLOON);
     expect(preference.fallbackReasonCode).toBe(
       RECOMMENDATION_FALLBACK_REASON_CODES.PREFERRED_BRANCH_INELIGIBLE
+    );
+  });
+
+  it('falls back from a missing preferred branch to cluster mode when a valid cluster exists', () => {
+    const preference = resolveRecommendationPreference(
+      {
+        preferredBranchShopId: 99,
+        preferredCluster: RECOMMENDATION_CLUSTERS.EAST_KOWLOON,
+      },
+      [createQueueItem(2)],
+      createStoreMap([createStore(2, RECOMMENDATION_CLUSTERS.EAST_KOWLOON)])
+    );
+
+    expect(preference.requestedBranchShopId).toBe(99);
+    expect(preference.requestedCluster).toBe(RECOMMENDATION_CLUSTERS.EAST_KOWLOON);
+    expect(preference.activeMode).toBe(RECOMMENDATION_MODES.CLUSTER);
+    expect(preference.activeCluster).toBe(RECOMMENDATION_CLUSTERS.EAST_KOWLOON);
+    expect(preference.activeBranchShopId).toBeUndefined();
+    expect(preference.fallbackReasonCode).toBe(
+      RECOMMENDATION_FALLBACK_REASON_CODES.PREFERRED_BRANCH_NOT_FOUND
     );
   });
 
@@ -113,5 +151,42 @@ describe('recommendation preferences', () => {
     expect(preference.fallbackReasonCode).toBe(
       RECOMMENDATION_FALLBACK_REASON_CODES.PREFERRED_BRANCH_INELIGIBLE
     );
+  });
+
+  it('falls back from an unavailable cluster to auto mode when no eligible cluster candidates exist', () => {
+    const preference = resolveRecommendationPreference(
+      {
+        preferredCluster: RECOMMENDATION_CLUSTERS.EAST_KOWLOON,
+      },
+      [createQueueItem(2, 'UNAVAILABLE')],
+      createStoreMap([createStore(2, RECOMMENDATION_CLUSTERS.EAST_KOWLOON)])
+    );
+
+    expect(preference.activeMode).toBe(RECOMMENDATION_MODES.AUTO);
+    expect(preference.activeCluster).toBeUndefined();
+    expect(preference.fallbackReasonCode).toBe(
+      RECOMMENDATION_FALLBACK_REASON_CODES.PREFERRED_CLUSTER_UNAVAILABLE
+    );
+  });
+
+  it('keeps backend resolution authoritative when branch and cluster URL inputs conflict', () => {
+    const preference = resolveRecommendationPreference(
+      {
+        preferredBranchShopId: 1,
+        preferredCluster: RECOMMENDATION_CLUSTERS.EAST_KOWLOON,
+      },
+      [createQueueItem(1), createQueueItem(2)],
+      createStoreMap([
+        createStore(1, RECOMMENDATION_CLUSTERS.WEST_KOWLOON),
+        createStore(2, RECOMMENDATION_CLUSTERS.EAST_KOWLOON),
+      ])
+    );
+
+    expect(preference.requestedBranchShopId).toBe(1);
+    expect(preference.requestedCluster).toBe(RECOMMENDATION_CLUSTERS.EAST_KOWLOON);
+    expect(preference.activeMode).toBe(RECOMMENDATION_MODES.BRANCH);
+    expect(preference.activeBranchShopId).toBe(1);
+    expect(preference.activeCluster).toBe(RECOMMENDATION_CLUSTERS.WEST_KOWLOON);
+    expect(preference.fallbackReasonCode).toBeUndefined();
   });
 });

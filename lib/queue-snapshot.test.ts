@@ -7,6 +7,7 @@ import {
 } from '@/lib/queue-snapshot';
 import {
   RECOMMENDATION_CLUSTERS,
+  RECOMMENDATION_FALLBACK_REASON_CODES,
   RECOMMENDATION_MODES,
   RECOMMENDATION_REASON_CODES,
   Store,
@@ -115,6 +116,101 @@ describe('queue snapshot builder', () => {
 
     expect(snapshot.preferences.activeMode).toBe(RECOMMENDATION_MODES.BRANCH);
     expect(snapshot.preferences.activeBranchShopId).toBe(1);
+    expect(snapshot.recommended[0].shopId).toBe(1);
+    expect(snapshot.recommended[0].reasonCodes).toContain(
+      RECOMMENDATION_REASON_CODES.PREFERRED_BRANCH
+    );
+  });
+
+  it('returns explicit response preference metadata when branch input falls back to cluster', () => {
+    const snapshot = buildQueueSnapshot(
+      createLiveStoresResult({
+        stores: [
+          createStore(1, Number.NaN),
+          {
+            ...createStore(2, 1),
+            recommendationCluster: RECOMMENDATION_CLUSTERS.EAST_KOWLOON,
+          },
+        ],
+        totalStores: 2,
+        successfulQueueFetches: 1,
+        failedQueueFetches: 1,
+      }),
+      {
+        preferredBranchShopId: 1,
+        preferredCluster: RECOMMENDATION_CLUSTERS.EAST_KOWLOON,
+      }
+    );
+
+    expect(snapshot.preferences.requestedBranchShopId).toBe(1);
+    expect(snapshot.preferences.requestedCluster).toBe(
+      RECOMMENDATION_CLUSTERS.EAST_KOWLOON
+    );
+    expect(snapshot.preferences.activeMode).toBe(RECOMMENDATION_MODES.CLUSTER);
+    expect(snapshot.preferences.activeBranchShopId).toBeUndefined();
+    expect(snapshot.preferences.activeCluster).toBe(
+      RECOMMENDATION_CLUSTERS.EAST_KOWLOON
+    );
+    expect(snapshot.preferences.fallbackReasonCode).toBe(
+      RECOMMENDATION_FALLBACK_REASON_CODES.PREFERRED_BRANCH_INELIGIBLE
+    );
+  });
+
+  it('falls back to auto in response metadata when the requested cluster has no eligible branches', () => {
+    const snapshot = buildQueueSnapshot(
+      createLiveStoresResult({
+        stores: [
+          {
+            ...createStore(1, Number.NaN),
+            recommendationCluster: RECOMMENDATION_CLUSTERS.EAST_KOWLOON,
+          },
+          createStore(2, 1),
+        ],
+        totalStores: 2,
+        successfulQueueFetches: 1,
+        failedQueueFetches: 1,
+      }),
+      {
+        preferredCluster: RECOMMENDATION_CLUSTERS.EAST_KOWLOON,
+      }
+    );
+
+    expect(snapshot.preferences.requestedCluster).toBe(
+      RECOMMENDATION_CLUSTERS.EAST_KOWLOON
+    );
+    expect(snapshot.preferences.activeMode).toBe(RECOMMENDATION_MODES.AUTO);
+    expect(snapshot.preferences.activeCluster).toBe(RECOMMENDATION_CLUSTERS.WEST_KOWLOON);
+    expect(snapshot.preferences.fallbackReasonCode).toBe(
+      RECOMMENDATION_FALLBACK_REASON_CODES.PREFERRED_CLUSTER_UNAVAILABLE
+    );
+  });
+
+  it('keeps backend preference resolution authoritative when URL inputs conflict', () => {
+    const snapshot = buildQueueSnapshot(
+      createLiveStoresResult({
+        stores: [
+          createStore(1, 1),
+          {
+            ...createStore(2, 0),
+            recommendationCluster: RECOMMENDATION_CLUSTERS.EAST_KOWLOON,
+          },
+        ],
+        totalStores: 2,
+        successfulQueueFetches: 2,
+      }),
+      {
+        preferredBranchShopId: 1,
+        preferredCluster: RECOMMENDATION_CLUSTERS.EAST_KOWLOON,
+      }
+    );
+
+    expect(snapshot.preferences.requestedBranchShopId).toBe(1);
+    expect(snapshot.preferences.requestedCluster).toBe(
+      RECOMMENDATION_CLUSTERS.EAST_KOWLOON
+    );
+    expect(snapshot.preferences.activeMode).toBe(RECOMMENDATION_MODES.BRANCH);
+    expect(snapshot.preferences.activeBranchShopId).toBe(1);
+    expect(snapshot.preferences.activeCluster).toBe(RECOMMENDATION_CLUSTERS.WEST_KOWLOON);
     expect(snapshot.recommended[0].shopId).toBe(1);
     expect(snapshot.recommended[0].reasonCodes).toContain(
       RECOMMENDATION_REASON_CODES.PREFERRED_BRANCH
