@@ -17,7 +17,7 @@
     "open": "Open",
     "languages": {
       "en": "English",
-      "zh-HK": "繁體中文"
+      "zh-HK": "Traditional Chinese"
     },
     "regions": {
       "香港島": "Hong Kong Island",
@@ -41,13 +41,12 @@
       "北區": "North District",
       "大埔區": "Tai Po District",
       "沙田區": "Sha Tin District",
-      "西貢區": "Sai Kung District",
-      "離島區": "Islands District"
+      "西貢區": "Sai Kung District"
     }
   },
   "dashboard": {
     "title": "Store Queue Dashboard",
-    "subtitle": "Monitor store queues and wait times in real-time",
+    "subtitle": "Monitor store queues and wait times in real time",
     "stats": {
       "totalStores": "Total Stores",
       "totalWaiting": "Total Waiting",
@@ -98,7 +97,7 @@
     "general": "Something went wrong",
     "notFound": "Page not found",
     "networkError": "Network error occurred",
-    "failedToLoadData": "Failed to Load Data",
+    "failedToLoadData": "Failed to load data",
     "unableToFetchStores": "Unable to fetch store information from the server.",
     "unableToLoadData": "Unable to load data",
     "apiRequestFailed": "API request failed",
@@ -120,22 +119,22 @@
   },
   "dashboardQueue": {
     "title": "Sushiro Queue Dashboard",
-    "subtitle": "Scan all branches and spot the shortest queue first.",
+    "subtitle": "Set your preferred branch or area, then compare the best live queue options.",
     "availableNow": "Fastest Seating",
-    "availableNowHint": "Start with branches that can seat you immediately, then compare the shortest waits.",
+    "availableNowHint": "These branches can seat you right away, with nearby alternatives kept in view.",
     "bestOptions": "Best Options",
-    "bestOptionsHint": "Immediate seating is unavailable right now, so these are the shortest known waits.",
+    "bestOptionsHint": "Immediate seating is not available right now, so these are the strongest live queue options.",
     "moreAvailableHint": "+{count} more available below",
     "updatedAtLabel": "Updated",
     "refresh": "Refresh",
     "retry": "Retry",
     "loading": "Loading...",
     "empty": "No queue data is available right now.",
-    "noRecommendedStores": "All branches are currently closed or queue information is unavailable.",
+    "noRecommendedStores": "All branches are currently closed or live queue information is unavailable.",
     "error": "Unable to load queue data.",
     "partialDataTitle": "Queue data is partially available",
     "partialDataMessage": "Showing live queue results with {count} branches currently missing queue information.",
-    "recommendationsPartialHint": "Recommendations are based on the live queue data that is available right now.",
+    "recommendationsPartialHint": "Recommendations are based on the live queue data that is currently available.",
     "unavailableTitle": "Live queue data unavailable",
     "unavailableHint": "Store metadata or queue data could not be loaded right now. Try refreshing again shortly.",
     "refreshing": "Refreshing",
@@ -153,6 +152,45 @@
     "busyStatus": "Busy",
     "queueUnavailableStatus": "Queue unavailable",
     "invalid": "Unavailable",
-    "emptyGroup": "No branches in this group."
+    "emptyGroup": "No branches in this group.",
+    "preference": {
+      "title": "Recommendation preference",
+      "subtitle": "Pick a branch or area and we will anchor the recommendation there before widening out.",
+      "branchLabel": "Preferred branch",
+      "clusterLabel": "Preferred area",
+      "autoOption": "Best available",
+      "branchPriorityHint": "A preferred branch takes priority. Changing the area clears the branch preference.",
+      "activeMode": {
+        "branch": "Using your preferred branch: {name}",
+        "cluster": "Using your selected area: {cluster}",
+        "auto": "Using automatic recommendations"
+      },
+      "fallbackMessages": {
+        "PREFERRED_BRANCH_NOT_FOUND": "The selected branch is no longer available, so we widened the scope.",
+        "PREFERRED_BRANCH_INELIGIBLE": "The selected branch is not recommendable right now, so nearby alternatives are shown instead.",
+        "PREFERRED_CLUSTER_UNAVAILABLE": "The selected area has no recommendable branches right now, so we widened the scope."
+      },
+      "reasonLabels": {
+        "PREFERRED_BRANCH": "your preferred branch",
+        "SAME_CLUSTER_AS_PREFERRED_BRANCH": "same area as your preferred branch",
+        "IN_SELECTED_CLUSTER": "in your selected area",
+        "NEARBY_FALLBACK": "nearby fallback",
+        "BEST_FALLBACK": "best fallback",
+        "OPEN_NOW": "open now",
+        "SHORT_WAIT": "short wait"
+      },
+      "clusterLabels": {
+        "HK_ISLAND_WEST": "Hong Kong Island West",
+        "HK_ISLAND_EAST": "Hong Kong Island East",
+        "WEST_KOWLOON": "West Kowloon",
+        "EAST_KOWLOON": "East Kowloon",
+        "TSEUNG_KWAN_O": "Tseung Kwan O",
+        "SHA_TIN_BELT": "Sha Tin Belt",
+        "NORTH_NT": "North New Territories",
+        "TSUEN_KWAN_WEST": "Tsuen Wan / Kwai Tsing",
+        "FAR_WEST_NT": "Tuen Mun / Yuen Long",
+        "UNKNOWN": "Unknown"
+      }
+    }
   }
 }

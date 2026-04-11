@@ -1,11 +1,16 @@
 import type { LiveStoresResult } from '@/lib/live-stores';
 import { buildQueueItem, compareQueueItems } from '@/lib/queue-items';
+import {
+  parseRecommendationPreference,
+  resolveRecommendationPreference,
+} from '@/lib/recommendation-preferences';
 import { buildRecommendedQueues } from '@/lib/queue-recommendations';
 import { buildQueueGroups, createEmptyQueueGroups } from '@/lib/queue-response';
 import {
   QUEUE_SNAPSHOT_STATUS,
   QueueApiResponse,
   QueueSnapshotStatus,
+  RecommendationPreferenceInput,
 } from '@/lib/types';
 
 function getQueueSnapshotStatus(
@@ -24,7 +29,8 @@ function getQueueSnapshotStatus(
 
 export function buildUnavailableQueueSnapshot(
   updatedAt: Date,
-  errorCode = 'STORE_DATA_UNAVAILABLE'
+  errorCode = 'STORE_DATA_UNAVAILABLE',
+  preferenceInput: RecommendationPreferenceInput = {}
 ): QueueApiResponse {
   return {
     status: QUEUE_SNAPSHOT_STATUS.UNAVAILABLE,
@@ -40,16 +46,24 @@ export function buildUnavailableQueueSnapshot(
       successfulQueueFetches: 0,
       failedQueueFetches: 0,
     },
+    preferences: {
+      requestedBranchShopId: preferenceInput.preferredBranchShopId,
+      requestedCluster: preferenceInput.preferredCluster,
+      activeMode: 'auto',
+      branchOptions: [],
+      clusterOptions: [],
+    },
   };
 }
 
 export function buildQueueSnapshot(
-  liveStores: LiveStoresResult
+  liveStores: LiveStoresResult,
+  preferenceInput: RecommendationPreferenceInput = {}
 ): QueueApiResponse {
   const status = getQueueSnapshotStatus(liveStores);
 
   if (status === QUEUE_SNAPSHOT_STATUS.UNAVAILABLE) {
-    return buildUnavailableQueueSnapshot(liveStores.timestamp);
+    return buildUnavailableQueueSnapshot(liveStores.timestamp, 'STORE_DATA_UNAVAILABLE', preferenceInput);
   }
 
   const storesByShopId = new Map(
@@ -65,7 +79,16 @@ export function buildQueueSnapshot(
       )
     )
     .sort(compareQueueItems);
-  const recommended = buildRecommendedQueues(data, storesByShopId);
+  const preference = resolveRecommendationPreference(
+    preferenceInput,
+    data,
+    storesByShopId
+  );
+  const recommendationResult = buildRecommendedQueues(
+    data,
+    storesByShopId,
+    preference
+  );
   const groups = buildQueueGroups(data);
   const warnings =
     status === QUEUE_SNAPSHOT_STATUS.PARTIAL
@@ -80,7 +103,7 @@ export function buildQueueSnapshot(
     status,
     updatedAt: liveStores.timestamp.toISOString(),
     data,
-    recommended,
+    recommended: recommendationResult.items,
     groups,
     warnings,
     partialData: status === QUEUE_SNAPSHOT_STATUS.PARTIAL,
@@ -95,5 +118,12 @@ export function buildQueueSnapshot(
       successfulQueueFetches: liveStores.successfulQueueFetches,
       failedQueueFetches: liveStores.failedQueueFetches,
     },
+    preferences: {
+      ...preference,
+      activeCluster:
+        preference.activeCluster ?? recommendationResult.activeCluster,
+    },
   };
 }
+
+export { parseRecommendationPreference };

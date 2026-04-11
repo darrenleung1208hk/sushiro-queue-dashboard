@@ -26,12 +26,19 @@ Browser
 
 `GET /api/queues` is the primary app contract. Keep it stable.
 
+Public request interface:
+
+- `preferredBranch=<shopId>` accepts an optional positive integer branch id
+- `preferredCluster=<clusterId>` accepts an optional `RecommendationCluster`
+- Query params are the source of truth for recommendation preference input
+- Backend resolution is authoritative: route parsing and snapshot building decide whether the active mode is `branch`, `cluster`, or `auto`
+
 ```ts
 interface QueueApiResponse {
   status: 'success' | 'partial' | 'unavailable';
   updatedAt: string;
   data: QueueItem[];
-  recommended: QueueItem[];
+  recommended: RecommendedQueueItem[];
   groups: QueueGroups;
   warnings: string[];
   partialData: boolean;
@@ -40,6 +47,19 @@ interface QueueApiResponse {
     totalStores: number;
     successfulQueueFetches: number;
     failedQueueFetches: number;
+  };
+  preferences: {
+    requestedBranchShopId?: number;
+    requestedCluster?: RecommendationCluster;
+    activeMode: 'branch' | 'cluster' | 'auto';
+    activeBranchShopId?: number;
+    activeCluster?: RecommendationCluster;
+    fallbackReasonCode?:
+      | 'PREFERRED_BRANCH_NOT_FOUND'
+      | 'PREFERRED_BRANCH_INELIGIBLE'
+      | 'PREFERRED_CLUSTER_UNAVAILABLE';
+    branchOptions: RecommendationBranchOption[];
+    clusterOptions: RecommendationCluster[];
   };
 }
 ```
@@ -51,13 +71,18 @@ Rules:
 - Use `partial` when branch metadata exists but some queue requests fail.
 - Use `unavailable` only when the route cannot produce a usable branch snapshot.
 - Keep route handlers thin and push deterministic logic into `lib/`.
+- Do not make the frontend infer active preference mode from raw query params. Use `response.preferences` as the public backend decision.
 
 ## Recommendation Rules
 
 - Recommendation ranking lives in `lib/queue-recommendations.ts`.
+- Preference parsing and fallback resolution live in `lib/recommendation-preferences.ts`.
 - Queue normalization lives in `lib/queue-items.ts`.
 - Cluster mapping lives in `lib/recommendation-clusters.ts`.
 - Recommendations may render in `partial` mode because ranking uses the normalized branch snapshot, not queue-fetch success alone.
+- Supported precedence is `preferred branch > preferred cluster > auto`.
+- If a preferred branch is invalid or ineligible, fall back to cluster when possible; otherwise fall back to auto.
+- If a preferred cluster has no eligible candidates, fall back to auto and surface that via `preferences.fallbackReasonCode`.
 - If recommendation behavior changes, update tests and docs in the same change.
 
 ## Internationalization
